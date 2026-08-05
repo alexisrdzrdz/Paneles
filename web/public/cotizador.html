@@ -348,7 +348,11 @@ const state = {
   zip:'',
   room:{ name:'Baño 1', back:'concrete', showWall:true, height:58, floorGap:12, mount:'standard',
          stalls:Array.from({length:5},()=>defaultStall('stall')),
-         splitAuto:true, ada:false, layout:'inline' }
+         splitAuto:true, ada:false, layout:'inline',
+         /* Riel superior: 'none' | 'flush' (al ras, corona las pilastras)
+            | 'total' (corrido al frente). Antes se dibujaba siempre, aunque
+            nadie lo pidiera, y quedaba flotando sin sujetar nada. */
+         headrail:'none' }
 };
 const isUrinalUnit = u => u.kind==='urinal';
 function countKind(k){ return state.room.stalls.filter(u=>u.kind===k).length; }
@@ -965,7 +969,7 @@ function build3D(reframe){
     if(r===live[0]) addHeightDim(g, top, gap, r.depth);
     // herrajes de estructura: zapatas al piso donde hay panel completo + riel superior
     bs.forEach(b=>{ if(b.tall) addShoe(g, b.a, b.depth); });
-    if(hasStall) addHeadrail(g, r.length, top, r.depth);
+    if(hasStall && state.room.headrail!=='none') addHeadrail(g, r, top, state.room.headrail);
     r.stalls.forEach(st=>{
       if(selHas(st.gi)){
         const hl=new THREE.Mesh(new THREE.PlaneGeometry((st.aEnd-st.aStart)*S, st.depth*S),
@@ -1095,10 +1099,29 @@ function addShoe(g,a,depth){
   const shoe=new THREE.Mesh(new THREE.BoxGeometry(PL*S+.5*S,4*S,depth*S+.5*S),m);
   shoe.position.set(a*S,2*S,depth*S/2); shoe.castShadow=true; shoe.receiveShadow=true; g.add(shoe);
 }
-function addHeadrail(g,length,top,depth){
+/* Riel superior. Va APOYADO sobre el canto de las pilastras, no incrustado a
+   media altura, y solo abarca de la primera a la última: así se ve que une
+   algo en vez de flotar. 'total' lo corre por todo el frente de la hilera. */
+function addHeadrail(g, r, top, kind){
   const m=getChrome();
-  const rail=new THREE.Mesh(new THREE.BoxGeometry(length*S,1.5*S,1.5*S),m);
-  rail.position.set(length*S/2, top-.2*S, depth*S); rail.castShadow=true; g.add(rail);
+  const tall=runBoundaries(r).filter(b=>b.tall);
+  if(tall.length<2) return;                        // sin dos apoyos no hay riel
+  const a0 = kind==='total' ? 0 : tall[0].a;
+  const a1 = kind==='total' ? r.length : tall[tall.length-1].a;
+  const len = a1-a0;
+  if(len<=0) return;
+  const depth = Math.max(...tall.map(b=>b.depth));
+  if(kind==='flush'){
+    // Al ras: corona el canto superior con el mismo fondo que la pilastra.
+    const cap=new THREE.Mesh(new THREE.BoxGeometry(len*S, 1.2*S, depth*S), m);
+    cap.position.set((a0+len/2)*S, top+0.6*S, depth*S/2);
+    cap.castShadow=true; cap.receiveShadow=true; g.add(cap);
+  } else {
+    // Corrido: tubo al frente, apoyado sobre el canto.
+    const rail=new THREE.Mesh(new THREE.BoxGeometry(len*S, 1.5*S, 1.5*S), m);
+    rail.position.set((a0+len/2)*S, top+0.75*S, depth*S);
+    rail.castShadow=true; rail.receiveShadow=true; g.add(rail);
+  }
 }
 function addNum(g,x,y,n,sel){
   const cv=document.createElement('canvas'); cv.width=cv.height=128; const c=cv.getContext('2d');
@@ -1389,7 +1412,15 @@ function renderStep(){
       ${countKind('stall') ? `<div class="ui-label" style="margin-top:var(--space-3)">Altura del montaje</div>
       <div class="ui-segmented" id="mountSeg" style="display:flex">
         ${[['standard','Estándar'],['tall','Alto'],['fullheight','Piso a techo']].map(m=>`<button class="ui-seg ${r.mount===m[0]?'is-on':''}" type="button" data-mount="${m[0]}" style="flex:1">${m[1]}</button>`).join('')}
-      </div>` : ''}
+      </div>
+      <div class="ui-label" style="margin-top:var(--space-3)">Riel superior</div>
+      <div class="ui-segmented" id="railSeg" style="display:flex">
+        ${[['none','Sin riel'],['flush','Al ras'],['total','Corrido']].map(m=>`<button class="ui-seg ${r.headrail===m[0]?'is-on':''}" type="button" data-rail="${m[0]}" style="flex:1">${m[1]}</button>`).join('')}
+      </div>
+      <p class="ui-meta" style="margin:6px 0 0">${
+        r.headrail==='none' ? 'Sin travesaño arriba. Las divisiones se sujetan al muro y al piso.'
+        : r.headrail==='flush' ? 'Corona al ras del canto superior, entre la primera y la última pilastra.'
+        : 'Tubo corrido por todo el frente de la hilera.'}</p>` : ''}
       <details class="fine">
         <summary>Ajuste fino (${nFino} medidas)</summary>
         <div class="fine-body">
@@ -1418,6 +1449,9 @@ function renderStep(){
       state.room[sel.dataset.room]=parseFloat(e.target.value); state.room.mount='custom'; framed=false; renderStep(); render();
     }));
     body.querySelectorAll('#mountSeg .ui-seg').forEach(b=> b.addEventListener('click',()=>setMount(b.dataset.mount)));
+    body.querySelectorAll('#railSeg .ui-seg').forEach(b=> b.addEventListener('click',()=>{
+      state.room.headrail=b.dataset.rail; renderStep(); render();
+    }));
     body.querySelectorAll('[data-moveto]').forEach(b=> b.addEventListener('click',()=>{
       materializeSplit(); moveUnitTo(state.selected, +b.dataset.moveto, -1);
       framed=false; refreshStallSelect(); renderStep(); render();

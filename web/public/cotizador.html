@@ -174,6 +174,16 @@
   }
   /* Teléfono: el logotipo con la palabra completa se salía del ancho. Se
      encoge la sigla y se permite que la barra parta en dos líneas. */
+  @media (max-width:640px){
+    /* El pie del asistente se encimaba: la pista de texto y el botón peleaban
+       por la misma línea. Ahora el botón manda y la pista se retira. */
+    .wiz-foot{flex-wrap:wrap;gap:var(--space-2)}
+    .wiz-foot #footHint{display:none}
+    .wiz-foot .ui-btn{flex:1 1 auto}
+    /* Un baño en línea es muy ancho y poco profundo: en un lienzo alto el
+       dibujo queda como una franja rodeada de vacío. Se recorta la altura. */
+    .canvas-wrap{height:clamp(260px,38vh,380px)}
+  }
   @media (max-width:480px){
     .ui-topbar{flex-wrap:wrap;row-gap:6px}
     .ui-wordmark{font-size:1rem;min-width:0}
@@ -203,11 +213,14 @@
   </a>
   <div class="ui-topbar-right">
     <nav class="site-nav" aria-label="Navegación">
-      <a class="ui-link" href="index.html">Inicio</a>
-      <a class="ui-link" href="materiales.html">Materiales</a>
-      <a class="ui-link" href="industrias.html">Industrias</a>
-      <a class="ui-link" href="proyectos.html">Proyectos</a>
-      <a class="ui-link" href="contacto.html">Contacto</a>
+      <a class="ui-link" href="/">Inicio</a>
+      <a class="ui-link" href="/materiales">Materiales</a>
+      <a class="ui-link" href="/industrias">Industrias</a>
+      <a class="ui-link" href="/proyectos">Proyectos</a>
+      <a class="ui-link" href="/contacto">Contacto</a>
+      <!-- El cotizador es estático y no conoce la sesión. Un solo enlace sirve
+           para ambos casos: /portal manda a /entrar si no hay sesión. -->
+      <a class="ui-link" href="/portal">Mi cuenta</a>
     </nav>
     <div class="price-mini">Total estimado <b id="miniTotal">$0</b></div>
     <button class="ui-theme-toggle" type="button" aria-label="Cambiar tema" data-ui-theme>&#9680;</button>
@@ -602,7 +615,11 @@ function draw2D(){
   const {runs,bounds}=computeRuns();
   // La elevación vive en una columna derecha reservada: la planta se dibuja a su izquierda.
   const eb=elevBox(W,H);
-  const mg={t:64, r: eb ? (W-eb.x0)+24 : 60, b:64, l:70};
+  /* Los márgenes se encogen con el lienzo. Fijos en 64/70 px se comían el 57%
+     del ancho en un teléfono y el plano quedaba diminuto en medio del vacío. */
+  const k=Math.min(1, W/700);
+  const mg={ t:24+40*k, b:24+40*k, l:24+46*k,
+             r: eb ? (W-eb.x0)+24 : 20+40*k };
   const s=Math.min((W-mg.l-mg.r)/Math.max(1,bounds.w),(H-mg.t-mg.b)/Math.max(1,bounds.d));
   const ox=mg.l+((W-mg.l-mg.r)-bounds.w*s)/2 - bounds.x0*s;
   const oy=mg.t+((H-mg.t-mg.b)-bounds.d*s)/2 - bounds.y0*s;
@@ -641,9 +658,11 @@ function draw2D(){
   });
 
   if(drag&&drag.moved) drawDropHint(M);
-  // cotas de la cabina seleccionada
+  /* Cotas de la unidad seleccionada. En un lienzo estrecho las píldoras miden
+     más que la cabina y se encaraman sobre el dibujo; ahí se omiten, porque
+     las medidas ya salen en la fila de etiquetas de arriba. */
   const sel=findStall(state.selected);
-  if(sel){ drawDims(sel.run, sel.st, M, s); }
+  if(sel && W>=420){ drawDims(sel.run, sel.st, M, s); }
   drawElevation(eb);
 
   function strokePlan(r, pts, color, w){
@@ -805,12 +824,17 @@ function drawDoor(r,st,M,s){
 function drawDims(r,st,M,s){
   const c=st.cfg;
   const wLabel=(c.stallWidth+(c.stallWidthFrac?({0.25:' 1/4',0.5:' 1/2',0.75:' 3/4'})[c.stallWidthFrac]:''))+'"';
-  dimLine(P(r,st.aStart,st.depth*0.34), P(r,st.aEnd,st.depth*0.34), wLabel);
+  /* Las cotas van FUERA del dibujo, como en un plano de verdad. Antes el ancho
+     se acotaba a un tercio del fondo, es decir encima de la cabina, y las tres
+     píldoras se amontonaban sobre la unidad seleccionada. */
+  dimLine(P(r,st.aStart,-12), P(r,st.aEnd,-12), wLabel);          // ancho: detrás del muro
   const depthLabel = isUrinalUnit(c) ? `Fondo ${c.partitionDepth}"` : `Prof ${c.partitionDepth}"`;
-  dimLine(P(r,st.aStart-PL,0), P(r,st.aStart-PL,st.depth), depthLabel);
+  dimLine(P(r,st.aStart-PL-4,0), P(r,st.aStart-PL-4,st.depth), depthLabel);   // fondo: al costado
   if(!isUrinalUnit(c)){
     const dl=doorLayout(st);
-    dimLine(P(r,dl.doorStart,st.depth+8),P(r,dl.doorEnd,st.depth+8), `${c.doorOpening}"`);
+    /* Por delante del barrido de la hoja, para no cruzarse con el arco. */
+    const fuera = st.depth + Math.sin(50*Math.PI/180)*c.doorOpening + 14;
+    dimLine(P(r,dl.doorStart,fuera),P(r,dl.doorEnd,fuera), `${c.doorOpening}"`);
   }
   function dimLine(p1,p2,label){
     const m1=M(p1.x,p1.y), m2=M(p2.x,p2.y);
@@ -1003,13 +1027,25 @@ function build3D(reframe){
     });
   });
 
+  /* El encuadre necesita el aspecto REAL del lienzo, así que se ajusta primero.
+     Antes se enmarcaba con un múltiplo fijo del ancho y la escena quedaba
+     diminuta y descentrada en cuanto el lienzo no era casi cuadrado. */
+  resize3D();
   if(reframe||!framed){
-    const cx=(bounds.x0+bounds.w/2)*S, cz=(bounds.y0+bounds.d/2)*S, span=Math.max(bounds.w,bounds.d)*S;
-    controls.target.set(cx, top*.4, cz);
-    camera.position.set(cx, span*.6+top, cz + span*.9 + bounds.d*S*.4);
+    const cx=(bounds.x0+bounds.w/2)*S, cz=(bounds.y0+bounds.d/2)*S;
+    const w=bounds.w*S, d=bounds.d*S;
+    /* Radio de la esfera que envuelve el baño; la distancia sale de ahí y del
+       campo de visión, tomando el lado que peor encaja (alto o ancho). */
+    const r=Math.max(Math.hypot(w,d)/2, top)*1.08;
+    const fovV=camera.fov*Math.PI/180;
+    const fovH=2*Math.atan(Math.tan(fovV/2)*Math.max(.4,camera.aspect));
+    const dist=Math.max(r/Math.sin(fovV/2), r/Math.sin(fovH/2))*0.92;
+    controls.target.set(cx, top*0.45, cz);
+    camera.position.set(cx + dist*0.32, top*0.5 + dist*0.44, cz + dist*0.80);
+    camera.near=Math.max(0.1, dist/200); camera.far=dist*20;
+    camera.updateProjectionMatrix();
     framed=true;
   }
-  resize3D();
 }
 function addBox(g,w,h,d,x,y,z,m){ const b=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m); b.position.set(x,y,z); b.castShadow=true; b.receiveShadow=true; g.add(b); }
 function addToilet(g,x,m){
@@ -1042,8 +1078,10 @@ function addDoor(g,st,gap,partH,m){
   addHook(grp, L.dir, openW, partH);
   grp.position.set(L.hingeA*S, gap+partH/2, st.depth*S);
   const openAngle = (L.left ? (L.inward?1:-1) : (L.inward?-1:1)) * THREE.MathUtils.degToRad(50);
-  grp.rotation.y = animateOpenOnce ? 0 : openAngle;
-  doorAnims.push({group:grp, openAngle:openAngle, cur:animateOpenOnce?0:1, target:1});
+  /* En reposo las puertas van CERRADAS: cinco hojas abiertas a 50° se leían
+     como aletas sueltas y tapaban el interior. El recorrido las abre. */
+  grp.rotation.y = 0;
+  doorAnims.push({group:grp, openAngle:openAngle, cur:0, target:0});
   g.add(grp);
   // placa de cierre (keeper) en el canto de cierre de la puerta
   addStrike(g, L.closeA, gap, partH, st.depth);

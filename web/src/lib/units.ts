@@ -3,7 +3,14 @@
    siempre, no se arrastra error de redondeo al convertir de ida y vuelta, y
    una obra en metros y otra en pulgadas conviven en la misma base. */
 
-export type UnitSystem = 'metrico' | 'imperial';
+/* Tres unidades de trabajo, no dos: hay obra que se habla en metros, plano que
+   se acota en centímetros y catálogo que viene en pulgadas. */
+export type DisplayUnit = 'm' | 'cm' | 'in';
+
+export const UNIT_LABEL: Record<DisplayUnit, string> = {
+  m: 'Metros', cm: 'Centímetros', in: 'Pulgadas',
+};
+export const UNIT_SUFFIX: Record<DisplayUnit, string> = { m: 'm', cm: 'cm', in: '"' };
 
 export const MM_PER_INCH = 25.4;
 
@@ -18,12 +25,9 @@ const FRACTIONS: [number, string][] = [
   [0.5, ' 1/2'], [0.625, ' 5/8'], [0.75, ' 3/4'], [0.875, ' 7/8'],
 ];
 
-export function formatLength(mm: number, system: UnitSystem): string {
-  if (system === 'metrico') {
-    if (mm >= 1000) return `${(mm / 1000).toFixed(mm % 1000 === 0 ? 0 : 2)} m`;
-    if (mm >= 10) return `${(mm / 10).toFixed(mm % 10 === 0 ? 0 : 1)} cm`;
-    return `${mm} mm`;
-  }
+export function formatLength(mm: number, unit: DisplayUnit): string {
+  if (unit === 'm')  return `${(mm / 1000).toFixed(mm % 1000 === 0 ? 0 : 2)} m`;
+  if (unit === 'cm') return `${(mm / 10).toFixed(mm % 10 === 0 ? 0 : 1)} cm`;
   const totalIn = mmToInches(mm);
   const feet = Math.floor(totalIn / 12);
   const restIn = totalIn - feet * 12;
@@ -36,9 +40,10 @@ export function formatLength(mm: number, system: UnitSystem): string {
 }
 
 /* Acepta lo que el cliente teclee de verdad: «2.4 m», «240cm», «94.5"»,
-   «7' 10 1/2"», «2400». Sin unidad, se asume la del sistema activo.
+   «7' 10 1/2"», «2400». Una unidad escrita SIEMPRE gana sobre la activa; un
+   número pelón se interpreta en la unidad de trabajo.
    Devuelve milímetros enteros, o null si no se entiende. */
-export function parseLength(raw: string, system: UnitSystem): number | null {
+export function parseLength(raw: string, unit: DisplayUnit): number | null {
   const s = raw.trim().toLowerCase().replace(/,/g, '.');
   if (!s) return null;
 
@@ -60,9 +65,10 @@ export function parseLength(raw: string, system: UnitSystem): number | null {
     const frac = imp[3] && imp[4] ? parseInt(imp[3], 10) / parseInt(imp[4], 10) : 0;
     const total = feet * 12 + inch + frac;
     if (!Number.isFinite(total) || total <= 0) return null;
-    /* Un número pelón sin unidad se interpreta según el sistema activo:
-       en métrico son milímetros, en imperial son pulgadas. */
-    if (!hasUnit && system === 'metrico') return Math.round(total);
+    if (hasUnit) return inchesToMm(total);         // llevaba ' o ": son pulgadas
+    /* Número pelón: manda la unidad de trabajo. */
+    if (unit === 'm')  return metersToMm(total);
+    if (unit === 'cm') return Math.round(total * 10);
     return inchesToMm(total);
   }
   return null;

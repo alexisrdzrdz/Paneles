@@ -117,16 +117,24 @@ eq('sin reglas, cero', buildBom(room, items, []).subtotalCents, 0);
 const soloOtro = buildBom(room, items.map((i) => ({ ...i, materialId: 'inox' })), rules);
 eq('una pieza de otro material no entra', soloOtro.subtotalCents, 0);
 
-console.log('--- 7. Unidades: se teclea como se habla ---');
-eq('«2.4 m»', parseLength('2.4 m', 'metrico'), 2400);
-eq('«240cm»', parseLength('240cm', 'metrico'), 2400);
-eq('«2400» en metrico son mm', parseLength('2400', 'metrico'), 2400);
-eq('«94.5"»', parseLength('94.5"', 'metrico'), inchesToMm(94.5));
-eq('«7\' 10 1/2"»', parseLength(`7' 10 1/2"`, 'imperial'), inchesToMm(94.5));
-eq('«60» en imperial son pulgadas', parseLength('60', 'imperial'), inchesToMm(60));
-eq('basura -> null', parseLength('como tres metros', 'metrico'), null);
-eq('formato metrico', formatLength(2400, 'metrico'), '2.40 m');
-eq('formato imperial', formatLength(inchesToMm(94.5), 'imperial'), `7'-10 1/2"`);
+console.log('--- 7. Unidades: metros, centimetros y pulgadas ---');
+// La unidad escrita SIEMPRE gana sobre la unidad de trabajo.
+eq('«2.4 m» trabajando en cm', parseLength('2.4 m', 'cm'), 2400);
+eq('«240cm» trabajando en m', parseLength('240cm', 'm'), 2400);
+eq('«2400mm» trabajando en pulgadas', parseLength('2400mm', 'in'), 2400);
+eq('«94.5"» trabajando en metros', parseLength('94.5"', 'm'), inchesToMm(94.5));
+eq('«7\' 10 1/2"»', parseLength(`7' 10 1/2"`, 'in'), inchesToMm(94.5));
+// Un numero pelon se lee en la unidad de trabajo, sin adivinar.
+eq('«2.4» en metros', parseLength('2.4', 'm'), 2400);
+eq('«240» en centimetros', parseLength('240', 'cm'), 2400);
+eq('«60» en pulgadas', parseLength('60', 'in'), inchesToMm(60));
+eq('basura -> null', parseLength('como tres metros', 'm'), null);
+eq('vacio -> null', parseLength('   ', 'cm'), null);
+eq('formato en metros', formatLength(2400, 'm'), '2.40 m');
+eq('formato en centimetros', formatLength(2400, 'cm'), '240 cm');
+eq('formato en pulgadas', formatLength(inchesToMm(94.5), 'in'), `7'-10 1/2"`);
+eq('los tres formatos describen el mismo milimetraje',
+  [formatLength(6000, 'm'), formatLength(6000, 'cm')], ['6 m', '600 cm']);
 
 console.log(fails ? `\n${fails} FALLOS` : '\nTodo en verde');
 process.exitCode = fails ? 1 : 0;

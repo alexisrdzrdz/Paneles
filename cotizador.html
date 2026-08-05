@@ -1300,9 +1300,11 @@ function refreshSummary(){
 
 /* ═══════════════ Pasos (panel izquierdo) ═══════════════ */
 function renderStepper(){
+  /* Paloma en lo hecho, punto en lo actual, círculo en lo que falta. Un cliente
+     no cuenta pasos: le basta ver qué ya quedó y dónde está parado. */
   document.getElementById('stepper').innerHTML = STEPS.map((s,i)=>`
     <li class="ui-step wiz-step ${i<state.step?'is-done':''} ${i===state.step?'is-current':''}" data-step="${i}">
-      <span class="ui-step-dot">${i<state.step?'✓':i+1}</span> ${s.t}
+      <span class="ui-step-dot">${i<state.step?'✓':i===state.step?'●':'○'}</span> ${s.t}
     </li>`).join('');
   document.querySelectorAll('.wiz-step').forEach(el=> el.addEventListener('click',()=>gotoStep(+el.dataset.step)));
 }
@@ -1311,7 +1313,8 @@ function opt(list,val,isNum){ return list.map(o=>{ const v=Array.isArray(o)?o[0]
 
 function renderStep(){
   document.getElementById('stepTitle').textContent=STEPS[state.step].t;
-  document.getElementById('stepMeta').textContent='PASO '+(state.step+1)+' / 5';
+  /* Sin "PASO 2 / 5": la paloma del asistente ya dice dónde va. */
+  document.getElementById('stepMeta').textContent=STEPS[state.step].m;
   const body=document.getElementById('stepBody');
   const r=state.room;
 

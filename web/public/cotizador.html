@@ -1,0 +1,1645 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>mauricios · Cotizador de particiones</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+
+<!-- Design system Nord -->
+<link rel="stylesheet" href="Framework/theme.css">
+<link rel="stylesheet" href="Framework/framework.css">
+<link rel="stylesheet" href="Framework/layout.css">
+<link rel="stylesheet" href="Framework/movimiento.css">
+<script src="Framework/ui.js" defer></script>
+<script src="site.js" defer></script>
+
+<!-- three.js para la vista 3D -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<style>
+  body{margin:0}
+  .site-nav{display:flex;gap:var(--space-4);align-items:center}
+  .nav-mobile{position:relative;display:none}
+  .nav-burger{padding:0 12px;font-size:18px;line-height:1}
+  .ui-topbar .nav-mobile .ui-menu{position:absolute;right:0;left:auto;top:calc(100% + 8px);min-width:196px;z-index:300;display:flex;flex-direction:column;gap:2px;background:var(--menu-bg);border:var(--border-width) solid var(--line);border-radius:var(--radius-md);box-shadow:var(--shadow-md);padding:6px}
+  .ui-topbar .nav-mobile .ui-menu-item{display:block;padding:9px 12px;border-radius:var(--radius-sm);text-decoration:none;color:var(--ink);font-weight:var(--fw-medium)}
+  .ui-topbar .nav-mobile .ui-menu-item:hover{background:var(--surface-3)}
+  @media(max-width:900px){.site-nav{display:none} .nav-mobile{display:block}}
+  .brand-logo{height:26px;width:auto;display:block}
+  .price-mini{
+    display:flex;align-items:baseline;gap:8px;
+    font-size:var(--fs-label);text-transform:uppercase;letter-spacing:var(--ls-caps);
+    color:var(--ink-dim);
+  }
+  .price-mini b{font-family:var(--font-mono);font-size:18px;color:var(--ink);letter-spacing:0}
+
+  .wiz{max-width:1440px;margin:0 auto;padding:var(--space-4) var(--content-pad) var(--space-6)}
+  .wiz-stepper{
+    background:var(--surface);border:var(--border-width) solid var(--line);
+    border-radius:var(--radius-lg);padding:var(--space-3) var(--space-4);
+    justify-content:space-between;box-shadow:var(--shadow-sm);
+  }
+  .wiz-step{cursor:pointer}
+  .wiz-grid{
+    display:grid;grid-template-columns:308px minmax(0,1fr) 312px;
+    gap:var(--gap);align-items:start;margin-top:var(--space-4);
+  }
+  .wiz-left,.wiz-right{position:sticky;top:var(--space-4)}
+  .panel-scroll{max-height:calc(100vh - 220px);overflow:auto}
+
+  .canvas-panel .ui-panel-body{padding:0}
+  .canvas-bar{
+    display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap;
+    padding:var(--space-3) var(--space-4);border-bottom:var(--border-width) solid var(--line);
+  }
+  .canvas-bar .grow{flex:1}
+  .canvas-wrap{position:relative;height:clamp(380px,52vh,560px);background:
+    var(--page-mesh), var(--surface)}
+  #view2d{display:block;width:100%;height:100%}
+  #view3d{position:absolute;inset:0;display:none}
+  .canvas-hint{
+    position:absolute;right:14px;bottom:14px;background:var(--surface);
+    border:var(--border-width) solid var(--line);border-radius:var(--radius-pill);
+    padding:7px 13px;font-size:var(--fs-label);color:var(--ink-dim);
+    box-shadow:var(--shadow-sm);pointer-events:none;
+  }
+  .canvas-badge{
+    position:absolute;left:14px;top:14px;display:flex;gap:6px;flex-wrap:wrap;pointer-events:none
+  }
+
+  /* Contadores */
+  .counter{display:flex;align-items:center;gap:6px}
+  .counter button{
+    width:32px;height:32px;border-radius:var(--radius-sm);
+    border:var(--border-width) solid var(--btn-border);background:var(--btn-bg);
+    color:var(--ink);font-size:17px;line-height:1;cursor:pointer;font-weight:600;
+  }
+  .counter button:hover{background:var(--surface-3)}
+  .counter output{
+    min-width:34px;text-align:center;font-family:var(--font-mono);font-size:16px;color:var(--ink)
+  }
+  .count-row{
+    display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);
+    padding:var(--space-2) 0;border-bottom:var(--border-width) solid var(--line);
+  }
+  .count-row:last-of-type{border-bottom:0}
+  .count-row small{display:block;color:var(--ink-faint);font-size:var(--fs-label)}
+
+  /* Tarjetas de layout */
+  .layout-card{
+    display:grid;grid-template-columns:78px 1fr;gap:var(--space-3);
+    padding:var(--space-3);border:var(--border-width) solid var(--line);
+    border-radius:var(--radius-md);background:var(--surface);cursor:pointer;
+    margin-bottom:var(--space-3);transition:border-color var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
+  }
+  .layout-card:hover{border-color:var(--line-strong)}
+  .layout-card.is-active{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+  .layout-card.is-off{opacity:.5;cursor:not-allowed}
+  .layout-card svg{width:78px;height:58px;background:var(--surface-inset);border-radius:var(--radius-sm)}
+  .layout-card b{display:block;margin-bottom:2px}
+  .layout-card p{margin:0;font-size:var(--fs-label);color:var(--ink-faint);line-height:1.45}
+
+  /* Materiales */
+  .mat-card{
+    border:var(--border-width) solid var(--line);border-radius:var(--radius-md);
+    padding:var(--space-3);background:var(--surface);cursor:pointer;margin-bottom:var(--space-2);
+    display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);
+  }
+  .mat-card.is-active{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+  .mat-card .mono{font-family:var(--font-mono)}
+  .swatches{display:flex;gap:6px;margin-top:var(--space-2);flex-wrap:wrap}
+  .swatch{width:26px;height:26px;border-radius:var(--radius-sm);border:2px solid transparent;cursor:pointer}
+  .swatch.is-active{border-color:var(--ink)}
+
+  .sum-line{display:flex;justify-content:space-between;gap:var(--space-3);padding:5px 0;font-size:var(--fs-body)}
+  .sum-line span:first-child{color:var(--ink-dim)}
+  .sum-line .mono{font-family:var(--font-mono)}
+  .sum-total{border-top:var(--border-width) solid var(--line-strong);margin-top:var(--space-2);padding-top:var(--space-2)}
+
+  /* Medidas: tamaños con nombre + el detalle técnico plegado */
+  .preset-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:var(--space-3)}
+  .preset-card{
+    border:var(--border-width) solid var(--line);border-radius:var(--radius-md);
+    padding:10px 6px;text-align:center;background:var(--surface);cursor:pointer;
+    transition:border-color var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
+  }
+  .preset-card:hover{border-color:var(--line-strong)}
+  .preset-card.is-active{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+  .preset-card b{display:block;font-size:var(--fs-body);margin-bottom:2px}
+  .preset-card .dim{display:block;font-family:var(--font-mono);color:var(--ink-dim);font-size:var(--fs-label)}
+  .preset-card small{display:block;color:var(--ink-faint);font-size:11px;line-height:1.35;margin-top:3px}
+  .fine{
+    border:var(--border-width) solid var(--line);border-radius:var(--radius-md);
+    margin-top:var(--space-3);background:var(--surface);
+  }
+  .fine>summary{
+    cursor:pointer;padding:10px 12px;font-size:var(--fs-label);font-weight:600;
+    color:var(--ink-dim);list-style:none;
+  }
+  .fine>summary::-webkit-details-marker{display:none}
+  .fine>summary::before{content:'▸  '}
+  .fine[open]>summary::before{content:'▾  '}
+  .fine>summary:hover{color:var(--ink)}
+  .fine-body{padding:0 12px 12px}
+
+  .wiz-foot{
+    display:flex;gap:var(--space-3);margin-top:var(--space-4);align-items:center;
+  }
+  .wiz-foot .grow{flex:1}
+
+  @media (max-width:1080px){
+    .wiz-grid{grid-template-columns:1fr}
+    .wiz-left,.wiz-right{position:static}
+    .panel-scroll{max-height:none}
+  }
+</style>
+</head>
+<body class="ui" data-layout="topbar" data-panel="card" data-anim="aparecer">
+
+<header class="ui-topbar">
+  <a class="ui-wordmark" href="index.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit">
+    <img class="brand-logo" src="logo.png" alt="mauricios"
+         onerror="this.style.display='none';document.getElementById('logoSvg').style.display='block';">
+    <svg id="logoSvg" style="display:none" width="26" height="26" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-label="logo">
+      <g transform="translate(100,182)" fill="#3a7d2c" stroke="#2e6b2a" stroke-width="1">
+        <path d="M0,0 C -7,-25 -5,-65 0,-92 C 5,-65 7,-25 0,0 Z"/>
+        <path d="M0,0 C -7,-25 -5,-65 0,-92 C 5,-65 7,-25 0,0 Z" transform="rotate(26) scale(1,.9)"/>
+        <path d="M0,0 C -7,-25 -5,-65 0,-92 C 5,-65 7,-25 0,0 Z" transform="rotate(-26) scale(1,.9)"/>
+        <path d="M0,0 C -7,-25 -5,-65 0,-92 C 5,-65 7,-25 0,0 Z" transform="rotate(52) scale(1,.74)"/>
+        <path d="M0,0 C -7,-25 -5,-65 0,-92 C 5,-65 7,-25 0,0 Z" transform="rotate(-52) scale(1,.74)"/>
+      </g>
+    </svg>
+    mauricios <span class="ui-sigla">PARTICIONES</span>
+  </a>
+  <div class="ui-topbar-right">
+    <nav class="site-nav" aria-label="Navegación">
+      <a class="ui-link" href="index.html">Inicio</a>
+      <a class="ui-link" href="materiales.html">Materiales</a>
+      <a class="ui-link" href="industrias.html">Industrias</a>
+      <a class="ui-link" href="proyectos.html">Proyectos</a>
+      <a class="ui-link" href="contacto.html">Contacto</a>
+    </nav>
+    <div class="price-mini">Total estimado <b id="miniTotal">$0</b></div>
+    <button class="ui-theme-toggle" type="button" aria-label="Cambiar tema" data-ui-theme>&#9680;</button>
+  </div>
+</header>
+
+<div class="wiz">
+  <ol class="ui-stepper wiz-stepper" id="stepper"></ol>
+
+  <div class="wiz-grid">
+    <!-- Panel de paso (cambia según el paso) -->
+    <section class="ui-panel wiz-left">
+      <div class="ui-panel-head">
+        <span class="ui-panel-title" id="stepTitle">Tu espacio</span>
+        <span class="ui-panel-meta" id="stepMeta">PASO 1 / 5</span>
+      </div>
+      <div class="ui-panel-body panel-scroll" id="stepBody"></div>
+    </section>
+
+    <!-- Canvas central -->
+    <section class="ui-panel canvas-panel">
+      <div class="ui-panel-body">
+        <div class="canvas-bar">
+          <div class="ui-field grow" style="margin:0;min-width:150px">
+            <label>Nombre del baño</label>
+            <input id="roomName" type="text" value="Baño 1">
+          </div>
+          <div class="grow"></div>
+          <div class="ui-field" style="margin:0;min-width:130px">
+            <label>Cabina</label>
+            <select id="stallSelect"></select>
+          </div>
+          <div class="ui-segmented" id="viewToggle" role="group" aria-label="Vista">
+            <button class="ui-seg is-on" type="button" data-view="2d">2D</button>
+            <button class="ui-seg" type="button" data-view="3d">3D</button>
+          </div>
+          <button class="ui-btn" id="tourBtn" type="button" title="Recorrido automático">&#9654; Recorrido</button>
+        </div>
+        <div class="canvas-wrap" id="canvasWrap">
+          <canvas id="view2d"></canvas>
+          <div id="view3d"></div>
+          <div class="canvas-badge" id="canvasBadge"></div>
+          <div class="canvas-hint">Clic para seleccionar una cabina</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Resumen + análisis en vivo -->
+    <aside class="ui-panel wiz-right">
+      <div class="ui-panel-head">
+        <span class="ui-panel-title">Resumen en vivo</span>
+        <span class="ui-badge ui-badge-ok">AUTOGUARDADO</span>
+      </div>
+      <div class="ui-panel-body panel-scroll">
+        <div class="ui-stat primary" style="margin-bottom:var(--space-3)">
+          <div class="ui-stat-value" id="sumTotal">$0</div>
+          <div class="ui-stat-label">Estimado del proyecto · <span id="sumMat">—</span></div>
+        </div>
+        <div id="sumLines"></div>
+        <div style="margin-top:var(--space-4)">
+          <div class="ui-label">Análisis del diseño</div>
+          <div id="analysisBox"></div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <footer class="wiz-foot">
+    <button class="ui-btn" type="button" id="backBtn">Atrás</button>
+    <div class="grow"></div>
+    <span class="ui-meta" id="footHint"></span>
+    <button class="ui-btn ui-btn-primary" type="button" id="nextBtn">Continuar</button>
+  </footer>
+</div>
+
+<div class="ui-toasts" data-ui-toasts style="position:fixed;right:16px;bottom:16px;z-index:500"></div>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+/* ═══════════════ Datos base ═══════════════ */
+const OPTS = {
+  partitionDepth:[54,57,60,63,66,69,72,78],
+  stallWidth:[36,42,48,54,60,66,70],
+  doorOpening:[24,26,28,30,32,34,36],
+  swing:[['left-in','Izq · adentro'],['left-out','Izq · afuera'],['right-in','Der · adentro'],['right-out','Der · afuera']],
+  position:[['center','Centro'],['left','Izquierda'],['right','Derecha']],
+  frac:[['0','--'],['0.25','1/4"'],['0.5','1/2"'],['0.75','3/4"']],
+  screenDepth:[16,18,20,22,24,26,30],
+  urinalWidth:[24,28,30,32,36,42],
+  height:[36,42,48,55,58,64,72,84,96],
+  floorGap:[0,4,6,8,10,12,14,16]
+};
+
+const MATERIALS = [
+  {id:'laminado', name:'Laminado plástico', lvl:1, warranty:'1 año',  perStall:320, tag:'Económico',        desc:'Uso ligero en interiores secos.', colors:['#e7e2d6','#c9d3d6','#b8c4b0','#d8c3a5']},
+  {id:'metal',    name:'Acero laminado',    lvl:2, warranty:'5 años',  perStall:390, tag:'Clásico',          desc:'Resistente y buen precio.',        colors:['#9aa6ad','#6f7d86','#8a8f74','#b6a48c']},
+  {id:'hdpe',     name:'Polietileno HDPE',  lvl:3, warranty:'25 años', perStall:520, tag:'Anti-humedad',     desc:'Ideal para humedad y vandalismo.', colors:['#5a7d94','#3f6f5f','#7a5c46','#4b4f57','#8a5b6a']},
+  {id:'compacto', name:'Fenólico compacto', lvl:4, warranty:'15 años', perStall:610, tag:'Alta resistencia', desc:'Máxima resistencia estructural.',  colors:['#2f3a42','#4a3b2f','#3a4b3f','#5a5150']},
+  {id:'inox',     name:'Acero inoxidable',  lvl:5, warranty:'15 años', perStall:840, tag:'Premium',          desc:'Acabado premium, larga vida.',     colors:['#b8bfc4','#9099a0','#c7ccd0']}
+];
+
+const LAYOUTS = [
+  {id:'inline',   name:'En línea',        desc:'Todas las cabinas contra una pared. Simple y económico; ideal para espacios alargados.'},
+  {id:'alcove',   name:'Entre muros',     desc:'En un nicho, con pared a ambos lados. Aprovecha un hueco existente.'},
+  {id:'corner-l', name:'En esquina (L)',  desc:'Sobre dos paredes en ángulo. Ideal para espacios cuadrados o esquinas.'},
+  {id:'island',   name:'Espalda con espalda', desc:'Dos hileras que comparten muro. Máxima densidad en salas anchas.'}
+];
+
+/* Tamaños con nombre. El cliente elige "Amplia", no 70 pulgadas; las medidas
+   crudas siguen ahí, pero plegadas en "Ajuste fino". */
+const SIZE_PRESETS = {
+  stall:[
+    {id:'compacta', name:'Compacta', dim:'48"', desc:'Aprovecha el espacio',
+     cfg:{stallWidth:48, stallWidthFrac:0, partitionDepth:60, doorOpening:26}},
+    {id:'estandar', name:'Estándar', dim:'60"', desc:'La más común',
+     cfg:{stallWidth:60, stallWidthFrac:0, partitionDepth:72, doorOpening:32}},
+    {id:'amplia',   name:'Amplia',   dim:'70"', desc:'Más holgura',
+     cfg:{stallWidth:70, stallWidthFrac:0, partitionDepth:78, doorOpening:36}}
+  ],
+  urinal:[
+    {id:'compacta', name:'Compacta', dim:'24"', desc:'Máxima densidad',
+     cfg:{stallWidth:24, partitionDepth:18}},
+    {id:'estandar', name:'Estándar', dim:'30"', desc:'La más común',
+     cfg:{stallWidth:30, partitionDepth:24}},
+    {id:'amplia',   name:'Amplia',   dim:'36"', desc:'Más separación',
+     cfg:{stallWidth:36, partitionDepth:26}}
+  ]
+};
+
+const STEPS = [
+  {t:'Tu espacio',    m:'Selección'},
+  {t:'Distribución',  m:'Diseño'},
+  {t:'Medidas',       m:'Ajuste fino'},
+  {t:'Material', m:'Acabado'},
+  {t:'Cotización',    m:'Cierre'}
+];
+
+/* Una unidad = una posición de uso. `kind` dice qué es (inodoro o mingitorio) y
+   `run` en qué hilera vive. Antes ambas cosas vivían en la sala: el tipo era un
+   interruptor global excluyente y el reparto entre hileras era un ceil(n/2) fijo.
+   Al bajarlas a la unidad, una misma cotización admite tipos mezclados y
+   repartos libres (2 de un lado, 8 del otro). */
+function defaultStall(kind, run){
+  const base={kind, run:run||0, stallWidthFrac:0, doorSwing:'left-in',
+              doorPosition:'center', toiletPosition:'center', ada:false, privacy:false};
+  return kind==='urinal'
+    ? {...base, partitionDepth:24, stallWidth:30, doorOpening:0}
+    : {...base, partitionDepth:72, stallWidth:70, doorOpening:34};
+}
+
+const state = {
+  step:0, view:'2d', selected:0, sel:[0],   // `selected` es el ancla; `sel` la selección múltiple
+  materialId:'hdpe', colorHex:'#5a7d94',
+  zip:'',
+  room:{ name:'Baño 1', back:'concrete', showWall:true, height:58, floorGap:12, mount:'standard',
+         stalls:Array.from({length:5},()=>defaultStall('stall')),
+         splitAuto:true, ada:false, layout:'inline' }
+};
+const isUrinalUnit = u => u.kind==='urinal';
+function countKind(k){ return state.room.stalls.filter(u=>u.kind===k).length; }
+
+/* ── Selección múltiple ───────────────────────────────────────
+   `state.selected` es el ancla (la que se edita y de la que salen las cotas);
+   `state.sel` son todas las unidades a las que se aplica un cambio. Editar de
+   una en una era el cuello de botella real al configurar diez cabinas. */
+const selHas = i => state.sel.includes(i);
+function setSel(list, anchor){
+  const n=state.room.stalls.length;
+  const uniq=[...new Set(list)].filter(i=>i>=0&&i<n).sort((a,b)=>a-b);
+  state.sel = uniq.length ? uniq : [Math.max(0,Math.min(n-1,anchor|0))];
+  state.selected = state.sel.includes(anchor) ? anchor : state.sel[0];
+}
+/* Conjuntos con nombre: de aquí salen los botones de "aplicar a". */
+function scopeIndices(scope){
+  const list=state.room.stalls, a=state.selected, all=list.map((_,i)=>i);
+  if(scope==='all')  return all;
+  if(scope==='kind') return all.filter(i=>list[i].kind===list[a].kind);
+  if(scope==='run')  return all.filter(i=>unitRun(i)===unitRun(a));
+  return [a];
+}
+function activeScope(){
+  const cur=[...state.sel].sort((x,y)=>x-y).join(',');
+  // 'all' antes que 'run': con una sola hilera ambos coinciden y gana el más claro.
+  return ['one','kind','all','run'].find(s=>scopeIndices(s).sort((x,y)=>x-y).join(',')===cur) || null;
+}
+/* Un cambio solo se aplica a lo seleccionado del mismo tipo que el ancla: las
+   pulgadas de una cabina no significan lo mismo en un mingitorio. */
+function editTargets(){
+  const list=state.room.stalls, k=list[state.selected] && list[state.selected].kind;
+  return state.sel.filter(i=>list[i] && list[i].kind===k);
+}
+
+const PL = 3;                          // grosor de pilastra (pulgadas)
+const S = 1/12;                        // pulgadas -> pies (3D)
+const feetInches = i => { const f=Math.floor(i/12), n=Math.round(i-f*12); return `${f}'-${n}"`; };
+const money = n => '$'+Math.round(n).toLocaleString('en-US');
+
+/* ═══════════════ Motor de distribución (runs axis-aligned) ═══════════════ */
+function makeFixtures(){
+  return state.room.stalls.map((c,i)=>({gi:i, run:c.run|0, width:c.stallWidth+c.stallWidthFrac, depth:c.partitionDepth, cfg:c}));
+}
+function buildRun(orient, facing, x, y, fx, sideWalls, emptyDepth){
+  let a = PL; const stalls=[];
+  fx.forEach(f=>{ stalls.push({...f, aStart:a, aEnd:a+f.width, aCenter:a+f.width/2}); a += f.width + PL; });
+  // Una hilera vacía conserva huella: se dibuja punteada y sirve de zona de soltado.
+  const empty=!fx.length;
+  const length = empty ? 2*(PL+36) : a;
+  const depth  = empty ? (emptyDepth||60) : Math.max(1,...fx.map(f=>f.depth));
+  const r={orient, facing, x, y, length, depth, stalls, empty, sideWalls:sideWalls||[false,false]};
+  // datos para 3D
+  if(orient==='h' && facing==='down'){ r.theta=0;           r.o3={x:x,          y:y}; }
+  if(orient==='h' && facing==='up'){   r.theta=Math.PI;     r.o3={x:x+length,   y:y+depth}; }
+  if(orient==='v' && facing==='right'){r.theta=Math.PI/2;   r.o3={x:x,          y:y+length}; }
+  return r;
+}
+function runCount(L){ return (L==='island'||L==='corner-l') ? 2 : 1; }
+/* Reparto entre hileras. Mientras nadie lo toque (`splitAuto`) se usa el 50/50
+   de siempre; en cuanto el usuario mueve una unidad, manda el `run` de cada una. */
+function splitFixtures(fx, nRuns, auto){
+  if(nRuns===1) return [fx];
+  if(auto){ const k=Math.ceil(fx.length/2); return [fx.slice(0,k), fx.slice(k)]; }
+  return [fx.filter(f=>f.run!==1), fx.filter(f=>f.run===1)];
+}
+function computeRuns(layoutOverride){
+  const fx=makeFixtures();
+  const L=layoutOverride||state.room.layout;
+  const auto = layoutOverride ? true : !!state.room.splitAuto;
+  const G=splitFixtures(fx, runCount(L), auto);
+  const depthOf=g=>g&&g.length?Math.max(...g.map(f=>f.depth)):0;
+  const dA=depthOf(G[0]), dB=depthOf(G[1]), fb=Math.max(dA,dB,60);
+  let runs=[];
+  if(L==='inline'  ) runs=[buildRun('h','down',0,0,G[0],[false,false],fb)];
+  else if(L==='alcove') runs=[buildRun('h','down',0,0,G[0],[true,true],fb)];
+  else if(L==='island'){
+    const top=buildRun('h','up',   0,0, G[0], null, dB||fb);
+    const bot=buildRun('h','down', 0, top.depth, G[1], null, dA||fb);
+    runs=[top,bot];
+  } else if(L==='corner-l'){
+    const hor=buildRun('h','down',0,0, G[0], [true,false], dB||fb);
+    const ver=buildRun('v','right',0, hor.depth, G[1], [true,false], dA||fb);
+    runs=[hor,ver];
+  }
+  runs.forEach((r,i)=>{ r.runIdx=i; });
+  // bounds
+  let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+  runs.forEach(r=>{
+    const rx1 = r.orient==='h' ? r.x+r.length : r.x+r.depth;
+    const ry1 = r.orient==='h' ? r.y+r.depth  : r.y+r.length;
+    x0=Math.min(x0,r.x); y0=Math.min(y0,r.y); x1=Math.max(x1,rx1); y1=Math.max(y1,ry1);
+  });
+  return {runs, bounds:{x0,y0,x1,y1,w:x1-x0,d:y1-y0}};
+}
+/* plan (a,t)->(x,y) */
+function P(r,a,t){
+  if(r.orient==='h'){
+    const x=r.x+a, y = r.facing==='down' ? r.y+t : r.y+r.depth-t;
+    return {x,y};
+  } else {
+    const y=r.y+a, x = r.facing==='right' ? r.x+t : r.x+r.depth-t;
+    return {x,y};
+  }
+}
+function invP(r,x,y){
+  if(r.orient==='h'){ const a=x-r.x, t= r.facing==='down'? y-r.y : r.y+r.depth-y; return {a,t}; }
+  else { const a=y-r.y, t= r.facing==='right'? x-r.x : r.x+r.depth-x; return {a,t}; }
+}
+function doorLayout(st){
+  const c=st.cfg, stallW=st.aEnd-st.aStart;
+  const op=Math.min(c.doorOpening, stallW);
+  const slack=Math.max(0, stallW-op);
+  let lp,rp;
+  if(c.doorPosition==='left'){ lp=0; rp=slack; }
+  else if(c.doorPosition==='right'){ lp=slack; rp=0; }
+  else { lp=slack/2; rp=slack/2; }
+  const doorStart=st.aStart+lp, doorEnd=doorStart+op;
+  const left=c.doorSwing.includes('left'), inward=c.doorSwing.includes('in');
+  return {op,lp,rp,doorStart,doorEnd,left,inward,
+          hingeA:left?doorStart:doorEnd, closeA:left?doorEnd:doorStart, dir:left?1:-1};
+}
+/* Divisiones de una hilera. Cada frontera toma la profundidad y la altura de
+   las unidades que separa: entre dos mingitorios es una mampara corta, junto a
+   una cabina es un panel completo. Antes toda la hilera usaba un solo valor. */
+function runBoundaries(r){
+  const L=r.stalls, out=[];
+  if(!L.length) return out;
+  const at=(a,left,right)=>{
+    const us=[left,right].filter(Boolean);
+    out.push({ a:Math.max(0,Math.min(r.length,a)),
+               depth:Math.max(...us.map(u=>u.depth)),
+               tall:us.some(u=>!isUrinalUnit(u.cfg)) });
+  };
+  at(0, null, L[0]);
+  L.forEach((st,i)=>{ if(i<L.length-1) at((st.aEnd+L[i+1].aStart)/2, st, L[i+1]); });
+  at(r.length, L[L.length-1], null);
+  return out;
+}
+
+/* ── Mover unidades entre hileras ─────────────────────────────── */
+/* Hilera efectiva de la unidad i: mientras el reparto sea automático manda el
+   50/50; después manda su propio `run`. */
+function unitRun(i){
+  const r=state.room;
+  if(runCount(r.layout)===1) return 0;
+  if(r.splitAuto) return i < Math.ceil(r.stalls.length/2) ? 0 : 1;
+  return r.stalls[i].run|0;
+}
+function unitIdx(run){
+  const out=[]; state.room.stalls.forEach((_,i)=>{ if(unitRun(i)===run) out.push(i); }); return out;
+}
+/* Congela el 50/50 automático en los `run` de cada unidad. Se llama antes de
+   cualquier acción manual: sin esto, salir de `splitAuto` mandaría todo a A. */
+function materializeSplit(){
+  if(!state.room.splitAuto) return;
+  const n=runCount(state.room.layout), k=Math.ceil(state.room.stalls.length/2);
+  state.room.stalls.forEach((u,i)=>{ u.run = (n>1 && i>=k) ? 1 : 0; });
+  state.room.splitAuto=false;
+}
+/* Reubica la unidad `gi` en `run`, justo antes de `beforeGi` (-1 = al final).
+   El orden dentro de una hilera es el del arreglo, así que basta con reinsertar. */
+function moveUnitTo(gi, run, beforeGi){
+  const list=state.room.stalls, u=list[gi];
+  if(!u) return;
+  list.splice(gi,1);
+  u.run=run;
+  const at = beforeGi<0 ? list.length : (beforeGi>gi ? beforeGi-1 : beforeGi);
+  list.splice(Math.max(0,Math.min(list.length,at)), 0, u);
+  const at2=list.indexOf(u);
+  setSel([at2], at2);                            // reordenar invalida los índices previos
+}
+
+/* ═══════════════ Precio y análisis ═══════════════ */
+/* Mamparas de mingitorio: cada grupo contiguo de u mingitorios necesita u+1
+   (una entre cada par, más las dos de los extremos). Un vecino de tipo cabina
+   corta el grupo, porque esa frontera ya la cierra el panel de la cabina. */
+function countScreens(){
+  let s=0;
+  computeRuns().runs.forEach(r=>{
+    let open=false;
+    r.stalls.forEach(st=>{
+      const u=isUrinalUnit(st.cfg);
+      if(u){ if(!open){ s++; open=true; } s++; } else open=false;
+    });
+  });
+  return s;
+}
+function computeQuote(){
+  const r=state.room, m=MATERIALS.find(x=>x.id===state.materialId);
+  const units=r.stalls, n=units.length;
+  const nStall=units.filter(u=>!isUrinalUnit(u)).length, nUrinal=n-nStall;
+  const screens=countScreens(), perScreen=Math.round(m.perStall*0.5);
+  const stalls=nStall*m.perStall, doors=nStall*90, hardware=nStall*65;
+  const screensCost=screens*perScreen, brackets=screens*40;
+  const ada=units.some(u=>u.ada)?520:0;
+  const nPriv=units.filter(u=>u.privacy && !isUrinalUnit(u)).length, privacy=nPriv*120;
+  const backPanel = r.back==='panel' ? n*Math.round(m.perStall*0.45) : 0;
+  const subtotal=stalls+doors+hardware+screensCost+brackets+ada+privacy+backPanel;
+  const shipping=nStall?180:140, total=subtotal+shipping;
+  return {m,n,nStall,nUrinal,nPriv,screens,perScreen,screensCost,brackets,
+          stalls,doors,hardware,ada,privacy,backPanel,subtotal,shipping,total};
+}
+function analysis(){
+  const {bounds,runs}=computeRuns();
+  const live=runs.filter(r=>!r.empty);
+  const wall=live.reduce((s,r)=>s+r.length,0);
+  const adaStall=state.room.stalls.find(s=>s.ada);
+  const adaOk = !state.room.ada || (adaStall && (adaStall.stallWidth+adaStall.stallWidthFrac)>=60);
+  // recomendación
+  const n=state.room.stalls.length, ratio=bounds.w/Math.max(1,bounds.d);
+  let rec='inline';
+  if(n>=6) rec='island'; else if(n>=3 && ratio<2.4) rec='corner-l';
+  return {W:bounds.w, D:bounds.d, wall, adaOk, adaStall, rec, runs:live};
+}
+
+/* ═══════════════ Vista 2D (canvas) ═══════════════ */
+const canvas=document.getElementById('view2d'), ctx=canvas.getContext('2d');
+let map=null, pickRuns=[], drag=null;
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+function draw2D(){
+  const wrap=document.getElementById('canvasWrap'), dpr=window.devicePixelRatio||1;
+  const W=wrap.clientWidth, H=wrap.clientHeight;
+  canvas.width=W*dpr; canvas.height=H*dpr; canvas.style.width=W+'px'; canvas.style.height=H+'px';
+  ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,W,H);
+
+  const {runs,bounds}=computeRuns();
+  // La elevación vive en una columna derecha reservada: la planta se dibuja a su izquierda.
+  const eb=elevBox(W,H);
+  const mg={t:64, r: eb ? (W-eb.x0)+24 : 60, b:64, l:70};
+  const s=Math.min((W-mg.l-mg.r)/Math.max(1,bounds.w),(H-mg.t-mg.b)/Math.max(1,bounds.d));
+  const ox=mg.l+((W-mg.l-mg.r)-bounds.w*s)/2 - bounds.x0*s;
+  const oy=mg.t+((H-mg.t-mg.b)-bounds.d*s)/2 - bounds.y0*s;
+  map={s,ox,oy};
+  const M=(x,y)=>({X:ox+x*s, Y:oy+y*s});
+
+  pickRuns=runs;
+  const wall=state.colorHex;
+
+  runs.forEach(r=>{
+    if(r.empty){ emptyRunZone(r,M); return; }
+    // resaltado + relleno de cada unidad (con su propia profundidad)
+    r.stalls.forEach(st=>{
+      const c=[P(r,st.aStart,0),P(r,st.aEnd,0),P(r,st.aEnd,st.depth),P(r,st.aStart,st.depth)].map(p=>M(p.x,p.y));
+      ctx.beginPath(); ctx.moveTo(c[0].X,c[0].Y); c.slice(1).forEach(p=>ctx.lineTo(p.X,p.Y)); ctx.closePath();
+      ctx.fillStyle = selHas(st.gi) ? 'rgba(147,60,68,.12)' : 'rgba(255,255,255,.55)';
+      ctx.fill();
+      if(selHas(st.gi)){                       // contorno: continuo el ancla, punteado el resto
+        ctx.strokeStyle=css('--danger'); ctx.lineWidth=st.gi===state.selected?2:1.2;
+        if(st.gi!==state.selected) ctx.setLineDash([5,4]);
+        ctx.stroke(); ctx.setLineDash([]);
+      }
+      if(drag&&drag.moved&&st.gi===drag.gi){ ctx.globalAlpha=.35; ctx.fillStyle='rgba(147,60,68,.25)'; ctx.fill(); ctx.globalAlpha=1; }
+    });
+    // fondo: panel de fondo (producto), muro de concreto (referencia) u oculto
+    if(state.room.back==='panel') strokePlan(r, [ [0,0],[r.length,0] ], wall, 6);
+    else if(state.room.showWall) strokePlan(r, [ [0,0],[r.length,0] ], '#b3b8be', 9);
+    // pilastras / divisiones: cada una con la profundidad de lo que separa
+    runBoundaries(r).forEach(b=> strokePlan(r,[[b.a,0],[b.a,b.depth]], wall, b.tall?4:3));
+    // muros laterales (nicho / esquina)
+    if(r.sideWalls[0]) strokePlan(r,[[0,0],[0,r.depth]], wall, 7);
+    if(r.sideWalls[1]) strokePlan(r,[[r.length,0],[r.length,r.depth]], wall, 7);
+    // inodoros/mingitorios + puertas
+    r.stalls.forEach(st=>{ if(isUrinalUnit(st.cfg)){ drawUrinal(r,st,M); } else { drawToilet(r,st,M); drawDoor(r,st,M,s); } });
+    if(runs.length>1) runTag(r,M);
+  });
+
+  if(drag&&drag.moved) drawDropHint(M);
+  // cotas de la cabina seleccionada
+  const sel=findStall(state.selected);
+  if(sel){ drawDims(sel.run, sel.st, M, s); }
+  drawElevation(eb);
+
+  function strokePlan(r, pts, color, w){
+    ctx.strokeStyle=color; ctx.lineWidth=w; ctx.lineCap='round'; ctx.beginPath();
+    pts.forEach((p,i)=>{ const q=P(r,p[0],p[1]), m=M(q.x,q.y); i?ctx.lineTo(m.X,m.Y):ctx.moveTo(m.X,m.Y); });
+    ctx.stroke();
+  }
+}
+function findStall(gi){
+  const {runs}=computeRuns();
+  for(const r of runs){ const st=r.stalls.find(s=>s.gi===gi); if(st) return {run:r,st}; }
+  return null;
+}
+const runLetter = i => i? 'B' : 'A';
+/* Hilera sin unidades: huella punteada para saber dónde caería lo que se arrastre. */
+function emptyRunZone(r,M){
+  const c=[P(r,0,0),P(r,r.length,0),P(r,r.length,r.depth),P(r,0,r.depth)].map(p=>M(p.x,p.y));
+  const hot = drag&&drag.drop&&drag.drop.run===r.runIdx;
+  ctx.save();
+  ctx.setLineDash([6,5]); ctx.lineWidth=1.5;
+  ctx.strokeStyle = hot? css('--danger') : 'rgba(120,130,145,.5)';
+  ctx.fillStyle   = hot? 'rgba(147,60,68,.07)' : 'rgba(120,130,145,.05)';
+  ctx.beginPath(); ctx.moveTo(c[0].X,c[0].Y); c.slice(1).forEach(p=>ctx.lineTo(p.X,p.Y)); ctx.closePath();
+  ctx.fill(); ctx.stroke(); ctx.setLineDash([]);
+  const q=P(r,r.length/2,r.depth/2), m=M(q.x,q.y);
+  ctx.fillStyle= hot? css('--danger') : 'rgba(120,130,145,.75)';
+  ctx.font='700 10px Inter,sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('HILERA '+runLetter(r.runIdx)+' · VACÍA', m.X, m.Y);
+  ctx.restore();
+}
+function runTag(r,M){
+  const q=P(r,-6,r.depth/2), m=M(q.x,q.y);
+  ctx.save();
+  ctx.fillStyle='rgba(120,130,145,.8)'; ctx.font='700 10px Inter,sans-serif';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(runLetter(r.runIdx), m.X, m.Y);
+  ctx.restore();
+}
+/* Marca de inserción durante el arrastre: línea roja donde caerá la unidad. */
+function drawDropHint(M){
+  const d=drag&&drag.drop; if(!d) return;
+  const r=pickRuns.find(x=>x.runIdx===d.run); if(!r) return;
+  let a = r.length;
+  if(d.beforeGi>=0){ const st=r.stalls.find(s=>s.gi===d.beforeGi); if(st) a=st.aStart-PL/2; }
+  else if(r.stalls.length) a=r.stalls[r.stalls.length-1].aEnd+PL/2;
+  else a=r.length/2;
+  const p0=P(r,a,-4), p1=P(r,a,r.depth+4), m0=M(p0.x,p0.y), m1=M(p1.x,p1.y);
+  ctx.save();
+  ctx.strokeStyle=css('--danger'); ctx.lineWidth=3; ctx.lineCap='round';
+  ctx.beginPath(); ctx.moveTo(m0.X,m0.Y); ctx.lineTo(m1.X,m1.Y); ctx.stroke();
+  ctx.restore();
+}
+/* Caja de la elevación: única fuente de verdad para su posición.
+   La usa draw2D para reservar el margen derecho y drawElevation para dibujar.
+   Devuelve null cuando no cabe (canvas angosto o bajo) → no se reserva columna. */
+const ELEV_W=142, ELEV_H=206;
+function elevBox(W,H){
+  if(W<=520) return null;                   // canvas angosto: no mostrar
+  const x0=W-ELEV_W-16, y0=H-ELEV_H-50;
+  if(y0<8) return null;                     // no cabe a lo alto: omitir
+  return {x0, y0, w:ELEV_W, h:ELEV_H};
+}
+function drawElevation(box){
+  if(!box) return;
+  const hIn=state.room.height, gIn=state.room.floorGap, tIn=hIn+gIn;
+  const boxW=box.w, cardH=box.h, x0=box.x0, cardY=box.y0;
+  ctx.save();
+  const rr=(x,y,w,h,r)=>{ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); };
+  ctx.fillStyle='rgba(255,255,255,.93)'; ctx.strokeStyle=css('--line'); ctx.lineWidth=1;
+  rr(x0,cardY,boxW,cardH,8); ctx.fill(); ctx.stroke();
+  ctx.fillStyle=css('--ink-faint'); ctx.font='700 9px Inter,sans-serif'; ctx.textAlign='left'; ctx.textBaseline='top';
+  ctx.fillText('ELEVACIÓN (LATERAL)', x0+10, cardY+8);
+  const baseY=cardY+cardH-24, topArea=cardY+30, eScale=(baseY-topArea)/Math.max(60,tIn+6);
+  const bx=x0+50, bw=24, panelBottom=baseY-gIn*eScale, panelTop=baseY-tIn*eScale;
+  // muro de fondo (contexto): concreto gris o panel del material, sube casi al techo
+  const wallTop=topArea-4;
+  ctx.save(); ctx.globalAlpha = state.room.back==='panel'?0.5:0.85;
+  ctx.fillStyle = state.room.back==='panel'? state.colorHex : '#c2c6ca';
+  ctx.fillRect(bx-9, wallTop, 7, baseY-wallTop); ctx.restore();
+  // piso + hachurado
+  ctx.strokeStyle=css('--ink-dim'); ctx.lineWidth=1.6; ctx.beginPath(); ctx.moveTo(bx-34,baseY); ctx.lineTo(bx+bw+34,baseY); ctx.stroke();
+  ctx.strokeStyle=css('--ink-faint'); ctx.lineWidth=1;
+  for(let hx=bx-32; hx<bx+bw+32; hx+=6){ ctx.beginPath(); ctx.moveTo(hx,baseY); ctx.lineTo(hx-4,baseY+5); ctx.stroke(); }
+  // soporte al piso si flota
+  if(gIn>0){ ctx.strokeStyle=css('--ink-faint'); ctx.setLineDash([3,3]); ctx.beginPath(); ctx.moveTo(bx+bw/2,panelBottom); ctx.lineTo(bx+bw/2,baseY); ctx.stroke(); ctx.setLineDash([]); }
+  // panel (material)
+  ctx.fillStyle=state.colorHex; rr(bx,panelTop,bw,panelBottom-panelTop,3); ctx.fill();
+  // cotas: izquierda Alto/Piso, derecha Total
+  vdim(bx-18, panelTop, panelBottom, hIn+'"', 'Alto', 'right');
+  if(gIn>0) vdim(bx-18, panelBottom, baseY, gIn+'"', 'Piso', 'right');
+  vdim(bx+bw+16, panelTop, baseY, tIn+'"', 'Total', 'left');
+  ctx.restore();
+  function vdim(x,yA,yB,label,cap,side){
+    ctx.strokeStyle=css('--danger'); ctx.fillStyle=css('--danger'); ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(x,yA); ctx.lineTo(x,yB); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x-3,yA); ctx.lineTo(x+3,yA); ctx.moveTo(x-3,yB); ctx.lineTo(x+3,yB); ctx.stroke();
+    ctx.textBaseline='middle'; ctx.textAlign = side==='right' ? 'right' : 'left';
+    const tx = side==='right' ? x-5 : x+5, my=(yA+yB)/2;
+    ctx.font='bold 10px Inter,sans-serif'; ctx.fillStyle=css('--danger'); ctx.fillText(label, tx, my-5);
+    ctx.font='600 8px Inter,sans-serif'; ctx.fillStyle=css('--ink-faint'); ctx.fillText(cap, tx, my+6);
+  }
+}
+function drawToilet(r,st,M){
+  const back=P(r,st.aCenter,4), bowl=P(r,st.aCenter,16);
+  const b=M(bowl.x,bowl.y), k=M(back.x,back.y), sc=map.s;
+  ctx.save();
+  ctx.strokeStyle='#9fb3c4'; ctx.fillStyle='#fbfdff'; ctx.lineWidth=1.3;
+  ctx.beginPath(); ctx.rect(k.X-9, k.Y-9, 18,18); ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.ellipse(b.X,b.Y, 11,11,0,0,Math.PI*2); ctx.fill(); ctx.stroke();
+  ctx.restore();
+  const rd=11;
+  ctx.beginPath(); ctx.arc(b.X,b.Y,rd,0,Math.PI*2);
+  ctx.fillStyle = selHas(st.gi) ? css('--danger') : css('--ink');
+  ctx.fill();
+  if(st.cfg.ada){ ctx.strokeStyle=css('--info'); ctx.lineWidth=2.4; ctx.stroke(); }
+  ctx.fillStyle='#fff'; ctx.font='bold 12px Inter,sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(String(st.gi+1), b.X, b.Y+0.5);
+}
+function drawUrinal(r,st,M){
+  const back=P(r,st.aCenter,3), b=M(back.x,back.y);
+  ctx.save();
+  ctx.strokeStyle='#9fb3c4'; ctx.fillStyle='#fbfdff'; ctx.lineWidth=1.3;
+  ctx.beginPath(); ctx.ellipse(b.X,b.Y+9,8.5,12,0,0,Math.PI*2); ctx.fill(); ctx.stroke();
+  ctx.restore();
+  ctx.beginPath(); ctx.arc(b.X,b.Y+9,10,0,Math.PI*2);
+  ctx.fillStyle = selHas(st.gi) ? css('--danger') : css('--ink'); ctx.fill();
+  ctx.fillStyle='#fff'; ctx.font='bold 11px Inter,sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(String(st.gi+1), b.X, b.Y+9);
+}
+function drawDoor(r,st,M,s){
+  const L=doorLayout(st);
+  // paneles fijos del frente (cierran el vano; la puerta ya no flota)
+  if(L.lp>0.5) frontWall(st.aStart, st.aStart+L.lp);
+  if(L.rp>0.5) frontWall(st.aEnd-L.rp, st.aEnd);
+  // hoja abatida, abisagrada en la pilastra/panel
+  const aH=L.hingeA, along=L.dir, vert=L.inward?-1:1, th=50*Math.PI/180, len=L.op;
+  const aL=aH+along*Math.cos(th)*len, tL=st.depth+vert*Math.sin(th)*len;
+  const p0=P(r,aH,st.depth), p1=P(r,aL,tL), m0=M(p0.x,p0.y), m1=M(p1.x,p1.y);
+  ctx.save();
+  ctx.strokeStyle='rgba(110,120,136,.45)'; ctx.setLineDash([4,4]); ctx.lineWidth=1;
+  const pC=P(r,aH+along*len, st.depth), mc=M(pC.x,pC.y);
+  ctx.beginPath(); ctx.moveTo(mc.X,mc.Y); ctx.lineTo(m0.X,m0.Y); ctx.lineTo(m1.X,m1.Y); ctx.stroke();
+  ctx.setLineDash([]); ctx.strokeStyle=state.colorHex; ctx.lineWidth=4;
+  ctx.beginPath(); ctx.moveTo(m0.X,m0.Y); ctx.lineTo(m1.X,m1.Y); ctx.stroke();
+  // manija (punto) en el canto de cierre de la hoja
+  ctx.fillStyle='#c8ccd2'; ctx.beginPath(); ctx.arc(m1.X,m1.Y,2.6,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+  // tira de privacidad: tapa la rendija del lado de la bisagra
+  if(st.cfg.privacy){
+    const g0=P(r,aH-2.5,st.depth), g1=P(r,aH+2.5,st.depth);
+    const n0=M(g0.x,g0.y), n1=M(g1.x,g1.y);
+    ctx.save(); ctx.strokeStyle=css('--info'); ctx.lineWidth=6; ctx.lineCap='butt';
+    ctx.beginPath(); ctx.moveTo(n0.X,n0.Y); ctx.lineTo(n1.X,n1.Y); ctx.stroke(); ctx.restore();
+  }
+  function frontWall(a0,a1){ const q0=P(r,a0,st.depth),q1=P(r,a1,st.depth),n0=M(q0.x,q0.y),n1=M(q1.x,q1.y);
+    ctx.strokeStyle=state.colorHex; ctx.lineWidth=7; ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(n0.X,n0.Y); ctx.lineTo(n1.X,n1.Y); ctx.stroke(); }
+}
+function drawDims(r,st,M,s){
+  const c=st.cfg;
+  const wLabel=(c.stallWidth+(c.stallWidthFrac?({0.25:' 1/4',0.5:' 1/2',0.75:' 3/4'})[c.stallWidthFrac]:''))+'"';
+  dimLine(P(r,st.aStart,st.depth*0.34), P(r,st.aEnd,st.depth*0.34), wLabel);
+  const depthLabel = isUrinalUnit(c) ? `Fondo ${c.partitionDepth}"` : `Prof ${c.partitionDepth}"`;
+  dimLine(P(r,st.aStart-PL,0), P(r,st.aStart-PL,st.depth), depthLabel);
+  if(!isUrinalUnit(c)){
+    const dl=doorLayout(st);
+    dimLine(P(r,dl.doorStart,st.depth+8),P(r,dl.doorEnd,st.depth+8), `${c.doorOpening}"`);
+  }
+  function dimLine(p1,p2,label){
+    const m1=M(p1.x,p1.y), m2=M(p2.x,p2.y);
+    ctx.save(); ctx.strokeStyle=css('--danger'); ctx.fillStyle=css('--danger'); ctx.lineWidth=1.2;
+    ctx.beginPath(); ctx.moveTo(m1.X,m1.Y); ctx.lineTo(m2.X,m2.Y); ctx.stroke();
+    tick(m1); tick(m2);
+    pill((m1.X+m2.X)/2,(m1.Y+m2.Y)/2,label);
+    ctx.restore();
+    function tick(m){ ctx.beginPath(); ctx.arc(m.X,m.Y,2.2,0,Math.PI*2); ctx.fill(); }
+  }
+  function pill(x,y,text){
+    ctx.font='bold 11px Inter,sans-serif'; const w=ctx.measureText(text).width+14, h=18;
+    ctx.fillStyle='#fff'; ctx.strokeStyle=css('--danger'); ctx.lineWidth=1.2;
+    rr(x-w/2,y-h/2,w,h,9); ctx.fill(); ctx.stroke();
+    ctx.fillStyle=css('--danger'); ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(text,x,y+.5);
+  }
+  function rr(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+}
+/* Clic = seleccionar. Arrastrar = mover la unidad de hilera o reordenarla.
+   Se distingue por el umbral de 5 px, así un clic torpe no reacomoda el baño. */
+function canvasPt(e){
+  const rect=canvas.getBoundingClientRect();
+  return {x:(e.clientX-rect.left-map.ox)/map.s, y:(e.clientY-rect.top-map.oy)/map.s};
+}
+function hitUnit(px,py){
+  for(const r of pickRuns){
+    if(r.empty) continue;
+    const {a,t}=invP(r,px,py);
+    if(t<-4||t>r.depth+4) continue;
+    const st=r.stalls.find(s=>a>=s.aStart-PL && a<=s.aEnd+PL);
+    if(st) return st.gi;
+  }
+  return null;
+}
+/* Hilera y punto de inserción bajo el cursor. Se elige la hilera MÁS CERCANA,
+   no la que contenga el punto exacto: exigir puntería dentro de la huella hacía
+   que el arrastre pareciera muerto cuando soltabas un poco fuera. */
+function dropTarget(px,py){
+  let best=null, bestD=Infinity;
+  for(const r of pickRuns){
+    const {a,t}=invP(r,px,py);
+    const da = a<0 ? -a : (a>r.length ? a-r.length : 0);
+    const dt = t<0 ? -t : (t>r.depth  ? t-r.depth  : 0);
+    const d=Math.hypot(da,dt);
+    if(d<bestD){ bestD=d; best={r,a}; }
+  }
+  if(!best || bestD>140) return null;        // a más de ~12 pies, fuera de todo
+  let beforeGi=-1;
+  for(const st of best.r.stalls){ if(best.a<st.aCenter){ beforeGi=st.gi; break; } }
+  return {run:best.r.runIdx, beforeGi};
+}
+canvas.addEventListener('pointerdown',e=>{
+  if(!map||e.button) return;
+  const p=canvasPt(e), gi=hitUnit(p.x,p.y);
+  if(gi==null) return;
+  drag={gi, sx:e.clientX, sy:e.clientY, moved:false, drop:null, px:p.x, py:p.y};
+  try{ canvas.setPointerCapture(e.pointerId); }catch(_){}
+});
+canvas.addEventListener('pointermove',e=>{
+  if(!map) return;
+  if(!drag){                                  // sin arrastrar: solo la pista del cursor
+    const p=canvasPt(e);
+    canvas.style.cursor = hitUnit(p.x,p.y)!=null ? 'grab' : '';
+    return;
+  }
+  if(!drag.moved && Math.hypot(e.clientX-drag.sx, e.clientY-drag.sy)<5) return;
+  drag.moved=true; canvas.style.cursor='grabbing';
+  const p=canvasPt(e); drag.px=p.x; drag.py=p.y;
+  drag.drop=dropTarget(p.x,p.y);
+  draw2D();
+});
+canvas.addEventListener('pointerup',e=>{
+  if(!drag) return;
+  const d=drag; drag=null; canvas.style.cursor='';
+  try{ canvas.releasePointerCapture(e.pointerId); }catch(_){}
+  if(!d.moved){
+    selectStall(d.gi, e.shiftKey ? 'range' : (e.ctrlKey||e.metaKey) ? 'toggle' : 'set');
+    return;
+  }
+  if(d.drop){
+    materializeSplit();
+    moveUnitTo(d.gi, d.drop.run, d.drop.beforeGi);
+    framed=false; refreshStallSelect(); renderStep(); render();
+  } else draw2D();
+});
+canvas.addEventListener('pointercancel',()=>{ drag=null; canvas.style.cursor=''; draw2D(); });
+canvas.addEventListener('pointerleave',()=>{ if(!drag) canvas.style.cursor=''; });
+
+/* ═══════════════ Vista 3D (three.js) ═══════════════ */
+const host=document.getElementById('view3d');
+let renderer,scene,camera,controls,rootG,ray,ptr,running=false,framed=false,pick3d=[],sun=null,steelMat=null,chromeMat=null,doorAnims=[],tour={active:false,start:0},clock=null,animateOpenOnce=false,concreteTex=null;
+function init3D(){
+  renderer=new THREE.WebGLRenderer({antialias:true});
+  renderer.setPixelRatio(window.devicePixelRatio); renderer.setClearColor(0xe9eaed,1);
+  renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.05;
+  host.appendChild(renderer.domElement);
+  scene=new THREE.Scene();
+  // Entorno para reflejos realistas del metal (sin archivos externos)
+  const pmrem=new THREE.PMREMGenerator(renderer);
+  scene.environment=pmrem.fromScene(new RoomEnvironment(),0.04).texture;
+  camera=new THREE.PerspectiveCamera(45,1,0.1,3000);
+  controls=new OrbitControls(camera,renderer.domElement);
+  controls.enableDamping=true; controls.dampingFactor=.08; controls.maxPolarAngle=Math.PI*.49;
+  scene.add(new THREE.HemisphereLight(0xffffff,0x8b95a3,.55));
+  sun=new THREE.DirectionalLight(0xffffff,1.15); sun.position.set(16,34,20); sun.castShadow=true;
+  sun.shadow.mapSize.set(2048,2048); sun.shadow.bias=-0.0004; sun.shadow.normalBias=0.02;
+  const sc=sun.shadow.camera; sc.near=1; sc.far=220; sc.left=sc.bottom=-45; sc.right=sc.top=45; sc.updateProjectionMatrix();
+  scene.add(sun);
+  rootG=new THREE.Group(); scene.add(rootG);
+  ray=new THREE.Raycaster(); ptr=new THREE.Vector2(); clock=new THREE.Clock();
+  renderer.domElement.addEventListener('pointerdown',onPick3D);
+}
+/* Acero inoxidable cepillado: textura procedural (albedo + rugosidad + relieve)
+   sobre material PBR físico con anisotropía. Se genera una sola vez. */
+function getSteel(){
+  if(steelMat) return steelMat;
+  const w=512,h=512;
+  const base=document.createElement('canvas'); base.width=w; base.height=h; const bg=base.getContext('2d');
+  bg.fillStyle='#c4c9cd'; bg.fillRect(0,0,w,h);
+  for(let i=0;i<15000;i++){ const y=Math.random()*h,x=Math.random()*w,len=15+Math.random()*170;
+    const dark=Math.random()<0.5, v=dark?(90+Math.random()*60):(200+Math.random()*55);
+    bg.strokeStyle=`rgba(${v|0},${v|0},${(v+3)|0},${0.03+Math.random()*0.05})`; bg.lineWidth=Math.random()<0.5?1:0.6;
+    bg.beginPath(); bg.moveTo(x,y); bg.lineTo(x+len,y); bg.stroke(); }
+  const map=new THREE.CanvasTexture(base); map.colorSpace=THREE.SRGBColorSpace;
+  map.wrapS=map.wrapT=THREE.RepeatWrapping; map.anisotropy=8; map.repeat.set(2,3);
+  const rc=document.createElement('canvas'); rc.width=w; rc.height=h; const rg=rc.getContext('2d');
+  rg.fillStyle='#7c7c7c'; rg.fillRect(0,0,w,h);
+  for(let i=0;i<17000;i++){ const y=Math.random()*h,x=Math.random()*w,len=15+Math.random()*210;
+    const v=Math.random()<0.5?55:185; rg.strokeStyle=`rgba(${v},${v},${v},.07)`;
+    rg.beginPath(); rg.moveTo(x,y); rg.lineTo(x+len,y); rg.stroke(); }
+  const rough=new THREE.CanvasTexture(rc); rough.wrapS=rough.wrapT=THREE.RepeatWrapping; rough.repeat.set(2,3);
+  steelMat=new THREE.MeshPhysicalMaterial({ color:0xd7dbde, metalness:1.0, roughness:.42,
+    map, roughnessMap:rough, bumpMap:map, bumpScale:.015, envMapIntensity:1.3,
+    anisotropy:1.0, anisotropyRotation:Math.PI/2 });
+  return steelMat;
+}
+function build3D(reframe){
+  if(!renderer) init3D();
+  while(rootG.children.length) rootG.remove(rootG.children[0]);
+  pick3d=[]; doorAnims=[];
+  const {runs,bounds}=computeRuns();
+  const partH=state.room.height*S, gap=state.room.floorGap*S, top=gap+partH;
+  const inox = state.materialId==='inox';
+  const steel = inox ? getSteel() : null;
+  const wallMat = inox ? steel : new THREE.MeshStandardMaterial({color:new THREE.Color(state.colorHex),roughness:.82,envMapIntensity:.5});
+  const doorMat = inox ? steel : new THREE.MeshStandardMaterial({color:new THREE.Color(state.colorHex).offsetHSL(0,0,.08),roughness:.7,envMapIntensity:.5});
+  const porc=new THREE.MeshStandardMaterial({color:0xf7fafc,roughness:.22,metalness:.05,envMapIntensity:.7});
+  const floorMat=new THREE.MeshStandardMaterial({color:0xdfe3e8,roughness:.7,metalness:0,envMapIntensity:.45});
+  const concreteMat=getConcreteMat();
+
+  // suelo general
+  const floor=new THREE.Mesh(new THREE.PlaneGeometry(bounds.w*S+2,bounds.d*S+2),floorMat);
+  floor.rotation.x=-Math.PI/2; floor.position.set((bounds.x0+bounds.w/2)*S,0,(bounds.y0+bounds.d/2)*S);
+  floor.receiveShadow=true;
+  rootG.add(floor);
+
+  const live=runs.filter(r=>!r.empty);
+  live.forEach(r=>{
+    const g=new THREE.Group(); g.rotation.y=r.theta||0; g.position.set(r.o3.x*S,0,r.o3.y*S); rootG.add(g);
+    const hasStall=r.stalls.some(st=>!isUrinalUnit(st.cfg));
+    // fondo: panel de fondo (material) o muro de concreto de referencia (o nada)
+    if(state.room.back==='panel'){
+      addBox(g, r.length*S, partH, 1.4*S, r.length*S/2, gap+partH/2, -0.7*S, wallMat);
+    } else if(state.room.showWall){
+      addBox(g, r.length*S, top+18*S, PL*S, r.length*S/2, (top+18*S)/2, -PL*S/2, concreteMat);
+    }
+    // pilastras: alto y fondo según las unidades que separa (mampara corta vs panel)
+    const bs=runBoundaries(r);
+    const divH=b=>b.tall?top:partH, divY=b=>b.tall?top/2:gap+partH/2;
+    bs.forEach(b=> addBox(g, PL*S, divH(b), b.depth*S, b.a*S, divY(b), b.depth*S/2, wallMat));
+    const sideH = hasStall?top:partH, sideY = hasStall?top/2:gap+partH/2;
+    if(r.sideWalls[0]) addBox(g, PL*S, sideH, r.depth*S, 0, sideY, r.depth*S/2, wallMat);
+    if(r.sideWalls[1]) addBox(g, PL*S, sideH, r.depth*S, r.length*S, sideY, r.depth*S/2, wallMat);
+    if(r===live[0]) addHeightDim(g, top, gap, r.depth);
+    // herrajes de estructura: zapatas al piso donde hay panel completo + riel superior
+    bs.forEach(b=>{ if(b.tall) addShoe(g, b.a, b.depth); });
+    if(hasStall) addHeadrail(g, r.length, top, r.depth);
+    r.stalls.forEach(st=>{
+      if(selHas(st.gi)){
+        const hl=new THREE.Mesh(new THREE.PlaneGeometry((st.aEnd-st.aStart)*S, st.depth*S),
+          new THREE.MeshStandardMaterial({color:0x933c44,transparent:true,opacity:.14}));
+        hl.rotation.x=-Math.PI/2; hl.position.set(st.aCenter*S,.02,st.depth*S/2); g.add(hl);
+      }
+      if(isUrinalUnit(st.cfg)){ addUrinal3D(g, st.aCenter*S, gap, partH, porc); }
+      else { addToilet(g, st.aCenter*S, porc); addDoor(g, st, gap, partH, doorMat); }
+      addNum(g, st.aCenter*S, top+9*S, st.gi+1, selHas(st.gi));
+      const zone=new THREE.Mesh(new THREE.PlaneGeometry((st.aEnd-st.aStart)*S,st.depth*S), new THREE.MeshBasicMaterial({visible:false}));
+      zone.rotation.x=-Math.PI/2; zone.position.set(st.aCenter*S,.01,st.depth*S/2); zone.userData.gi=st.gi; g.add(zone); pick3d.push(zone);
+    });
+  });
+
+  if(reframe||!framed){
+    const cx=(bounds.x0+bounds.w/2)*S, cz=(bounds.y0+bounds.d/2)*S, span=Math.max(bounds.w,bounds.d)*S;
+    controls.target.set(cx, top*.4, cz);
+    camera.position.set(cx, span*.6+top, cz + span*.9 + bounds.d*S*.4);
+    framed=true;
+  }
+  resize3D();
+}
+function addBox(g,w,h,d,x,y,z,m){ const b=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m); b.position.set(x,y,z); b.castShadow=true; b.receiveShadow=true; g.add(b); }
+function addToilet(g,x,m){
+  const grp=new THREE.Group();
+  const tank=new THREE.Mesh(new THREE.BoxGeometry(19*S,20*S,7*S),m); tank.position.set(0,10*S,3.5*S);
+  const base=new THREE.Mesh(new THREE.CylinderGeometry(6*S,7*S,12*S,20),m); base.position.set(0,6*S,16*S);
+  const bowl=new THREE.Mesh(new THREE.CylinderGeometry(9*S,7*S,5*S,24),m); bowl.position.set(0,14*S,16*S);
+  [tank,base,bowl].forEach(o=>{o.castShadow=true;o.receiveShadow=true;});
+  grp.add(tank,base,bowl); grp.position.set(x,0,0); g.add(grp);
+}
+function addUrinal3D(g,x,gap,partH,m){
+  const u=new THREE.Mesh(new THREE.CapsuleGeometry(4.5*S,9*S,6,16),m);
+  u.position.set(x, 22*S, 3.2*S); u.castShadow=true; u.receiveShadow=true; g.add(u);
+  const lip=new THREE.Mesh(new THREE.CylinderGeometry(5*S,4*S,2*S,16),m);
+  lip.position.set(x, 17*S, 4.6*S); lip.castShadow=true; g.add(lip);
+}
+function addDoor(g,st,gap,partH,m){
+  const L=doorLayout(st), openW=L.op*S;
+  // paneles fijos que cierran el resto del frente (la hoja ya no queda flotando)
+  if(L.lp>0.5) addFrontPanel(g, st.aStart, st.aStart+L.lp, gap, partH, st.depth, m);
+  if(L.rp>0.5) addFrontPanel(g, st.aEnd-L.rp, st.aEnd, gap, partH, st.depth, m);
+  const grp=new THREE.Group();
+  const mesh=new THREE.Mesh(new THREE.BoxGeometry(openW,partH,1.2*S),m);
+  mesh.position.x=L.dir*openW/2; mesh.castShadow=true; mesh.receiveShadow=true; grp.add(mesh);
+  // herrajes: bisagras (en la pilastra), pestillo, manija de jalar y gancho
+  addHinge(grp, L.dir, partH*0.34);
+  addHinge(grp, L.dir, -partH*0.34);
+  addLatch(grp, L.dir, openW);
+  addHandle(grp, L.dir, openW);
+  addHook(grp, L.dir, openW, partH);
+  grp.position.set(L.hingeA*S, gap+partH/2, st.depth*S);
+  const openAngle = (L.left ? (L.inward?1:-1) : (L.inward?-1:1)) * THREE.MathUtils.degToRad(50);
+  grp.rotation.y = animateOpenOnce ? 0 : openAngle;
+  doorAnims.push({group:grp, openAngle:openAngle, cur:animateOpenOnce?0:1, target:1});
+  g.add(grp);
+  // placa de cierre (keeper) en el canto de cierre de la puerta
+  addStrike(g, L.closeA, gap, partH, st.depth);
+  // tira de privacidad sobre la bisagra
+  if(st.cfg.privacy){
+    const strip=new THREE.Mesh(new THREE.BoxGeometry(2.5*S,partH,1.2*S),m);
+    strip.position.set(L.hingeA*S, gap+partH/2, st.depth*S+1.8*S);
+    strip.castShadow=true; strip.receiveShadow=true; g.add(strip);
+  }
+}
+function addFrontPanel(g,a0,a1,gap,partH,depth,m){
+  const w=(a1-a0)*S;
+  const p=new THREE.Mesh(new THREE.BoxGeometry(w,partH,1.2*S),m);
+  p.position.set((a0+a1)/2*S, gap+partH/2, depth*S);
+  p.castShadow=true; p.receiveShadow=true; g.add(p);
+}
+function addHandle(grp,dir,openW){
+  const g=getChrome(), lead=dir*openW, x=lead - dir*2.6*S, z=1.5*S;
+  const bar=new THREE.Mesh(new THREE.CylinderGeometry(.3*S,.3*S,7*S,10),g);
+  bar.position.set(x,0,z); bar.castShadow=true; grp.add(bar);
+  [3.2,-3.2].forEach(dy=>{ const post=new THREE.Mesh(new THREE.CylinderGeometry(.18*S,.18*S,1.5*S,8),g);
+    post.rotation.x=Math.PI/2; post.position.set(x,dy*S,z-0.8*S); post.castShadow=true; grp.add(post); });
+}
+
+/* ── Herrajes metálicos (cromo) ─────────────────────────────── */
+function getChrome(){
+  if(chromeMat) return chromeMat;
+  chromeMat=new THREE.MeshStandardMaterial({color:0xd8dce0,metalness:1,roughness:.22,envMapIntensity:1.25});
+  return chromeMat;
+}
+function addScrew(parent,x,y,z,face){
+  const s=new THREE.Mesh(new THREE.CylinderGeometry(.32*S,.32*S,.18*S,10),getChrome());
+  if(face==='x') s.rotation.z=Math.PI/2; else s.rotation.x=Math.PI/2;
+  s.position.set(x,y,z); s.castShadow=true; parent.add(s);
+}
+function addHinge(grp,dir,y){
+  const g=getChrome();
+  const barrel=new THREE.Mesh(new THREE.CylinderGeometry(.55*S,.55*S,4.4*S,12),g);
+  barrel.position.set(0,y,.55*S); barrel.castShadow=true; grp.add(barrel);
+  const leaf=new THREE.Mesh(new THREE.BoxGeometry(3.2*S,3.6*S,.35*S),g);
+  leaf.position.set(dir*1.7*S,y,.72*S); leaf.castShadow=true; grp.add(leaf);
+  addScrew(grp, dir*1.1*S, y+1.1*S, .95*S,'z');
+  addScrew(grp, dir*2.3*S, y-1.1*S, .95*S,'z');
+}
+function addLatch(grp,dir,openW){
+  const g=getChrome(); const lead=dir*openW;
+  const housing=new THREE.Mesh(new THREE.BoxGeometry(1.6*S,3.4*S,1.0*S),g);
+  housing.position.set(lead-dir*1.5*S,0,1.0*S); housing.castShadow=true; grp.add(housing);
+  const knob=new THREE.Mesh(new THREE.CylinderGeometry(.55*S,.55*S,1.1*S,14),g);
+  knob.rotation.x=Math.PI/2; knob.position.set(lead-dir*1.5*S,.4*S,1.9*S); knob.castShadow=true; grp.add(knob);
+  const bolt=new THREE.Mesh(new THREE.BoxGeometry(2.6*S,.7*S,.7*S),g);
+  bolt.position.set(lead-dir*0.1*S,-.5*S,1.0*S); bolt.castShadow=true; grp.add(bolt);
+  addScrew(grp, lead-dir*1.5*S, 1.5*S, 1.55*S,'z');
+  addScrew(grp, lead-dir*1.5*S, -1.5*S, 1.55*S,'z');
+}
+function addHook(grp,dir,openW,partH){
+  const g=getChrome(); const topY=partH/2-3*S, x=dir*openW*0.5, z=-.65*S;
+  const base=new THREE.Mesh(new THREE.CylinderGeometry(.5*S,.5*S,.35*S,10),g);
+  base.rotation.x=Math.PI/2; base.position.set(x,topY,z); base.castShadow=true; grp.add(base);
+  const arm=new THREE.Mesh(new THREE.CylinderGeometry(.2*S,.2*S,2.2*S,8),g);
+  arm.position.set(x,topY-.8*S,z-1.0*S); arm.rotation.x=Math.PI/2.4; arm.castShadow=true; grp.add(arm);
+}
+function addStrike(g,boundaryA,gap,partH,depth){
+  const m=getChrome();
+  const plate=new THREE.Mesh(new THREE.BoxGeometry(1.3*S,3.6*S,.3*S),m);
+  plate.position.set(boundaryA*S, gap+partH/2, depth*S+.28*S); plate.castShadow=true; g.add(plate);
+  addScrew(g, boundaryA*S, gap+partH/2+1.4*S, depth*S+.45*S,'z');
+  addScrew(g, boundaryA*S, gap+partH/2-1.4*S, depth*S+.45*S,'z');
+}
+function addShoe(g,a,depth){
+  const m=getChrome();
+  const shoe=new THREE.Mesh(new THREE.BoxGeometry(PL*S+.5*S,4*S,depth*S+.5*S),m);
+  shoe.position.set(a*S,2*S,depth*S/2); shoe.castShadow=true; shoe.receiveShadow=true; g.add(shoe);
+}
+function addHeadrail(g,length,top,depth){
+  const m=getChrome();
+  const rail=new THREE.Mesh(new THREE.BoxGeometry(length*S,1.5*S,1.5*S),m);
+  rail.position.set(length*S/2, top-.2*S, depth*S); rail.castShadow=true; g.add(rail);
+}
+function addNum(g,x,y,n,sel){
+  const cv=document.createElement('canvas'); cv.width=cv.height=128; const c=cv.getContext('2d');
+  c.beginPath(); c.arc(64,64,58,0,Math.PI*2); c.fillStyle=sel?'#933c44':'#191c22'; c.fill();
+  c.fillStyle='#fff'; c.font='bold 74px Inter,sans-serif'; c.textAlign='center'; c.textBaseline='middle'; c.fillText(String(n),64,70);
+  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(cv),depthTest:false}));
+  sp.scale.set(13*S,13*S,1); sp.position.set(x,y,3*S); g.add(sp);
+}
+function onPick3D(e){
+  const r=renderer.domElement.getBoundingClientRect();
+  ptr.x=((e.clientX-r.left)/r.width)*2-1; ptr.y=-((e.clientY-r.top)/r.height)*2+1;
+  ray.setFromCamera(ptr,camera); const h=ray.intersectObjects(pick3d,false);
+  if(h.length) selectStall(h[0].object.userData.gi);
+}
+/* Concreto procedural para el muro de referencia */
+function getConcreteTex(){
+  if(concreteTex) return concreteTex;
+  const w=512,h=512, c=document.createElement('canvas'); c.width=w;c.height=h; const g=c.getContext('2d');
+  g.fillStyle='#c6cace'; g.fillRect(0,0,w,h);
+  for(let i=0;i<180;i++){ const x=Math.random()*w,y=Math.random()*h,r=20+Math.random()*90;
+    const v=190+Math.floor(Math.random()*40); g.fillStyle=`rgba(${v},${v+2},${v+4},0.05)`;
+    g.beginPath(); g.arc(x,y,r,0,Math.PI*2); g.fill(); }
+  for(let i=0;i<9000;i++){ const x=Math.random()*w,y=Math.random()*h,r=Math.random()*1.6;
+    const d=Math.random()<0.5, v=d?120+Math.random()*40:210+Math.random()*40;
+    g.fillStyle=`rgba(${v|0},${v|0},${v|0},${0.15+Math.random()*0.2})`;
+    g.beginPath(); g.arc(x,y,r,0,Math.PI*2); g.fill(); }
+  for(let i=0;i<120;i++){ const x=Math.random()*w,y=Math.random()*h,r=1+Math.random()*2.5;
+    g.fillStyle='rgba(80,84,90,0.25)'; g.beginPath(); g.arc(x,y,r,0,Math.PI*2); g.fill(); }
+  concreteTex=new THREE.CanvasTexture(c); concreteTex.colorSpace=THREE.SRGBColorSpace;
+  concreteTex.wrapS=concreteTex.wrapT=THREE.RepeatWrapping; concreteTex.repeat.set(3,2);
+  return concreteTex;
+}
+function getConcreteMat(){
+  const tex=getConcreteTex();
+  return new THREE.MeshStandardMaterial({color:0xcfd2d6, map:tex, bumpMap:tex, bumpScale:.02,
+    roughness:1, metalness:0, envMapIntensity:.22});
+}
+/* Etiqueta 3D (píldora blanca con texto rojo) para cotas */
+function makeLabelSprite(text){
+  const f=48, pad=10;
+  const meas=document.createElement('canvas').getContext('2d'); meas.font='bold '+f+'px Inter,sans-serif';
+  const tw=meas.measureText(text).width;
+  const cv=document.createElement('canvas'); cv.width=Math.ceil(tw+pad*2); cv.height=f+pad*2;
+  const c=cv.getContext('2d'); c.font='bold '+f+'px Inter,sans-serif';
+  const rr=(x,y,w2,h2,r)=>{ c.beginPath(); c.moveTo(x+r,y); c.arcTo(x+w2,y,x+w2,y+h2,r); c.arcTo(x+w2,y+h2,x,y+h2,r); c.arcTo(x,y+h2,x,y,r); c.arcTo(x,y,x+w2,y,r); c.closePath(); };
+  c.fillStyle='#ffffff'; rr(1,1,cv.width-2,cv.height-2,14); c.fill();
+  c.strokeStyle='#933c44'; c.lineWidth=3; rr(2.5,2.5,cv.width-5,cv.height-5,12); c.stroke();
+  c.fillStyle='#933c44'; c.textAlign='center'; c.textBaseline='middle'; c.fillText(text,cv.width/2,cv.height/2+1);
+  const tex=new THREE.CanvasTexture(cv); tex.colorSpace=THREE.SRGBColorSpace;
+  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,depthTest:false,transparent:true}));
+  const hh=6*S; sp.scale.set(hh*cv.width/cv.height, hh, 1);
+  return sp;
+}
+/* Cota vertical: altura total y separación del piso */
+function addHeightDim(g, top, gap, depth){
+  const x=-5*S, z=depth*S+2*S;
+  const mat=new THREE.LineBasicMaterial({color:0x933c44});
+  const L=(a,b)=> g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([a,b]),mat));
+  L(new THREE.Vector3(x,0,z), new THREE.Vector3(x,top,z));
+  [0,gap,top].forEach(y=> L(new THREE.Vector3(x-1.6*S,y,z), new THREE.Vector3(x+1.6*S,y,z)));
+  const la=makeLabelSprite('Alto '+state.room.height+'\"'); la.position.set(x-7*S,(gap+top)/2,z); g.add(la);
+  if(gap>0){ const lb=makeLabelSprite('Piso '+state.room.floorGap+'\"'); lb.position.set(x-7*S, gap/2, z); g.add(lb); }
+}
+function resize3D(){ if(!renderer) return; const w=host.clientWidth,h=host.clientHeight; if(!w||!h) return; renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix(); }
+function loop(){
+  if(!running) return;
+  const dt=Math.min(.05, clock?clock.getDelta():.016), now=performance.now()/1000;
+  if(tour.active){
+    const el=now-tour.start;
+    doorAnims.forEach((d,i)=>{ d.target = el>(0.6+i*0.4)?1:0; });
+    controls.autoRotate=true; controls.autoRotateSpeed=1.7;
+    if(el>0.6+doorAnims.length*0.4+9){ tour.active=false; controls.autoRotate=false; }
+  }
+  doorAnims.forEach(d=>{ d.cur += (d.target-d.cur)*Math.min(1,dt*5); d.group.rotation.y=d.openAngle*d.cur; });
+  controls.update(); renderer.render(scene,camera); requestAnimationFrame(loop);
+}
+
+/* ═══════════════ Vista activa ═══════════════ */
+function setView(v){
+  const entering3D = v==='3d' && state.view!=='3d';
+  state.view=v;
+  document.querySelectorAll('#viewToggle .ui-seg').forEach(b=>b.classList.toggle('is-on',b.dataset.view===v));
+  document.getElementById('view2d').style.display=v==='2d'?'block':'none';
+  document.getElementById('view3d').style.display=v==='3d'?'block':'none';
+  if(v==='3d'){ animateOpenOnce=entering3D; build3D(false); animateOpenOnce=false; running=true; resize3D(); loop(); }
+  else { running=false; if(controls) controls.autoRotate=false; draw2D(); }
+}
+document.querySelectorAll('#viewToggle .ui-seg').forEach(b=> b.addEventListener('click',()=>setView(b.dataset.view)));
+function startTour(){
+  if(state.view!=='3d') document.querySelector('#viewToggle .ui-seg[data-view="3d"]').click();
+  framed=false; build3D(true);
+  doorAnims.forEach(d=>{ d.cur=0; d.target=0; d.group.rotation.y=0; });
+  tour.active=true; tour.start=performance.now()/1000;
+}
+document.getElementById('tourBtn').addEventListener('click',startTour);
+
+/* ═══════════════ Selección de cabina ═══════════════ */
+function refreshStallSelect(){
+  const el=document.getElementById('stallSelect'); el.innerHTML='';
+  const two=runCount(state.room.layout)>1;
+  state.room.stalls.forEach((u,i)=>{ const o=document.createElement('option'); o.value=i;
+    o.textContent=(isUrinalUnit(u)?'Mingitorio ':'Cabina ')+(i+1)+(two?' · '+runLetter(unitRun(i)):''); el.appendChild(o); });
+  el.value=state.selected;
+}
+document.getElementById('stallSelect').addEventListener('change',e=>selectStall(+e.target.value));
+/* mode: 'set' reemplaza · 'toggle' suma/quita (Ctrl) · 'range' hasta el ancla (Shift) */
+function selectStall(i,mode){
+  const n=state.room.stalls.length;
+  i=Math.max(0,Math.min(n-1,i));
+  if(mode==='toggle'){
+    const next = selHas(i) ? state.sel.filter(x=>x!==i) : [...state.sel,i];
+    setSel(next.length?next:[i], i);
+  } else if(mode==='range'){
+    const a=state.selected, lo=Math.min(a,i), hi=Math.max(a,i);
+    const range=[]; for(let k=lo;k<=hi;k++) range.push(k);
+    setSel(range, a);
+  } else setSel([i], i);
+  document.getElementById('stallSelect').value=state.selected;
+  if(state.step===2) renderStep();
+  render();
+}
+function applyScope(scope){ setSel(scopeIndices(scope), state.selected); renderStep(); render(); }
+
+/* ═══════════════ Render maestro ═══════════════ */
+function render(){ if(state.view==='2d') draw2D(); else build3D(false); refreshSummary(); refreshCanvasBadge(); }
+
+function refreshCanvasBadge(){
+  const a=analysis(), box=document.getElementById('canvasBadge');
+  const lay=LAYOUTS.find(l=>l.id===state.room.layout).name;
+  box.innerHTML=`<span class="ui-badge ui-badge-info">${lay}</span>
+    <span class="ui-badge">${feetInches(a.W)} × ${feetInches(a.D)}</span>
+    <span class="ui-badge">Alto ${state.room.height}" · Piso ${state.room.floorGap}"</span>
+    ${state.room.ada?`<span class="ui-badge ${a.adaOk?'ui-badge-ok':'ui-badge-danger'}">ADA ${a.adaOk?'OK':'REVISAR'}</span>`:''}`;
+}
+
+function refreshSummary(){
+  const q=computeQuote(), a=analysis();
+  document.getElementById('miniTotal').textContent=money(q.total);
+  document.getElementById('sumTotal').textContent=money(q.total);
+  document.getElementById('sumMat').textContent=q.m.name;
+  const L=[];
+  if(q.nStall){
+    L.push(['Cabinas ('+q.nStall+' × '+money(q.m.perStall)+')',q.stalls]);
+    L.push(['Puertas y herrajes',q.doors+q.hardware]);
+  }
+  if(q.screens){
+    L.push(['Mamparas de mingitorio ('+q.screens+' × '+money(q.perScreen)+')',q.screensCost]);
+    L.push(['Soportes y fijación',q.brackets]);
+  }
+  if(q.ada) L.push(['Kit accesible (ADA)',q.ada]);
+  if(q.privacy) L.push(['Tiras de privacidad ('+q.nPriv+' cabinas)',q.privacy]);
+  if(q.backPanel) L.push(['Panel de fondo ('+q.n+' × '+money(Math.round(q.m.perStall*0.45))+')',q.backPanel]);
+  L.push(['Envío estimado',q.shipping]);
+  document.getElementById('sumLines').innerHTML =
+    L.map(x=>`<div class="sum-line"><span>${x[0]}</span><span class="mono">${money(x[1])}</span></div>`).join('')
+    + `<div class="sum-line sum-total"><span><b>Total estimado</b></span><span class="mono"><b>${money(q.total)}</b></span></div>`;
+
+  const recName=LAYOUTS.find(l=>l.id===a.rec).name;
+  const piezas=[q.nStall?`${q.nStall} cabinas`:'', q.nUrinal?`${q.nUrinal} mingitorios`:'',
+                q.screens?`${q.screens} mamparas`:''].filter(Boolean).join(' · ');
+  const rows=[
+    ['Superficie', `${feetInches(a.W)} × ${feetInches(a.D)}`],
+    ['Frente total', feetInches(a.wall)],
+    ['Elementos', piezas]
+  ];
+  if(runCount(state.room.layout)>1)
+    rows.push(['Reparto', `A: ${unitIdx(0).length} · B: ${unitIdx(1).length}${state.room.splitAuto?' (auto)':''}`]);
+  document.getElementById('analysisBox').innerHTML =
+    rows.map(r=>`<div class="sum-line"><span>${r[0]}</span><span class="mono">${r[1]}</span></div>`).join('')
+    + `<div style="margin-top:8px">${state.room.ada
+        ? `<span class="ui-badge ${a.adaOk?'ui-badge-ok':'ui-badge-danger'}">${a.adaOk?'Cumple ADA':'Cabina ADA < 60\"'}</span>`
+        : ''}
+        <span class="ui-badge ${a.rec===state.room.layout?'ui-badge-ok':'ui-badge-info'}">
+        ${a.rec===state.room.layout?'Distribución óptima':'Sugerido: '+recName}</span></div>`;
+}
+
+/* ═══════════════ Pasos (panel izquierdo) ═══════════════ */
+function renderStepper(){
+  document.getElementById('stepper').innerHTML = STEPS.map((s,i)=>`
+    <li class="ui-step wiz-step ${i<state.step?'is-done':''} ${i===state.step?'is-current':''}" data-step="${i}">
+      <span class="ui-step-dot">${i<state.step?'✓':i+1}</span> ${s.t}
+    </li>`).join('');
+  document.querySelectorAll('.wiz-step').forEach(el=> el.addEventListener('click',()=>gotoStep(+el.dataset.step)));
+}
+function opt(list,val,isNum){ return list.map(o=>{ const v=Array.isArray(o)?o[0]:o, l=Array.isArray(o)?o[1]:o+' pulg';
+  return `<option value="${v}" ${String(v)===String(val)?'selected':''}>${l}</option>`;}).join(''); }
+
+function renderStep(){
+  document.getElementById('stepTitle').textContent=STEPS[state.step].t;
+  document.getElementById('stepMeta').textContent='PASO '+(state.step+1)+' / 5';
+  const body=document.getElementById('stepBody');
+  const r=state.room;
+
+  if(state.step===0){
+    const nS=countKind('stall'), nU=countKind('urinal');
+    body.innerHTML=`
+      <div class="ui-label">Elementos del baño</div>
+      <p class="ui-meta" style="margin-top:0">Combina cabinas y mingitorios en una sola cotización: el precio y el dibujo los toman juntos.</p>
+      ${countRow('Cabinas de inodoro','stall',nS,'Panel + puerta por cabina')}
+      ${countRow('Mingitorios','urinal',nU,'Una mampara entre cada uno')}
+      ${nS ? `<label class="ui-switch" style="margin-top:var(--space-3)">
+        <input type="checkbox" id="adaChk" ${r.ada?'checked':''}>
+        <span class="ui-switch-track"></span><span>Incluir cabina accesible (ADA)</span>
+      </label>` : ''}
+      <div class="ui-label" style="margin-top:var(--space-3)">Pared trasera / fondo</div>
+      <div class="ui-segmented" id="backSeg" style="display:flex;margin-bottom:var(--space-2)">
+        <button class="ui-seg ${r.back==='concrete'?'is-on':''}" type="button" data-back="concrete" style="flex:1">Muro de concreto</button>
+        <button class="ui-seg ${r.back==='panel'?'is-on':''}" type="button" data-back="panel" style="flex:1">Panel de fondo</button>
+      </div>
+      ${r.back==='concrete'
+        ? `<label class="ui-check"><input type="checkbox" id="showWallChk" ${r.showWall?'checked':''}><span>Mostrar muro de referencia</span></label>`
+        : `<p class="ui-meta" style="margin:0 0 var(--space-2)">Se incluye y cotiza un panel de fondo del material elegido.</p>`}
+      <div class="ui-alert ui-alert-info" style="margin-top:var(--space-3)">
+        <b>Análisis:</b> ${[nS?nS+' cabinas':'', nU?nU+' mingitorios':''].filter(Boolean).join(' y ')}
+        ocupan aprox. <b>${feetInches(analysis().W)}</b> de frente.
+      </div>`;
+    body.querySelectorAll('[data-counter]').forEach(bindCounter);
+    const adaEl=document.getElementById('adaChk'); if(adaEl) adaEl.addEventListener('change',e=>{ setAda(e.target.checked); });
+    body.querySelectorAll('#backSeg .ui-seg').forEach(b=> b.addEventListener('click',()=>setBack(b.dataset.back)));
+    const sw=document.getElementById('showWallChk'); if(sw) sw.addEventListener('change',e=>{ state.room.showWall=e.target.checked; render(); });
+  }
+
+  else if(state.step===1){
+    const n=r.stalls.length, a=analysis();
+    body.innerHTML=`
+      <p class="ui-meta" style="margin-top:0">Solo se muestran las distribuciones compatibles con tu configuración. Sugerida marcada.</p>
+      ${LAYOUTS.map(l=>{
+        const compat=layoutCompatible(l.id,n);
+        const active=r.layout===l.id, sug=a.rec===l.id;
+        return `<div class="layout-card ${active?'is-active':''} ${compat?'':'is-off'}" data-layout="${l.id}">
+          ${miniPreview(l.id)}
+          <div><b>${l.name} ${sug?'<span class="ui-badge ui-badge-ok" style="vertical-align:middle">SUGERIDA</span>':''}</b>
+          <p>${compat?l.desc:'Requiere '+(l.id==='island'?'4+':'3+')+' cabinas.'}</p></div>
+        </div>`;}).join('')}
+      ${runCount(r.layout)>1 ? splitControl() : ''}
+      <div class="ui-alert ui-alert-info" style="margin-top:var(--space-2)">
+        <b>${LAYOUTS.find(l=>l.id===r.layout).name}:</b> huella
+        <b>${feetInches(a.W)} × ${feetInches(a.D)}</b>, ${a.runs.length} ${a.runs.length>1?'hileras':'hilera'},
+        ${feetInches(a.wall)} de muro.
+      </div>`;
+    body.querySelectorAll('.layout-card').forEach(el=> el.addEventListener('click',()=>{
+      const id=el.dataset.layout; if(!layoutCompatible(id,r.stalls.length)) return;
+      r.layout=id; framed=false; renderStep(); render();
+    }));
+    body.querySelectorAll('[data-split]').forEach(b=> b.addEventListener('click',()=>adjustSplit(+b.dataset.split)));
+    const rs=document.getElementById('resetSplit');
+    if(rs) rs.addEventListener('click',()=>{ r.splitAuto=true; framed=false; renderStep(); render(); });
+  }
+
+  else if(state.step===2){
+    const c=r.stalls[state.selected], isU=isUrinalUnit(c);
+    const T=editTargets(), o=(list,key)=>optMulti(list, T.map(i=>r.stalls[i][key]));
+    // Lo técnico va plegado: un comprador no sabe qué es el giro de una puerta.
+    const fino = isU
+      ? `<div class="ui-field"><label>Proyección (fondo)</label>
+           <select data-cfg="partitionDepth">${o(OPTS.screenDepth,'partitionDepth')}</select></div>
+         <div class="ui-field"><label>Separación entre mingitorios</label>
+           <select data-cfg="stallWidth">${o(OPTS.urinalWidth,'stallWidth')}</select></div>`
+      : `<div class="ui-field"><label>Profundidad de partición</label>
+           <select data-cfg="partitionDepth">${o(OPTS.partitionDepth,'partitionDepth')}</select></div>
+         <div class="ui-form" style="gap:var(--space-2)">
+           <div class="ui-field"><label>Ancho de cabina</label>
+             <select data-cfg="stallWidth">${o(OPTS.stallWidth,'stallWidth')}</select></div>
+           <div class="ui-field"><label>Fracción</label>
+             <select data-cfg="stallWidthFrac">${o(OPTS.frac,'stallWidthFrac')}</select></div>
+         </div>
+         <div class="ui-form" style="gap:var(--space-2)">
+           <div class="ui-field"><label>Apertura de puerta</label>
+             <select data-cfg="doorOpening">${o(OPTS.doorOpening,'doorOpening')}</select></div>
+           <div class="ui-field"><label>Giro de puerta</label>
+             <select data-cfg="doorSwing">${o(OPTS.swing,'doorSwing')}</select></div>
+         </div>
+         <div class="ui-form" style="gap:var(--space-2)">
+           <div class="ui-field"><label>Posición de puerta</label>
+             <select data-cfg="doorPosition">${o(OPTS.position,'doorPosition')}</select></div>
+           <div class="ui-field"><label>Posición de inodoro</label>
+             <select data-cfg="toiletPosition">${o(OPTS.position,'toiletPosition')}</select></div>
+         </div>`;
+    const nFino = (isU?2:7) + 2;                       // + altura y separación del piso
+    body.innerHTML=`
+      ${scopeControl()}
+      <div class="ui-label">${isU?'Separación entre mingitorios':'Tamaño de las cabinas'}</div>
+      ${sizePresets(isU, T)}
+      ${isU ? '' : `<label class="ui-check">
+        <input type="checkbox" id="privChk" ${T.length&&T.every(i=>r.stalls[i].privacy)?'checked':''}>
+        <span>Tiras de privacidad <small style="color:var(--ink-faint)">— cierran la rendija junto a la bisagra</small></span></label>`}
+      ${moveControl()}
+      ${countKind('stall') ? `<div class="ui-label" style="margin-top:var(--space-3)">Altura del montaje</div>
+      <div class="ui-segmented" id="mountSeg" style="display:flex">
+        ${[['standard','Estándar'],['tall','Alto'],['fullheight','Piso a techo']].map(m=>`<button class="ui-seg ${r.mount===m[0]?'is-on':''}" type="button" data-mount="${m[0]}" style="flex:1">${m[1]}</button>`).join('')}
+      </div>` : ''}
+      <details class="fine">
+        <summary>Ajuste fino (${nFino} medidas)</summary>
+        <div class="fine-body">
+          <div class="ui-form" style="gap:var(--space-2)">
+            <div class="ui-field"><label>Altura del panel</label>
+              <select data-room="height">${opt(OPTS.height,r.height)}</select></div>
+            <div class="ui-field"><label>Separación del piso</label>
+              <select data-room="floorGap">${opt(OPTS.floorGap,r.floorGap)}</select></div>
+          </div>
+          ${fino}
+        </div>
+      </details>
+      ${isU?'<div class="ui-alert ui-alert-info" style="margin-top:var(--space-2)">Mamparas colgadas de muro, sin puerta.</div>':''}
+      ${c.ada?'<div class="ui-alert ui-alert-info" style="margin-top:var(--space-2)">Cabina ADA: mínimo 60\" y puerta hacia afuera.</div>':''}`;
+    body.querySelectorAll('[data-preset]').forEach(el=> el.addEventListener('click',()=>applyPreset(el.dataset.preset)));
+    body.querySelectorAll('[data-cfg]').forEach(sel=> sel.addEventListener('change',e=>{
+      if(e.target.value==='') return;                       // seguía en "— varios —"
+      const k=sel.dataset.cfg, num=['partitionDepth','stallWidth','stallWidthFrac','doorOpening'].includes(k);
+      const v = num? parseFloat(e.target.value): e.target.value;
+      editTargets().forEach(i=>{ r.stalls[i][k]=v; });
+      render();
+    }));
+    const pc=document.getElementById('privChk');
+    if(pc) pc.addEventListener('change',e=>{ editTargets().forEach(i=>{ r.stalls[i].privacy=e.target.checked; }); render(); });
+    body.querySelectorAll('[data-room]').forEach(sel=> sel.addEventListener('change',e=>{
+      state.room[sel.dataset.room]=parseFloat(e.target.value); state.room.mount='custom'; framed=false; renderStep(); render();
+    }));
+    body.querySelectorAll('#mountSeg .ui-seg').forEach(b=> b.addEventListener('click',()=>setMount(b.dataset.mount)));
+    body.querySelectorAll('[data-moveto]').forEach(b=> b.addEventListener('click',()=>{
+      materializeSplit(); moveUnitTo(state.selected, +b.dataset.moveto, -1);
+      framed=false; refreshStallSelect(); renderStep(); render();
+    }));
+    body.querySelectorAll('[data-scope]').forEach(b=> b.addEventListener('click',()=>applyScope(b.dataset.scope)));
+  }
+
+  else if(state.step===3){
+    body.innerHTML=`
+      <p class="ui-meta" style="margin-top:0">Elige el material. El diseño y el precio se ajustan; la comparación usa las medidas de tu proyecto.</p>
+      ${MATERIALS.map(x=>{ const q=quoteFor(x.id);
+        return `<div class="mat-card ${x.id===state.materialId?'is-active':''}" data-mat="${x.id}">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="width:26px;height:26px;border-radius:6px;flex:none;background:${x.colors[0]};border:1px solid rgba(0,0,0,.14)"></span>
+            <div><b>${x.name}</b><div class="ui-meta">${'$'.repeat(x.lvl)} · ${x.warranty} · ${x.tag}</div></div>
+          </div>
+          <div class="mono" style="text-align:right"><b>${money(q)}</b></div>
+        </div>`;}).join('')}
+      <div class="ui-alert ui-alert-info" style="margin-top:var(--space-3)">
+        <b>${MATERIALS.find(x=>x.id===state.materialId).name}:</b>
+        ${MATERIALS.find(x=>x.id===state.materialId).desc} Garantía ${MATERIALS.find(x=>x.id===state.materialId).warranty}.
+      </div>`;
+    body.querySelectorAll('.mat-card').forEach(el=> el.addEventListener('click',()=>{
+      state.materialId=el.dataset.mat;
+      state.colorHex=MATERIALS.find(x=>x.id===state.materialId).colors[0];
+      renderStep(); render();
+    }));
+  }
+
+  else if(state.step===4){
+    const q=computeQuote();
+    body.innerHTML=`
+      <p class="ui-meta" style="margin-top:0">Revisa el desglose. El precio está garantizado 30 días.</p>
+      <div class="ui-field"><label>Código postal (afina el envío)</label>
+        <input id="zip" type="text" inputmode="numeric" maxlength="5" placeholder="00000" value="${state.zip}"></div>
+      <div class="ui-alert ui-alert-ok"><b>Proyecto listo.</b>
+        ${[q.nStall?q.nStall+' cabinas':'', q.nUrinal?q.nUrinal+' mingitorios':''].filter(Boolean).join(' y ')}
+        en ${q.m.name}, distribución ${LAYOUTS.find(l=>l.id===state.room.layout).name.toLowerCase()}.</div>
+      <button class="ui-btn ui-btn-primary ui-btn-block" id="orderBtn">Solicitar cotización formal</button>
+      <div class="ui-form" style="gap:var(--space-2);margin-top:var(--space-2)">
+        <button class="ui-btn" id="pdfBtn">Descargar PDF</button>
+        <button class="ui-btn" id="shareBtn">Compartir enlace</button>
+      </div>`;
+    const zip=document.getElementById('zip'); zip.addEventListener('input',e=>{ state.zip=e.target.value.replace(/\D/g,''); });
+    document.getElementById('orderBtn').addEventListener('click',()=>UI&&UI.toast?UI.toast('Cotización enviada a un experto','ok'):toast('Cotización enviada'));
+    document.getElementById('pdfBtn').addEventListener('click',()=>toast('PDF generado (demo)'));
+    document.getElementById('shareBtn').addEventListener('click',()=>toast('Enlace copiado: /p/MAU-'+Math.random().toString(36).slice(2,7).toUpperCase()));
+  }
+}
+
+function countRow(label,key,val,sub){
+  return `<div class="count-row"><div><b>${label}</b><small>${sub}</small></div>
+    <div class="counter" data-counter="${key}">
+      <button type="button" data-d="-1">−</button><output>${val}</output><button type="button" data-d="1">+</button>
+    </div></div>`;
+}
+function bindCounter(el){
+  const key=el.dataset.counter;
+  el.querySelectorAll('button').forEach(b=> b.addEventListener('click',()=>{
+    setUnitCount(key, countKind(key)+ (+b.dataset.d));
+    renderStep(); render();
+  }));
+}
+/* Alta/baja de unidades de un tipo sin tocar las del otro. Las nuevas heredan la
+   hilera de la última, que es donde el usuario venía trabajando. */
+function setUnitCount(kind,n){
+  const list=state.room.stalls, cur=countKind(kind), other=list.length-cur;
+  n=Math.max(0,Math.min(10,n));
+  if(n===cur || n+other<1 || n+other>16) return;
+  if(n>cur){
+    const run = list.length? (list[list.length-1].run|0) : 0;
+    for(let i=cur;i<n;i++) list.push(defaultStall(kind,run));
+  } else {
+    for(let i=cur;i>n;i--){
+      let idx=-1; list.forEach((u,j)=>{ if(u.kind===kind) idx=j; });
+      if(idx>=0) list.splice(idx,1);
+    }
+  }
+  if(state.selected>=list.length) state.selected=list.length-1;
+  setSel([state.selected], state.selected);      // los índices se corrieron
+  if(!countKind('stall')) state.room.ada=false;
+  if(state.room.ada) setAda(true,true);
+  if(!layoutCompatible(state.room.layout,list.length)) state.room.layout='inline';
+  refreshStallSelect(); framed=false;
+}
+/* ── Reparto entre hileras ──────────────────────────────────── */
+function splitControl(){
+  const A=unitIdx(0).length, B=unitIdx(1).length, auto=state.room.splitAuto;
+  return `<div class="count-row" style="margin-top:var(--space-2)">
+      <div><b>Reparto entre hileras</b><small>Cuántas unidades van de cada lado${auto?' · automático 50/50':''}</small></div>
+      <div class="counter">
+        <button type="button" data-split="-1">−</button><output>${A} / ${B}</output><button type="button" data-split="1">+</button>
+      </div></div>
+    <p class="ui-meta" style="margin:0 0 var(--space-2)">Hilera <b>A</b> ${A} · hilera <b>B</b> ${B}.
+      También puedes arrastrar una unidad de una hilera a otra en el dibujo.
+      ${auto?'':' <button type="button" id="resetSplit" class="ui-link" style="background:none;border:0;padding:0;font:inherit;cursor:pointer">Volver a automático</button>'}</p>`;
+}
+/* +1 pasa la primera de B al final de A; −1 pasa la última de A al inicio de B. */
+function adjustSplit(d){
+  materializeSplit();
+  const A=unitIdx(0), B=unitIdx(1);
+  if(d>0 && B.length) moveUnitTo(B[0], 0, -1);
+  else if(d<0 && A.length) moveUnitTo(A[A.length-1], 1, B.length? B[0] : -1);
+  else return;
+  framed=false; refreshStallSelect(); renderStep(); render();
+}
+/* Un select con "— varios —" cuando lo seleccionado no comparte el mismo valor. */
+function optMulti(list, vals){
+  const u=[...new Set(vals)];
+  return u.length===1 ? opt(list,u[0]) : `<option value="" selected>— varios —</option>`+opt(list,null);
+}
+/* Botonera de alcance: a qué unidades se aplica lo que edites abajo. */
+function scopeControl(){
+  const list=state.room.stalls, a=list[state.selected], act=activeScope();
+  const kindName = isUrinalUnit(a) ? 'mingitorios' : 'cabinas';
+  const btn=(s,label)=>`<button class="ui-seg ${act===s?'is-on':''}" type="button" data-scope="${s}" style="flex:1;min-width:88px">${label}</button>`;
+  const two=runCount(state.room.layout)>1, nT=editTargets().length;
+  // "Todo" solo aparece si de verdad abarca más que "Todas": dos hileras o tipos mezclados.
+  const showAll = two || scopeIndices('kind').length<list.length;
+  return `<div class="ui-label">Aplicar cambios a</div>
+    <div class="ui-segmented" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px">
+      ${btn('one','Solo esta')}
+      ${btn('kind','Todas ('+scopeIndices('kind').length+')')}
+      ${two?btn('run','Esta hilera ('+scopeIndices('run').length+')'):''}
+      ${showAll?btn('all','Todo ('+list.length+')'):''}
+    </div>
+    <p class="ui-meta" style="margin:0 0 var(--space-3)">Cambiando <b>${nT}</b> ${nT===1?kindName.replace(/e?s$/,''):kindName}${state.sel.length>nT?` (de ${state.sel.length} seleccionadas)`:''}.
+      En el dibujo: <b>Ctrl+clic</b> suma o quita una, <b>Shift+clic</b> toma un rango.</p>`;
+}
+/* Un preset está activo si TODO lo seleccionado ya coincide con sus medidas. */
+function presetOf(kind, targets){
+  const list=state.room.stalls;
+  return (SIZE_PRESETS[kind]||[]).find(p=>
+    targets.length && targets.every(i=>Object.keys(p.cfg).every(k=>list[i][k]===p.cfg[k]))
+  ) || null;
+}
+function sizePresets(isU, targets){
+  const kind=isU?'urinal':'stall', act=presetOf(kind,targets);
+  return `<div class="preset-grid">${SIZE_PRESETS[kind].map(p=>`
+    <div class="preset-card ${act&&act.id===p.id?'is-active':''}" data-preset="${p.id}">
+      <b>${p.name}</b><span class="dim">${p.dim}</span><small>${p.desc}</small>
+    </div>`).join('')}</div>
+    ${act?'':'<p class="ui-meta" style="margin:-6px 0 var(--space-3)">Medidas a la carta. Elige un tamaño para volver a uno estándar.</p>'}`;
+}
+function applyPreset(id){
+  const list=state.room.stalls, kind=isUrinalUnit(list[state.selected])?'urinal':'stall';
+  const p=SIZE_PRESETS[kind].find(x=>x.id===id); if(!p) return;
+  editTargets().forEach(i=>{ Object.assign(list[i], p.cfg); });
+  if(state.room.ada) setAda(true,true);          // la cabina ADA no baja de 60"
+  framed=false; renderStep(); render();
+}
+function moveControl(){
+  if(runCount(state.room.layout)<2) return '';
+  const cur=unitRun(state.selected), to=cur?0:1;
+  return `<div class="ui-alert ui-alert-info" style="margin-top:0;display:flex;align-items:center;gap:10px;justify-content:space-between">
+      <span>Está en la hilera <b>${runLetter(cur)}</b>.</span>
+      <button class="ui-btn" type="button" data-moveto="${to}">Mover a hilera ${runLetter(to)}</button>
+    </div>`;
+}
+function setAda(on,keep){
+  const stalls=state.room.stalls.filter(s=>!isUrinalUnit(s));
+  const last=stalls[stalls.length-1];
+  state.room.ada = on && !!last;
+  state.room.stalls.forEach(s=>s.ada=false);
+  if(state.room.ada){ last.ada=true; if(last.stallWidth<60){ last.stallWidth=60; last.stallWidthFrac=0; } last.doorSwing='right-out'; }
+  if(!keep){ renderStep(); render(); }
+}
+function layoutCompatible(id,n){ if(id==='island') return n>=4; if(id==='corner-l') return n>=3; return n>=1; }
+function setBack(v){ state.room.back=v; renderStep(); render(); }
+function setMount(m){
+  state.room.mount=m;
+  if(m==='standard'){ state.room.height=58; state.room.floorGap=12; }
+  else if(m==='tall'){ state.room.height=72; state.room.floorGap=6; }
+  else if(m==='fullheight'){ state.room.height=96; state.room.floorGap=0; state.room.back='panel'; }
+  framed=false; renderStep(); render();
+}
+function quoteFor(matId){ const save=state.materialId; state.materialId=matId; const t=computeQuote().total; state.materialId=save; return t; }
+
+/* Miniatura SVG por layout (usa los runs reales) */
+function miniPreview(layoutId){
+  const {runs,bounds}=computeRuns(layoutId);
+  const W=78,H=58,pad=6;
+  const s=Math.min((W-2*pad)/Math.max(1,bounds.w),(H-2*pad)/Math.max(1,bounds.d));
+  const ox=pad+((W-2*pad)-bounds.w*s)/2-bounds.x0*s, oy=pad+((H-2*pad)-bounds.d*s)/2-bounds.y0*s;
+  const M=(x,y)=>[ox+x*s,oy+y*s];
+  let el='';
+  runs.forEach(r=>{
+    if(r.empty) return;
+    r.stalls.forEach(st=>{
+      const c=[P(r,st.aStart,0),P(r,st.aEnd,0),P(r,st.aEnd,st.depth),P(r,st.aStart,st.depth)].map(p=>M(p.x,p.y));
+      el+=`<polygon points="${c.map(p=>p.join(',')).join(' ')}" fill="rgba(133,153,157,.18)"/>`;
+    });
+    const b0=M(...Object.values(P(r,0,0))), b1=M(...Object.values(P(r,r.length,0)));
+    el+=`<line x1="${b0[0]}" y1="${b0[1]}" x2="${b1[0]}" y2="${b1[1]}" stroke="#4a7c7b" stroke-width="3" stroke-linecap="round"/>`;
+  });
+  return `<svg viewBox="0 0 ${W} ${H}">${el}</svg>`;
+}
+
+/* ═══════════════ Navegación ═══════════════ */
+function gotoStep(i){
+  state.step=Math.max(0,Math.min(4,i));
+  renderStepper(); renderStep(); render();
+  document.getElementById('backBtn').style.visibility = state.step===0?'hidden':'visible';
+  document.getElementById('nextBtn').textContent = state.step===4?'Finalizar':'Continuar';
+  document.getElementById('footHint').textContent = STEPS[state.step].m;
+}
+document.getElementById('nextBtn').addEventListener('click',()=>{ if(state.step<4) gotoStep(state.step+1); else toast('¡Listo! Proyecto guardado.'); });
+document.getElementById('backBtn').addEventListener('click',()=>gotoStep(state.step-1));
+document.getElementById('roomName').addEventListener('input',e=>{ state.room.name=e.target.value; });
+
+function toast(msg,type){ const box=document.querySelector('[data-ui-toasts]'); if(!box) return alert(msg);
+  const t=document.createElement('div'); t.className='ui-toast'+(type?' ui-toast-'+type:''); t.textContent=msg;
+  box.appendChild(t); setTimeout(()=>t.remove(),4000); }
+
+/* Resize */
+new ResizeObserver(()=>{ if(state.view==='2d') draw2D(); else resize3D(); }).observe(document.getElementById('canvasWrap'));
+
+/* ═══════════════ Arranque ═══════════════ */
+refreshStallSelect();
+renderStepper();
+gotoStep(0);
+setView('2d');
+</script>
+</body>
+</html>

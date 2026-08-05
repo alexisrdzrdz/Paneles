@@ -1,0 +1,64 @@
+body { margin: 0; }
+
+.app-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--space-4); padding: var(--space-3) var(--space-5);
+  border-bottom: var(--border-width) solid var(--line); background: var(--surface);
+}
+.app-brand { font-size: 20px; font-weight: 700; letter-spacing: -.01em; text-decoration: none; color: var(--ink); }
+.app-brand span { color: var(--accent); }
+.app-nav { display: flex; align-items: center; gap: var(--space-4); }
+.app-nav a { text-decoration: none; color: var(--ink-dim); }
+.app-nav a:hover { color: var(--ink); }
+.app-who { color: var(--ink-faint); font-size: var(--fs-label); }
+.app-main { padding: var(--space-5); max-width: 1180px; margin: 0 auto; }
+
+/* Formularios de cuenta: angostos y centrados, sin distracciones. */
+.auth-card {
+  max-width: 440px; margin: var(--space-6) auto; padding: var(--space-5);
+  border: var(--border-width) solid var(--line); border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+.auth-card h1 { margin: 0 0 4px; font-size: 22px; }
+.auth-card .lead { margin: 0 0 var(--space-4); color: var(--ink-dim); font-size: var(--fs-body); }
+.auth-card .ui-field { margin-bottom: var(--space-3); }
+.auth-foot { margin-top: var(--space-4); font-size: var(--fs-label); color: var(--ink-dim); }
+.auth-foot a { color: var(--link); }
+
+/* Portal */
+.portal-head { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--space-4); margin-bottom: var(--space-4); flex-wrap: wrap; }
+.portal-head h1 { margin: 0 0 2px; font-size: 24px; }
+.portal-head p { margin: 0; color: var(--ink-dim); }
+
+.quote-grid { display: grid; gap: var(--space-3); }
+.quote-card {
+  display: grid; grid-template-columns: 1fr auto; gap: var(--space-3);
+  padding: var(--space-4); border: var(--border-width) solid var(--line);
+  border-radius: var(--radius-md); background: var(--surface); text-decoration: none; color: inherit;
+}
+.quote-card:hover { border-color: var(--line-strong); }
+.quote-card .ref { font-family: var(--font-mono); font-size: var(--fs-label); color: var(--ink-faint); }
+.quote-card b { display: block; font-size: var(--fs-h6, 16px); margin: 2px 0 6px; }
+.quote-card .meta { color: var(--ink-dim); font-size: var(--fs-label); }
+.quote-card .money { font-family: var(--font-mono); font-size: 18px; text-align: right; white-space: nowrap; }
+
+.empty {
+  text-align: center; padding: var(--space-6) var(--space-4);
+  border: 1px dashed var(--line-strong); border-radius: var(--radius-lg); color: var(--ink-dim);
+}
+
+/* Seguimiento: la bitácora del proyecto */
+.track { list-style: none; margin: 0; padding: 0; position: relative; }
+.track::before { content: ''; position: absolute; left: 7px; top: 8px; bottom: 8px; width: 2px; background: var(--line); }
+.track li { position: relative; padding: 0 0 var(--space-4) var(--space-5); }
+.track .dot {
+  position: absolute; left: 0; top: 4px; width: 16px; height: 16px; border-radius: 50%;
+  background: var(--surface); border: 2px solid var(--line-strong);
+}
+.track li.is-current .dot { border-color: var(--accent); background: var(--accent); }
+.track .when { display: block; color: var(--ink-faint); font-size: var(--fs-label); font-family: var(--font-mono); }
+.track .what { display: block; margin-top: 2px; }
+.track .who { color: var(--ink-faint); font-size: var(--fs-label); }
+
+.two-col { display: grid; grid-template-columns: 1fr 320px; gap: var(--space-5); align-items: start; }
+@media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }

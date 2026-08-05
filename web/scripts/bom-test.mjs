@@ -138,5 +138,59 @@ eq('formato en pulgadas', formatLength(inchesToMm(94.5), 'in'), `7'-10 1/2"`);
 eq('los tres formatos describen el mismo milimetraje',
   [formatLength(6000, 'm'), formatLength(6000, 'cm')], ['6 m', '600 cm']);
 
+console.log('--- 8. Los mingitorios NO llevan puerta ---');
+const soloMing = {
+  materialId: 'hdpe', heightMm: 1200, floorGapMm: 400, backPanel: false, headrail: 'none',
+  runs: [{
+    lengthMm: 2400, units: [ming(760), ming(760), ming(760)],
+    boundaries: [{ tall: false, depthMm: 450 }, { tall: false, depthMm: 450 },
+                 { tall: false, depthMm: 450 }, { tall: false, depthMm: 450 }],
+  }],
+};
+const m1 = measure(soloMing);
+eq('tres mingitorios', m1.count.mingitorio, 3);
+eq('CERO puertas', m1.count.puerta, 0);
+eq('cero cabinas', m1.count.cabina, 0);
+eq('sus divisiones son mamparas cortas, no paneles altos',
+  [m1.count.division_alta, m1.count.division_corta], [0, 4]);
+
+const herrajes = [
+  item({ sku: 'BISAGRA2', category: 'bisagra', price: 85_00 }),
+  item({ sku: 'CERRADURA2', category: 'cerradura', price: 140_00 }),
+  item({ sku: 'PUERTA2', category: 'puerta', price: 2100_00 }),
+  item({ sku: 'MAMPARA2', category: 'mampara', price: 760_00 }),
+];
+const rHerrajes = [
+  rule({ itemId: 'BISAGRA2', target: 'puerta', qty: 2000 }),
+  rule({ itemId: 'CERRADURA2', target: 'puerta', qty: 1000 }),
+  rule({ itemId: 'PUERTA2', target: 'puerta', qty: 1000 }),
+  rule({ itemId: 'MAMPARA2', target: 'division_corta', qty: 1000 }),
+];
+const bMing = buildBom(soloMing, herrajes, rHerrajes);
+const skusMing = bMing.lines.map((l) => l.sku);
+eq('no se cotiza ninguna puerta', skusMing.includes('PUERTA2'), false);
+eq('no se cotizan bisagras', skusMing.includes('BISAGRA2'), false);
+eq('no se cotizan cerraduras', skusMing.includes('CERRADURA2'), false);
+eq('sí se cotizan las mamparas divisorias', skusMing.includes('MAMPARA2'), true);
+eq('el total son solo mamparas', bMing.subtotalCents, 4 * 760_00);
+
+// Mezclado: las puertas salen SOLO de las cabinas.
+const mixto = {
+  materialId: 'hdpe', heightMm: 1800, floorGapMm: 300, backPanel: false, headrail: 'none',
+  runs: [{
+    lengthMm: 5000, units: [cabina(1500), cabina(1500), ming(760), ming(760)],
+    boundaries: [{ tall: true, depthMm: 1500 }, { tall: true, depthMm: 1500 },
+                 { tall: true, depthMm: 1500 }, { tall: false, depthMm: 450 },
+                 { tall: false, depthMm: 450 }],
+  }],
+};
+const m2 = measure(mixto);
+eq('2 cabinas -> 2 puertas (los 2 mingitorios no cuentan)', m2.count.puerta, 2);
+eq('y los 2 mingitorios siguen contándose', m2.count.mingitorio, 2);
+const bMix = buildBom(mixto, herrajes, rHerrajes);
+eq('solo 2 puertas en el despiece mezclado',
+  bMix.lines.find((l) => l.sku === 'PUERTA2').billedMilli / 1000, 2);
+eq('4 bisagras, no 8', bMix.lines.find((l) => l.sku === 'BISAGRA2').billedMilli / 1000, 4);
+
 console.log(fails ? `\n${fails} FALLOS` : '\nTodo en verde');
 process.exitCode = fails ? 1 : 0;

@@ -80,7 +80,7 @@ export function RulesTable({ rules, items }: { rules: AssemblyRule[]; items: Cat
         </form>
       )}
 
-      <table className="cat-tbl">
+      <div className="tbl-scroll"><table className="cat-tbl">
         <thead>
           <tr>
             <th style={{ width: 34 }} />
@@ -115,7 +115,7 @@ export function RulesTable({ rules, items }: { rules: AssemblyRule[]; items: Cat
             );
           })}
         </tbody>
-      </table>
+      </table></div>
     </section>
   );
 }

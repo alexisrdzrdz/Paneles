@@ -12,7 +12,8 @@
     "seed": "node scripts/seed.mjs",
     "test:bom": "node scripts/bom-test.mjs",
     "seed:catalog": "node scripts/seed-catalog.mjs",
-    "seed:precios-demo": "node scripts/seed-precios-demo.mjs"
+    "seed:precios-demo": "node scripts/seed-precios-demo.mjs",
+    "admin": "node scripts/admin.mjs"
   },
   "dependencies": {
     "@node-rs/argon2": "^2.0.2",

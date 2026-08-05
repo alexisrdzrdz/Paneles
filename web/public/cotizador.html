@@ -163,6 +163,16 @@
     .wiz-left,.wiz-right{position:static}
     .panel-scroll{max-height:none}
   }
+  /* Teléfono: el logotipo con la palabra completa se salía del ancho. Se
+     encoge la sigla y se permite que la barra parta en dos líneas. */
+  @media (max-width:480px){
+    .ui-topbar{flex-wrap:wrap;row-gap:6px}
+    .ui-wordmark{font-size:1rem;min-width:0}
+    .ui-wordmark .ui-sigla{font-size:.78rem}
+    .ui-wordmark .brand-logo{height:22px}
+    .preset-grid{grid-template-columns:1fr}
+    .count-row{flex-wrap:wrap}
+  }
 </style>
 </head>
 <body class="ui" data-layout="topbar" data-panel="card" data-anim="aparecer">

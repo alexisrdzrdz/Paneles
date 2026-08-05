@@ -118,7 +118,7 @@ export function Calculadora() {
         {state.bom && (
           <>
             <div className="tbl-head"><h2>Despiece</h2></div>
-            <table className="cat-tbl">
+            <div className="tbl-scroll"><table className="cat-tbl">
               <thead>
                 <tr>
                   <th style={{ width: 28 }} />
@@ -164,7 +164,7 @@ export function Calculadora() {
                   </td>
                 </tr>
               </tfoot>
-            </table>
+            </table></div>
           </>
         )}
 

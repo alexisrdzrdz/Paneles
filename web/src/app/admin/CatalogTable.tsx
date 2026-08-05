@@ -54,7 +54,7 @@ export function CatalogTable({ items }: { items: CatalogItem[] }) {
         </form>
       )}
 
-      <table className="cat-tbl">
+      <div className="tbl-scroll"><table className="cat-tbl">
         <thead>
           <tr>
             <th style={{ width: 34 }} />
@@ -102,7 +102,7 @@ export function CatalogTable({ items }: { items: CatalogItem[] }) {
             );
           })}
         </tbody>
-      </table>
+      </table></div>
     </section>
   );
 }

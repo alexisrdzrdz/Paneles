@@ -218,7 +218,7 @@ export function buildBom(
 
   const order: CatalogItem['category'][] = [
     'panel', 'puerta', 'pilastra', 'mampara', 'riel', 'bisagra', 'cerradura',
-    'jaladera', 'gancho', 'escuadra', 'zapata', 'tornilleria', 'corte',
+    'jaladera', 'gancho', 'escuadra', 'zapata', 'tornilleria', 'empaque', 'corte',
     'mano_obra', 'flete', 'otro',
   ];
   lines.sort((a, b) => order.indexOf(a.category) - order.indexOf(b.category)

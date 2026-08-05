@@ -100,3 +100,9 @@ body { margin: 0; }
 @media (max-width: 780px) {
   .ui-form.two, .ui-form.three, .ui-form.four { grid-template-columns: 1fr; }
 }
+
+/* Calculadora: el formulario va angosto y el despiece se queda con el ancho,
+   al revés que .two-col (donde la bitácora manda). */
+.calc-cols { display: grid; grid-template-columns: 340px 1fr; gap: var(--space-5); align-items: start; }
+.calc-cols > section { min-width: 0; overflow-x: auto; }
+@media (max-width: 980px) { .calc-cols { grid-template-columns: 1fr; } }

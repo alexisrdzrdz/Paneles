@@ -7,12 +7,12 @@ import { formatLength } from '@/lib/units';
 import { Notice, Submit } from '@/components/Field';
 
 const CATEGORIES = ['panel','puerta','pilastra','mampara','bisagra','cerradura','jaladera',
-  'gancho','escuadra','zapata','riel','tornilleria','corte','mano_obra','flete','otro'] as const;
+  'gancho','escuadra','zapata','riel','tornilleria','empaque','corte','mano_obra','flete','otro'] as const;
 
 const CAT_LABEL: Record<string, string> = {
   panel: 'Panel', puerta: 'Puerta', pilastra: 'Pilastra', mampara: 'Mampara',
   bisagra: 'Bisagra', cerradura: 'Cerradura', jaladera: 'Jaladera', gancho: 'Gancho',
-  escuadra: 'Escuadra', zapata: 'Zapata', riel: 'Riel', tornilleria: 'Tornillería',
+  escuadra: 'Escuadra', zapata: 'Zapata', riel: 'Riel', tornilleria: 'Tornillería', empaque: 'Empaque',
   corte: 'Corte', mano_obra: 'Mano de obra', flete: 'Flete', otro: 'Otro',
 };
 const MODE_LABEL: Record<string, string> = {

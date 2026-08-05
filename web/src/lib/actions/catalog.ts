@@ -34,7 +34,7 @@ function isUniqueViolation(e: unknown): boolean {
 }
 
 const CATEGORIES = ['panel','puerta','pilastra','mampara','bisagra','cerradura','jaladera',
-  'gancho','escuadra','zapata','riel','tornilleria','corte','mano_obra','flete','otro'] as const;
+  'gancho','escuadra','zapata','riel','tornilleria','empaque','corte','mano_obra','flete','otro'] as const;
 const MODES = ['pieza','longitud','area','hora'] as const;
 const WASTE = ['exacto','pieza_completa','redondeo_arriba'] as const;
 const TARGETS = ['cabina','mingitorio','puerta','division_alta','division_corta',

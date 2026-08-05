@@ -120,6 +120,7 @@ export const itemCategory = pgEnum('item_category', [
   'mampara',    // mingitorios
   'bisagra', 'cerradura', 'jaladera', 'gancho', 'escuadra', 'zapata', 'riel',
   'tornilleria',// tornillos, taquetes, pijas
+  'empaque',    // empaques, sellos, burletes
   'corte',      // cargo por corte / maquinado
   'mano_obra',
   'flete',

@@ -30,6 +30,7 @@ export default async function AdminPage() {
           <h1>Tabulador</h1>
           <p>De aquí sale todo el precio. Lo que no esté capturado aquí, se cotiza en cero.</p>
         </div>
+        <a className="ui-btn ui-btn-primary" href="/admin/calculadora">Calculadora de material</a>
       </div>
 
       {/* Estado de captura con palomas, no con una columna de ceros. */}

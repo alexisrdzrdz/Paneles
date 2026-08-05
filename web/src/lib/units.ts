@@ -25,9 +25,14 @@ const FRACTIONS: [number, string][] = [
   [0.5, ' 1/2'], [0.625, ' 5/8'], [0.75, ' 3/4'], [0.875, ' 7/8'],
 ];
 
+/* Sin ceros de adorno: 1.5 m, no 1.50 m; 600 cm, no 600.0 cm. Solo se recortan
+   si hay punto decimal — recortar "100" a "1" sería otro tipo de error. */
+const trimZeros = (s: string) =>
+  s.includes('.') ? s.replace(/0+$/, '').replace(/\.$/, '') : s;
+
 export function formatLength(mm: number, unit: DisplayUnit): string {
-  if (unit === 'm')  return `${(mm / 1000).toFixed(mm % 1000 === 0 ? 0 : 2)} m`;
-  if (unit === 'cm') return `${(mm / 10).toFixed(mm % 10 === 0 ? 0 : 1)} cm`;
+  if (unit === 'm')  return `${trimZeros((mm / 1000).toFixed(2))} m`;
+  if (unit === 'cm') return `${trimZeros((mm / 10).toFixed(1))} cm`;
   const totalIn = mmToInches(mm);
   const feet = Math.floor(totalIn / 12);
   const restIn = totalIn - feet * 12;

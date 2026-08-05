@@ -130,8 +130,10 @@ eq('«240» en centimetros', parseLength('240', 'cm'), 2400);
 eq('«60» en pulgadas', parseLength('60', 'in'), inchesToMm(60));
 eq('basura -> null', parseLength('como tres metros', 'm'), null);
 eq('vacio -> null', parseLength('   ', 'cm'), null);
-eq('formato en metros', formatLength(2400, 'm'), '2.40 m');
+eq('formato en metros sin ceros de adorno', formatLength(2400, 'm'), '2.4 m');
 eq('formato en centimetros', formatLength(2400, 'cm'), '240 cm');
+ eq('metro exacto sin decimales', formatLength(6000, 'm'), '6 m');
+ eq('medio metro', formatLength(1500, 'm'), '1.5 m');
 eq('formato en pulgadas', formatLength(inchesToMm(94.5), 'in'), `7'-10 1/2"`);
 eq('los tres formatos describen el mismo milimetraje',
   [formatLength(6000, 'm'), formatLength(6000, 'cm')], ['6 m', '600 cm']);

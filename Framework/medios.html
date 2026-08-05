@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Explorar · Nord · 04 ago 22:10</title>
+<!-- Las tipografías con las que se diseñó el tema. Si prefieres no
+     depender de Google, baja los .woff2 y sustituye esto por tus
+     propias reglas @font-face: el resto del paquete no cambia. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="framework.css">
+<link rel="stylesheet" href="layout.css">
+<link rel="stylesheet" href="movimiento.css">
+<script src="ui.js" defer></script>
+</head>
+<body class="ui" data-layout="sidebar" data-panel="card" data-anim="aparecer" style="margin:0">
+
+<div class="ui-shell">
+  <aside class="ui-shell-nav" id="navPrincipal">
+    <div class="ui-shell-brand">
+      <span class="ui-shell-logo">M</span>
+      <span class="ui-shell-name">Marca <b>Uno</b></span>
+    </div>
+    <nav class="ui-side ui-shell-side" aria-label="Navegación principal">
+      <div class="ui-nav-label">Trabajo</div>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Panel</span></a>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Registros</span><span class="ui-chip">12</span></a>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Elementos</span></a>
+      <div class="ui-nav-label">Análisis</div>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Categorías</span></a>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Informes</span></a>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Mapa</span></a>
+      <div class="ui-nav-label">Descubrir</div>
+      <a href="#" class="ui-side-item active" aria-current="page"><span class="ui-side-dot"></span><span class="ui-side-text">Medios</span></a>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Social</span></a>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Mercados</span></a>
+      <div class="ui-nav-label">Cuenta</div>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Equipo</span></a>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Ajustes</span></a>
+    </nav>
+    <div class="ui-nav-user">
+      <span class="ui-avatar ui-avatar-sm">AR</span>
+      <span class="ui-nav-user-text">
+        <b>Ana Ruiz</b>
+        <span>Responsable</span>
+      </span>
+    </div>
+    <button class="ui-shell-collapse" type="button" aria-label="Colapsar el menú" data-ui-collapse>&lsaquo;</button>
+  </aside>
+  <div class="ui-shell-veil" data-ui-close="nav"></div>
+  <div class="ui-shell-main">
+    <div class="ui-shell-top">
+      <button class="ui-burger" type="button" aria-label="Abrir el menú" aria-expanded="false" data-ui-nav>
+        <span></span><span></span><span></span>
+      </button>
+      <h1 class="ui-shell-title">Explorar</h1>
+      <div class="ui-shell-actions">
+        <span class="ui-live"><span class="ui-live-dot"></span>EN VIVO</span>
+        <span class="mono ui-clock" data-ui-clock>09:41:22</span>
+        <button class="ui-theme-toggle" type="button" aria-label="Cambiar entre claro y oscuro" data-ui-theme>&#9680;</button>
+        <span class="ui-avatars">
+          <span class="ui-avatar ui-avatar-sm">AR</span>
+          <span class="ui-avatar ui-avatar-sm">LP</span>
+          <span class="ui-avatar ui-avatar-sm is-muted">+3</span>
+        </span>
+      </div>
+    </div>
+    <div class="ui-shell-body">
+      <div class="ui-chipbar" style="margin-bottom:var(--gap)">
+        <button class="ui-chip is-on" type="button" data-ui-seg>Todo</button>
+        <button class="ui-chip" type="button" data-ui-seg>Directos</button>
+        <button class="ui-chip" type="button" data-ui-seg>Cocina</button>
+        <button class="ui-chip" type="button" data-ui-seg>Rutas</button>
+        <button class="ui-chip" type="button" data-ui-seg>Música</button>
+        <button class="ui-chip" type="button" data-ui-seg>Ciencia</button>
+        <button class="ui-chip" type="button" data-ui-seg>Tutoriales</button>
+        <button class="ui-chip" type="button" data-ui-seg>Documentales</button>
+      </div>
+
+      <div class="ui-media-grid">
+        <article class="ui-media">
+          <div class="ui-thumb"><span class="ui-thumb-time">12:48</span></div>
+          <div class="ui-media-body">
+            <span class="ui-avatar ui-avatar-sm">OL</span>
+            <div>
+              <div class="ui-media-title">Cómo ordenar un archivo fotográfico de veinte años en una tarde</div>
+              <div class="ui-meta">Orden y Luz &middot; 128 mil visualizaciones &middot; hace 3 días</div>
+            </div>
+          </div>
+        </article>
+        <article class="ui-media">
+          <div class="ui-thumb ui-thumb-b"><span class="ui-thumb-time">24:05</span></div>
+          <div class="ui-media-body">
+            <span class="ui-avatar ui-avatar-sm">RN</span>
+            <div>
+              <div class="ui-media-title">Ruta en bici por la ribera: niebla, chopos y un café de premio</div>
+              <div class="ui-meta">Rutas del Norte &middot; 43 mil visualizaciones &middot; hace 1 semana</div>
+            </div>
+          </div>
+        </article>
+        <article class="ui-media">
+          <div class="ui-thumb ui-thumb-c"><span class="ui-thumb-time">18:32</span></div>
+          <div class="ui-media-body">
+            <span class="ui-avatar ui-avatar-sm">CD</span>
+            <div>
+              <div class="ui-media-title">Pan de hogaza con fermentación lenta, paso a paso y sin amasadora</div>
+              <div class="ui-meta">Cocina de Diario &middot; 301 mil visualizaciones &middot; hace 2 meses</div>
+            </div>
+          </div>
+        </article>
+        <article class="ui-media">
+          <div class="ui-thumb ui-thumb-d">
+            <span class="ui-thumb-stats">&#9825; 12,4 mil</span>
+            <span class="ui-thumb-time">EN VIVO</span>
+          </div>
+          <div class="ui-media-body">
+            <span class="ui-avatar ui-avatar-sm">LT</span>
+            <div>
+              <div class="ui-media-title">Directo: repaso de la semana y preguntas de la sala</div>
+              <div class="ui-meta">La Tertulia &middot; 3.240 viendo ahora</div>
+            </div>
+          </div>
+        </article>
+        <article class="ui-media">
+          <div class="ui-thumb ui-thumb-b"><span class="ui-thumb-time">31:17</span></div>
+          <div class="ui-media-body">
+            <span class="ui-avatar ui-avatar-sm">TS</span>
+            <div>
+              <div class="ui-media-title">El oficio de afinar pianos: una mañana en el taller</div>
+              <div class="ui-meta">Taller Sonoro &middot; 87 mil visualizaciones &middot; hace 5 días</div>
+            </div>
+          </div>
+        </article>
+        <article class="ui-media">
+          <div class="ui-thumb ui-thumb-c"><span class="ui-thumb-time">21:40</span></div>
+          <div class="ui-media-body">
+            <span class="ui-avatar ui-avatar-sm">CC</span>
+            <div>
+              <div class="ui-media-title">Aprende a leer un balance en veinte minutos, con ejemplos reales</div>
+              <div class="ui-meta">Cuentas Claras &middot; 210 mil visualizaciones &middot; hace 1 mes</div>
+            </div>
+          </div>
+        </article>
+        <article class="ui-media">
+          <div class="ui-thumb ui-thumb-d"><span class="ui-thumb-time">09:56</span></div>
+          <div class="ui-media-body">
+            <span class="ui-avatar ui-avatar-sm">SC</span>
+            <div>
+              <div class="ui-media-title">Tres ejercicios de espalda para quien trabaja sentado</div>
+              <div class="ui-meta">Salud en Casa &middot; 512 mil visualizaciones &middot; hace 4 meses</div>
+            </div>
+          </div>
+        </article>
+        <article class="ui-media">
+          <div class="ui-thumb"><span class="ui-thumb-time">44:03</span></div>
+          <div class="ui-media-body">
+            <span class="ui-avatar ui-avatar-sm">AC</span>
+            <div>
+              <div class="ui-media-title">Una noche en el observatorio: cielo limpio y tres planetas</div>
+              <div class="ui-meta">Aula de Ciencia &middot; 66 mil visualizaciones &middot; hace 2 semanas</div>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <h2 class="ui-panel-title" style="margin:var(--gap) 0 var(--space-3)">En vertical</h2>
+      <div class="ui-media-grid-v">
+        <article class="ui-media">
+          <div class="ui-thumb ui-thumb-v ui-thumb-c"><span class="ui-thumb-stats">&#9825; 325,5 mil</span></div>
+          <div class="ui-media-title">Tortilla jugosa en cinco minutos</div>
+        </article>
+        <article class="ui-media">
+          <div class="ui-thumb ui-thumb-v"><span class="ui-thumb-stats">&#9825; 48,2 mil</span></div>
+          <div class="ui-media-title">El nudo que nunca se afloja</div>
+        </article>
+        <article class="ui-media">
+          <div class="ui-thumb ui-thumb-v ui-thumb-b"><span class="ui-thumb-stats">&#9825; 112,9 mil</span></div>
+          <div class="ui-media-title">Mañana de mercado central</div>
+        </article>
+        <article class="ui-media">
+          <div class="ui-thumb ui-thumb-v ui-thumb-d"><span class="ui-thumb-stats">&#9825; 9.804</span></div>
+          <div class="ui-media-title">Estiramiento de dos minutos entre reuniones</div>
+        </article>
+        <article class="ui-media">
+          <div class="ui-thumb ui-thumb-v ui-thumb-b"><span class="ui-thumb-stats">&#9825; 77,1 mil</span></div>
+          <div class="ui-media-title">Atardecer desde el faro, sin cortes</div>
+        </article>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

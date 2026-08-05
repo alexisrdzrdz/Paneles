@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sitio · Nord · 04 ago 22:10</title>
+<!-- Las tipografías con las que se diseñó el tema. Si prefieres no
+     depender de Google, baja los .woff2 y sustituye esto por tus
+     propias reglas @font-face: el resto del paquete no cambia. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="framework.css">
+<link rel="stylesheet" href="layout.css">
+<link rel="stylesheet" href="movimiento.css">
+<script src="ui.js" defer></script>
+</head>
+<body class="ui" data-layout="sidebar" data-panel="card" data-anim="aparecer" style="margin:0">
+
+<header class="ui-topbar">
+  <span class="ui-wordmark">ENCUENTRO <span class="ui-sigla">ANUAL</span></span>
+  <span class="ui-subtitle">EDICIÓN DECIMOSEGUNDA</span>
+  <div class="ui-topbar-right">
+    <nav aria-label="Navegación del sitio" style="display:flex;gap:var(--space-4)">
+      <a href="#programa" class="ui-link">Programa</a>
+      <a href="#ponentes" class="ui-link">Ponentes</a>
+      <a href="#precios" class="ui-link">Entradas</a>
+    </nav>
+    <button class="ui-theme-toggle" type="button" aria-label="Cambiar entre claro y oscuro" data-ui-theme>&#9680;</button>
+    <button class="ui-btn ui-btn-primary" type="button">Inscribirse</button>
+  </div>
+</header>
+
+<main>
+  <section class="ui-hero">
+    <span class="ui-chip is-on">Inscripción abierta</span>
+    <h1 class="ui-hero-title">Encuentro Anual, tres días<br>para poner en común lo que funciona</h1>
+    <p class="ui-hero-text">Doce sesiones, veinte ponentes y una sala de trabajo abierta.
+      Del 14 al 16 de octubre, presencial y en línea.</p>
+    <div style="display:flex;gap:var(--space-3);justify-content:center;flex-wrap:wrap">
+      <button class="ui-btn ui-btn-primary" type="button">Conseguir entrada</button>
+      <button class="ui-btn" type="button">Ver el programa</button>
+    </div>
+    <p class="ui-meta">Más de 400 asistentes en la edición anterior &middot; Entrada en línea desde 49 &euro;</p>
+  </section>
+
+  <div class="ui-logos">
+    <span>MARCA UNO</span><span>MARCA DOS</span><span>MARCA TRES</span><span>MARCA CUATRO</span>
+  </div>
+
+  <section class="ui-features">
+    <div class="ui-feature">
+      <div class="ui-feature-icon">&#9672;</div>
+      <b>Doce sesiones</b>
+      <span class="ui-meta">Tres itinerarios en paralelo, todos con turno de preguntas.</span>
+    </div>
+    <div class="ui-feature">
+      <div class="ui-feature-icon">&#9681;</div>
+      <b>Taller práctico</b>
+      <span class="ui-meta">Plazas limitadas, con material y ejercicios para llevarse.</span>
+    </div>
+    <div class="ui-feature">
+      <div class="ui-feature-icon">&#9678;</div>
+      <b>Vídeos después</b>
+      <span class="ui-meta">Todas las sesiones grabadas y disponibles una semana después.</span>
+    </div>
+  </section>
+
+  <section id="programa" class="ui-panel" style="margin:var(--gap) var(--panel-pad)">
+    <div class="ui-panel-head">
+      <h2 class="ui-panel-title">Programa</h2>
+      <span class="ui-panel-meta">JUEVES 14</span>
+    </div>
+    <div class="ui-tabs" data-ui-tabs>
+      <button type="button" class="ui-tab active" data-ui-tab="dia-1" aria-selected="true">Día uno</button>
+      <button type="button" class="ui-tab" data-ui-tab="dia-2" aria-selected="false">Día dos</button>
+      <button type="button" class="ui-tab" data-ui-tab="dia-3" aria-selected="false">Día tres</button>
+    </div>
+    <div class="ui-panel-body" data-ui-panel="dia-1">
+      <ol class="ui-timeline">
+        <li class="ui-tl-item ui-tl-ok"><span class="mono">09:00</span> <b>Sesión de apertura</b> &middot; Ana Ruiz</li>
+        <li class="ui-tl-item"><span class="mono">10:30</span> <b>Simposio uno: lo que aprendimos</b> &middot; Luis Pardo</li>
+        <li class="ui-tl-item ui-tl-warn"><span class="mono">12:00</span> <b>Mesa redonda</b> &middot; cuatro invitados</li>
+        <li class="ui-tl-item"><span class="mono">16:00</span> <b>Taller práctico</b> &middot; plazas limitadas</li>
+      </ol>
+    </div>
+    <div class="ui-panel-body" data-ui-panel="dia-2" hidden>
+      <ol class="ui-timeline">
+        <li class="ui-tl-item"><span class="mono">09:30</span> <b>Simposio dos: casos reales</b> &middot; Marta Gil</li>
+        <li class="ui-tl-item ui-tl-ok"><span class="mono">11:00</span> <b>Sesión abierta</b> &middot; propuestas del público</li>
+        <li class="ui-tl-item"><span class="mono">17:00</span> <b>Encuentro informal</b> &middot; sala común</li>
+      </ol>
+    </div>
+    <div class="ui-panel-body" data-ui-panel="dia-3" hidden>
+      <ol class="ui-timeline">
+        <li class="ui-tl-item"><span class="mono">10:00</span> <b>Resumen de las tres jornadas</b> &middot; Diego Sanz</li>
+        <li class="ui-tl-item ui-tl-ok"><span class="mono">12:30</span> <b>Cierre y despedida</b></li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="ponentes" style="padding:0 var(--panel-pad) var(--gap)">
+    <h2 class="ui-panel-title" style="margin-bottom:var(--space-3)">Ponentes</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:var(--gap)">
+      <div class="ui-panel ui-profile">
+        <div class="ui-cover"></div>
+        <div class="ui-profile-body">
+          <span class="ui-avatar ui-avatar-lg">AR</span>
+          <div class="ui-profile-name">Ana Ruiz</div>
+          <div class="ui-meta">Sesión de apertura</div>
+        </div>
+      </div>
+      <div class="ui-panel ui-profile">
+        <div class="ui-cover"></div>
+        <div class="ui-profile-body">
+          <span class="ui-avatar ui-avatar-lg">LP</span>
+          <div class="ui-profile-name">Luis Pardo</div>
+          <div class="ui-meta">Simposio uno</div>
+        </div>
+      </div>
+      <div class="ui-panel ui-profile">
+        <div class="ui-cover"></div>
+        <div class="ui-profile-body">
+          <span class="ui-avatar ui-avatar-lg">MG</span>
+          <div class="ui-profile-name">Marta Gil</div>
+          <div class="ui-meta">Simposio dos</div>
+        </div>
+      </div>
+      <div class="ui-panel ui-profile">
+        <div class="ui-cover"></div>
+        <div class="ui-profile-body">
+          <span class="ui-avatar ui-avatar-lg">DS</span>
+          <div class="ui-profile-name">Diego Sanz</div>
+          <div class="ui-meta">Cierre</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="precios" style="padding:0 var(--panel-pad) var(--gap)">
+    <h2 class="ui-panel-title" style="margin-bottom:var(--space-3)">Entradas</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:var(--gap)">
+      <div class="ui-price">
+        <div class="ui-price-head">En línea</div>
+        <div class="ui-price-amount">49<span>&euro;</span></div>
+        <ul class="ui-price-list">
+          <li>Las doce sesiones en directo</li>
+          <li>Vídeos durante un mes</li>
+          <li>Material descargable</li>
+        </ul>
+        <button class="ui-btn ui-btn-block" type="button">Elegir</button>
+      </div>
+      <div class="ui-price">
+        <div class="ui-price-head">Presencial <span class="ui-badge">La más elegida</span></div>
+        <div class="ui-price-amount">180<span>&euro;</span></div>
+        <ul class="ui-price-list">
+          <li>Todo lo de la entrada en línea</li>
+          <li>Comidas de los tres días</li>
+          <li>Acceso al taller práctico</li>
+        </ul>
+        <button class="ui-btn ui-btn-primary ui-btn-block" type="button">Elegir</button>
+      </div>
+      <div class="ui-price">
+        <div class="ui-price-head">Grupo</div>
+        <div class="ui-price-amount">140<span>&euro; / persona</span></div>
+        <ul class="ui-price-list">
+          <li>A partir de cinco personas</li>
+          <li>Factura única</li>
+          <li>Sala reservada</li>
+        </ul>
+        <button class="ui-btn ui-btn-block" type="button">Consultar</button>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding:0 var(--panel-pad) var(--gap)">
+    <h2 class="ui-panel-title" style="margin-bottom:var(--space-3)">Preguntas frecuentes</h2>
+    <details class="ui-accordion" open>
+      <summary>¿Se pueden ver las sesiones después?</summary>
+      <p>Sí. Todas se graban y se publican una semana después, incluidas en cualquier entrada.</p>
+    </details>
+    <details class="ui-accordion">
+      <summary>¿Hay descuento para grupos?</summary>
+      <p>A partir de cinco personas se aplica la tarifa de grupo, con factura única.</p>
+    </details>
+    <details class="ui-accordion">
+      <summary>¿Puedo cambiar el titular de la entrada?</summary>
+      <p>Hasta 48 horas antes, desde el mismo correo con el que se hizo la compra.</p>
+    </details>
+  </section>
+
+  <div class="ui-cta">
+    <b>Quedan 40 plazas presenciales</b>
+    <button class="ui-btn ui-btn-primary" type="button">Inscribirse ahora</button>
+  </div>
+</main>
+
+<footer class="ui-footer">
+  <span>&copy; 2026 Encuentro Anual</span>
+  <span><a href="#" class="ui-link">Privacidad</a> &middot; <a href="#" class="ui-link">Términos</a> &middot; <a href="#" class="ui-link">Contacto</a></span>
+</footer>
+
+</body>
+</html>

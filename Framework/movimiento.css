@@ -1,0 +1,321 @@
+@charset "UTF-8";
+/* ═══════════════════════════════════════════════════════════════════════════
+   movimiento.css — capa de movimiento del sistema
+   Enlázalo DESPUÉS de framework.css y layout.css.
+   ───────────────────────────────────────────────────────────────────────────
+   POR QUÉ ES UN ARCHIVO APARTE Y NO ESTÁ DENTRO DE framework.css
+
+   `framework.css` es reemplazable: se regenera y se sustituye entero. Si el
+   movimiento viviera ahí, cada regeneración lo borraría. Aquí sobrevive, y
+   además se puede quitar de un enlace si un despliegue lo quiere todo quieto.
+
+   ───────────────────────────────────────────────────────────────────────────
+   QUÉ PROBLEMA RESUELVE
+
+   `framework.css` traía trece transiciones y **las trece usaban `ease`**, la
+   curva por defecto del navegador. `ease` arranca despacio y frena en seco: es
+   la razón principal de que una interfaz correcta se sienta barata. No es que
+   faltara una librería de animación; es que faltaban las curvas.
+
+   Este archivo hace tres cosas:
+
+     1. vuelve a declarar esas transiciones con las curvas de `theme.css`
+     2. añade movimiento donde no lo había —capas, filas, pestañas, foco—
+     3. coordina duraciones para que dos cosas que ocurren juntas se sientan
+        como un solo gesto y no como dos animaciones sueltas
+
+   ───────────────────────────────────────────────────────────────────────────
+   LAS REGLAS QUE LO GOBIERNAN
+
+   · **El movimiento explica, no adorna.** Cada transición responde a una
+     pregunta: ¿de dónde salió esto?, ¿adónde se fue?, ¿esto reaccionó a lo que
+     acabo de hacer? Lo que no responde a ninguna, sobra.
+
+   · **Nada supera los 320 ms.** Por encima, el usuario espera a la interfaz en
+     lugar de al revés. Los estados de hover van a 160 ms: por debajo del umbral
+     de percepción consciente, se sienten instantáneos pero no secos.
+
+   · **Nada se mueve en bucle.** Un elemento que late permanentemente en una
+     pantalla que alguien mira doce horas es una fuente de fatiga. La única
+     excepción legítima es un indicador de estado vivo, y va al final del
+     archivo, acotado y por debajo del umbral de WCAG 2.2 SC 2.3.1.
+
+   · **Se anima `transform` y `opacity`.** Son las dos propiedades que el
+     compositor resuelve sin recalcular la maquetación. Animar `width`, `top` o
+     `margin` obliga al navegador a rehacer el diseño en cada fotograma, y a 60
+     fps eso se ve. Donde este archivo anima `width` —el riel lateral— es
+     porque no hay alternativa, y por eso es la única.
+
+   · **Todo se apaga con `prefers-reduced-motion`.** Al final del archivo.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+
+/* Respaldos: si el tema es antiguo y no trae curvas, el archivo sigue
+   funcionando en lugar de dejar las transiciones sin valor.
+   El respaldo usa un nombre interno (--mov-*) porque "--x: var(--x, ...)"
+   es un ciclo de auto-referencia: la variable queda garantizada-inválida
+   (vacía) y toda transición que la use colapsa a "ease 0s". Con un nombre
+   distinto no hay ciclo, y el resto del archivo consume los --mov-*. */
+:root,
+.ui {
+  --mov-standard: var(--ease-standard, cubic-bezier(0.2, 0, 0.2, 1));
+  --mov-out: var(--ease-out, cubic-bezier(0, 0, 0.2, 1));
+  --mov-in: var(--ease-in, cubic-bezier(0.4, 0, 1, 1));
+  --mov-emphasis: var(--ease-emphasis, cubic-bezier(0.25, 0.1, 0.25, 1));
+  --mov-dur-slow: var(--dur-slow, 320ms);
+}
+
+
+/* ───────────────────────────────────────────────────────────────────────────
+   1 · CONTROLES
+   Reacción inmediata a la intención. 160 ms: se siente instantáneo sin ser
+   seco. El `transform` del pulsado va más rápido todavía —el clic tiene que
+   responder antes de que el dedo se levante—.
+   ─────────────────────────────────────────────────────────────────────────── */
+.ui :where(.ui-btn, .ui-page, .ui-chip, .ui-badge) {
+  transition:
+    background-color var(--dur-fast) var(--mov-standard),
+    border-color     var(--dur-fast) var(--mov-standard),
+    color            var(--dur-fast) var(--mov-standard),
+    box-shadow       var(--dur-fast) var(--mov-standard),
+    transform 90ms var(--mov-out);
+}
+.ui .ui-btn:active:not(:disabled) { transform: translateY(1px); }
+
+.ui :where(.ui-input, .ui-select, .ui-textarea, input, select, textarea) {
+  transition:
+    border-color var(--dur-fast) var(--mov-standard),
+    box-shadow   var(--dur-fast) var(--mov-standard),
+    background-color var(--dur-fast) var(--mov-standard);
+}
+
+/* El anillo de foco NO se anima en su aparición: tiene que estar cuando el
+   tabulador llega, no 160 ms después. Sí se suaviza al irse. */
+.ui :where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  transition: outline-color 0ms, box-shadow 0ms;
+}
+
+/* Interruptor y casilla: el pomo se desplaza, no aparece en el otro extremo. */
+.ui .ui-switch::after,
+.ui .ui-switch > span {
+  transition: transform var(--dur-base) var(--mov-emphasis),
+              background-color var(--dur-fast) var(--mov-standard);
+}
+.ui .ui-check input + span,
+.ui .ui-check span::after {
+  transition: background-color var(--dur-fast) var(--mov-standard),
+              border-color var(--dur-fast) var(--mov-standard),
+              transform var(--dur-fast) var(--mov-out);
+}
+
+
+/* ───────────────────────────────────────────────────────────────────────────
+   2 · NAVEGACIÓN
+   ─────────────────────────────────────────────────────────────────────────── */
+.ui .ui-side-item {
+  transition: background-color var(--dur-fast) var(--mov-standard),
+              color var(--dur-fast) var(--mov-standard),
+              padding-left var(--dur-base) var(--mov-emphasis);
+}
+
+/* La pestaña activa: el indicador se DESLIZA de una a otra en lugar de
+   apagarse aquí y encenderse allá. Es la señal de continuidad que hace que se
+   entienda que es el mismo control cambiando de valor. */
+.ui .ui-tab {
+  transition: color var(--dur-fast) var(--mov-standard),
+              box-shadow var(--dur-base) var(--mov-emphasis);
+}
+
+.ui .ui-breadcrumb a,
+.ui .ui-link {
+  transition: color var(--dur-fast) var(--mov-standard),
+              text-decoration-color var(--dur-fast) var(--mov-standard);
+}
+
+
+/* ───────────────────────────────────────────────────────────────────────────
+   3 · SUPERFICIES
+   El realce al pasar el ratón usa `--hover-lift` del tema. Se eleva y se
+   asienta; no rebota. El rebote sugiere ligereza, y un panel de datos no es
+   ligero.
+   ─────────────────────────────────────────────────────────────────────────── */
+.ui :where(.ui-panel, .ui-card, .ui-dash-card, .ui-stat) {
+  transition: border-color var(--dur-base) var(--mov-standard),
+              box-shadow   var(--dur-base) var(--mov-standard),
+              transform    var(--dur-base) var(--mov-emphasis);
+}
+
+.ui :where(a.ui-card, button.ui-card, [role="button"].ui-card):hover {
+  transform: translateY(calc(var(--hover-lift) * -1));
+}
+
+/* Fila de tabla: solo color. Una fila que se desplaza al pasar por encima
+   desalinea la columna y hace perder el renglón que se estaba leyendo. */
+.ui .ui-table tbody tr {
+  transition: background-color var(--dur-fast) var(--mov-standard);
+}
+
+
+/* ───────────────────────────────────────────────────────────────────────────
+   4 · CAPAS
+   Diálogo, cajón, menú y aviso. Todas comparten la misma gramática: entran
+   desde donde conceptualmente estaban, salen por donde vinieron.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* El velo antes que el contenido: primero se atenúa el fondo, luego llega lo
+   que hay que leer. Al revés, el diálogo compite con lo que tapa. */
+.ui .ui-stage-veil {
+  animation: ui-mov-velo var(--dur-base) var(--mov-out) both;
+}
+@keyframes ui-mov-velo { from { opacity: 0; } }
+
+/* El diálogo llega desde ligeramente detrás y algo más abajo: no cae del
+   techo ni crece desde el centro. 12 px son suficientes para leer la dirección
+   sin que parezca que viaja. */
+.ui .ui-dialog {
+  animation: ui-mov-dialogo var(--dur-base) var(--mov-emphasis) both;
+  animation-delay: 40ms;
+}
+@keyframes ui-mov-dialogo {
+  from { opacity: 0; transform: translateY(12px) scale(0.985); }
+}
+
+/* El cajón entra por su borde. `transform` y no `right`: el compositor lo
+   resuelve sin rehacer la maquetación en cada fotograma. */
+.ui .ui-drawer {
+  animation: ui-mov-cajon var(--mov-dur-slow) var(--mov-emphasis) both;
+}
+@keyframes ui-mov-cajon {
+  from { opacity: 0; transform: translateX(24px); }
+}
+
+/* El menú se abre desde su disparador: origen arriba, escala mínima. */
+.ui .ui-menu {
+  transform-origin: top center;
+  animation: ui-mov-menu var(--dur-fast) var(--mov-out) both;
+}
+@keyframes ui-mov-menu {
+  from { opacity: 0; transform: translateY(-6px) scale(0.97); }
+}
+.ui .ui-menu-item {
+  transition: background-color 90ms var(--mov-standard),
+              color 90ms var(--mov-standard);
+}
+
+/* El aviso entra por el lado en el que se apila. Sale más rápido de lo que
+   entra: irse no necesita anunciarse. */
+.ui .ui-toast {
+  animation: ui-mov-aviso var(--dur-base) var(--mov-emphasis) both;
+}
+@keyframes ui-mov-aviso {
+  from { opacity: 0; transform: translateX(16px) scale(0.98); }
+}
+.ui .ui-toast.is-saliendo {
+  animation: ui-mov-aviso-sale var(--dur-fast) var(--mov-in) both;
+}
+@keyframes ui-mov-aviso-sale {
+  to { opacity: 0; transform: translateX(16px); }
+}
+
+.ui .ui-tooltip {
+  animation: ui-mov-tooltip 120ms var(--mov-out) both;
+}
+@keyframes ui-mov-tooltip {
+  from { opacity: 0; transform: translateY(3px); }
+}
+
+
+/* ───────────────────────────────────────────────────────────────────────────
+   5 · ENTRADA ESCALONADA
+   Una rejilla que aparece de golpe se lee como un salto; escalonada, se lee
+   como que la página se está armando. El escalón se corta al sexto elemento:
+   con 45 ms cada uno, el vigésimo entraría casi un segundo tarde y eso ya es
+   esperar.
+
+   `backwards` es lo que evita el destello: sin él, el elemento se pinta en su
+   estado final y salta al inicial cuando arranca la animación.
+   ─────────────────────────────────────────────────────────────────────────── */
+.ui [data-anim] > * {
+  animation: ui-mov-entrar var(--anim-enter-dur) var(--mov-out) backwards;
+}
+.ui [data-anim] > *:nth-child(1) { animation-delay: calc(var(--anim-stagger) * 0); }
+.ui [data-anim] > *:nth-child(2) { animation-delay: calc(var(--anim-stagger) * 1); }
+.ui [data-anim] > *:nth-child(3) { animation-delay: calc(var(--anim-stagger) * 2); }
+.ui [data-anim] > *:nth-child(4) { animation-delay: calc(var(--anim-stagger) * 3); }
+.ui [data-anim] > *:nth-child(5) { animation-delay: calc(var(--anim-stagger) * 4); }
+.ui [data-anim] > *:nth-child(n+6) { animation-delay: calc(var(--anim-stagger) * 5); }
+
+@keyframes ui-mov-entrar {
+  from { opacity: 0; transform: translateY(8px); }
+}
+
+
+/* ───────────────────────────────────────────────────────────────────────────
+   6 · CAMBIO DE VISTA
+   Para enrutadores de cliente. La vista entrante sube un poco; la saliente no
+   se anima: dejar dos vistas moviéndose a la vez es lo que produce la
+   sensación de deslizamiento mareante.
+   ─────────────────────────────────────────────────────────────────────────── */
+.ui .ui-view-enter {
+  animation: ui-mov-vista var(--dur-base) var(--mov-out) both;
+}
+@keyframes ui-mov-vista {
+  from { opacity: 0; transform: translateY(6px); }
+}
+
+
+/* ───────────────────────────────────────────────────────────────────────────
+   7 · LA ÚNICA EXCEPCIÓN AL «NADA EN BUCLE»
+   Un indicador de estado vivo. 2 s por ciclo = 0,5 Hz, muy por debajo del
+   umbral de 3 destellos/s de WCAG 2.2 SC 2.3.1. Modula el HALO, nunca el punto
+   ni el texto: el dato no puede desaparecer de la pantalla.
+   ─────────────────────────────────────────────────────────────────────────── */
+.ui .ui-live-dot {
+  animation: ui-mov-latido 2s var(--mov-standard) infinite;
+}
+@keyframes ui-mov-latido {
+  0%   { box-shadow: 0 0 0 0 rgba(var(--rgb-ok), 0.5); }
+  70%  { box-shadow: 0 0 0 6px rgba(var(--rgb-ok), 0); }
+  100% { box-shadow: 0 0 0 0 rgba(var(--rgb-ok), 0); }
+}
+
+/* La barra de progreso indeterminada es la otra: comunica «sigo trabajando»,
+   que es información, no decoración. */
+.ui .ui-progress.is-indeterminado > span {
+  animation: ui-mov-progreso 1.4s var(--mov-standard) infinite;
+}
+@keyframes ui-mov-progreso {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(400%); }
+}
+
+
+/* ───────────────────────────────────────────────────────────────────────────
+   8 · MOVIMIENTO REDUCIDO
+   No es una cortesía: es un requisito de accesibilidad (WCAG 2.2 SC 2.3.3) y,
+   en un puesto de doce horas, una cuestión de salud laboral.
+
+   Se apaga TODO, incluidos los bucles del §7. Lo que informaba con movimiento
+   sigue informando: el punto de estado vivo se queda, quieto y visible. Se
+   pierde el latido, no el dato.
+
+   `1ms` en lugar de `0s` a propósito: con duración cero, algunos navegadores no
+   disparan el evento `animationend`, y el código que espera ese evento para
+   retirar un elemento del DOM se queda colgado.
+   ─────────────────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .ui *,
+  .ui *::before,
+  .ui *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
+    transition-duration: 1ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+  .ui .ui-btn:active:not(:disabled),
+  .ui :where(a.ui-card, button.ui-card, [role="button"].ui-card):hover {
+    transform: none;
+  }
+}

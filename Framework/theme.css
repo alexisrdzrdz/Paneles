@@ -1,0 +1,244 @@
+@charset "UTF-8";
+/* ═══════════════════════════════════════════════════════
+   Tema generado con SA-Diseñador.
+   Sustituye con esto el bloque :root de la hoja de tema del sistema.
+   ═══════════════════════════════════════════════════════ */
+:root,
+.ui {
+  color-scheme: light;
+  /* Superficies */
+  --bg: #e9eaed;
+  --surface: #f0f0f2;
+  --surface-2: #dcdfe3;
+  --surface-3: #ced1d7;
+  --line: #dcdfe3;
+  --line-strong: #c8ccd2;
+  /* Tinta */
+  --ink: #191c22;
+  --ink-dim: #465062;
+  --ink-faint: #6e7888;
+  /* Acento */
+  --accent: #85999d;
+  --accent-strong: #4a7c7b;
+  --accent-ink: #ffffff;
+  /* Semáforo (estado) */
+  --ok: #485e35;
+  --warn: #6e5013;
+  --danger: #933c44;
+  --info: #3b5a78;
+  --ok-bg: rgba(72, 94, 53, 0.12);
+  --warn-bg: rgba(110, 80, 19, 0.12);
+  --danger-bg: rgba(147, 60, 68, 0.14);
+  --info-bg: rgba(59, 90, 120, 0.12);
+  /* Tipografía · familias */
+  --font-display: 'Inter', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  /* Tipografía · tamaños */
+  --fs-base: 14px;
+  --fs-title-lg: 24px;
+  --fs-title: 16px;
+  --fs-body: 14px;
+  --fs-label: 11px;
+  --fs-mono: 13px;
+  --fs-stat: 28px;
+  --fs-table: 14px;
+  --fs-badge: 11px;
+  /* Tipografía · ritmo */
+  --lh-body: 1.6;
+  --lh-tight: 1.25;
+  --ls-title: 0em;
+  --heading-weight: 600;
+  --heading-transform: none;
+  /* Forma y disposición */
+  --border-width: 1px;
+  --radius: 6px;
+  --cols: 2;
+  --gap: 18px;
+  --panel-pad: 18px;
+  --para-space: 15px;
+  --panel-style: card;
+  /* Layout del sistema */
+  --kind: webapp;
+  --layout: sidebar;
+  --nav-w: 232px;
+  --nav-w-min: 56px;
+  --content-max: 1360px;
+  --density: 1;
+  /* Mapa */
+  --map-style: mapbox://styles/mapbox/light-v11;
+  /* Escalas */
+  --radius-xs: 4px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --radius-pill: 999px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 13px;
+  --space-4: 18px;
+  --space-5: 28px;
+  --space-6: 40px;
+  --content-pad: 24px;
+  --topbar-h: 54px;
+  --btn-h: 34px;
+  --input-h: 36px;
+  --row-h: 42px;
+  --fw-normal: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+  --fw-black: 700;
+  --ls-caps: 0.06em;
+  /* Interacción y elevación */
+  --focus-offset: 2px;
+  --shadow-strength: 0;
+  --tint-border-alpha: 0.32;
+  --blur-chrome: 0px;
+  --chrome-alpha: 1;
+  --tab-indicator-h: 2px;
+  --nav-active-bar-w: 2px;
+  --page-mesh: radial-gradient(1000px 560px at 78% -10%, rgba(136,192,208,0.10), transparent 60%);
+  --gradient-brand: linear-gradient(135deg, #88c0d0 0%, #81a1c1 70%, #5e81ac 100%);
+  /* Movimiento */
+  --anim-enter: aparecer;
+  --anim-enter-dur: 400ms;
+  --anim-stagger: 45ms;
+  --hover-lift: 2px;
+  --dur-fast: 150ms;
+  --dur-base: 250ms;
+  --dur-slow: 320ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-emphasis: cubic-bezier(0.25, 0.1, 0.25, 1);
+  /* Fondo animado */
+  --bg-anim: ninguno;
+  --bg-anim-speed: 1;
+  --bg-anim-density: 1;
+  --bg-anim-opacity: 0.5;
+  --bg-anim-scale: 1;
+  /* Capas y puntos de quiebre */
+  --z-sticky: 100;
+  --z-drawer: 200;
+  --z-dropdown: 300;
+  --z-modal: 400;
+  --z-toast: 500;
+  --z-tooltip: 600;
+  --bp-sm: 640px;
+  --bp-md: 768px;
+  --bp-lg: 1024px;
+  --bp-xl: 1280px;
+  --dash-cols: 4;
+  /* Derivados de la marca */
+  --brand-h: 190;
+  --brand-s: 11%;
+  --brand-l: 57%;
+  --rgb-accent: 133, 153, 157;
+  --rgb-ok: 72, 94, 53;
+  --rgb-warn: 110, 80, 19;
+  --rgb-danger: 147, 60, 68;
+  --rgb-info: 59, 90, 120;
+  --rgb-ink: 25, 28, 34;
+  --rgb-surface: 240, 240, 242;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, calc(var(--shadow-strength) * 0.5));
+  --shadow-md: 0 6px 18px rgba(0, 0, 0, calc(var(--shadow-strength) * 0.7));
+  --shadow-lg: 0 16px 42px rgba(0, 0, 0, calc(var(--shadow-strength) * 1));
+  --focus-width: 2px;
+  --shadow: none;
+  --overlay: #000000;
+  --overlay-alpha: 0.55;
+  --alert-tint: 0.12;
+  --progress-h: 6px;
+  --scroll-size: 10px;
+  /* Componentes · en Auto heredan del token global */
+  --fw-title-lg: 600;
+  --fw-title: 600;
+  --fw-body: 400;
+  --fw-label: 500;
+  --fw-stat: 500;
+  --fw-table-head: 600;
+  --fw-table: 400;
+  --fw-btn: 500;
+  --fw-nav: 500;
+  --fw-badge: 500;
+  --fw-mono: 400;
+  --accent-soft: color-mix(in srgb, var(--accent) calc(var(--alert-tint) * 100%), var(--surface));
+  --ok-soft: color-mix(in srgb, var(--ok) calc(var(--alert-tint) * 100%), var(--surface));
+  --warn-soft: color-mix(in srgb, var(--warn) calc(var(--alert-tint) * 100%), var(--surface));
+  --danger-soft: color-mix(in srgb, var(--danger) calc(var(--alert-tint) * 100%), var(--surface));
+  --info-soft: color-mix(in srgb, var(--info) calc(var(--alert-tint) * 100%), var(--surface));
+  --surface-inset: var(--bg);
+  --ink-strong: var(--ink);
+  --link: #337081;
+  --link-hover: #4a7c7b;
+  --focus-ring: #b4bec0;
+  --topbar-bg: #f0f0f2;
+  --topbar-accent: #397d90;
+  --panel-bg: #f0f0f2;
+  --panel-border: #dcdfe3;
+  --panel-border-width: var(--border-width);
+  --panel-radius: 6px;
+  --panel-tick: var(--accent);
+  --btn-radius: 5px;
+  --btn-border-width: 1px;
+  --btn-primary-bg: #b4bec0;
+  --btn-primary-ink: #ffffff;
+  --btn-primary-border: #b4bec0;
+  --btn-bg: #dcdfe3;
+  --btn-ink: #191c22;
+  --btn-border: #ced1d7;
+  --input-bg: #e9eaed;
+  --input-border: #ced1d7;
+  --input-border-width: var(--border-width);
+  --input-radius: 5px;
+  --input-focus: var(--accent);
+  --badge-radius: 4px;
+  --stat-accent: #397d90;
+  --nav-bg: #e9eaed;
+  --nav-ink: #465062;
+  --nav-active-bg: #dcdfe3;
+  --nav-active-ink: #4b6082;
+  --nav-radius: var(--radius-sm);
+  --tab-ink: var(--ink-dim);
+  --tab-active-ink: #191c22;
+  --tab-indicator: #397d90;
+  --alert-radius: var(--radius-md);
+  --control-accent: var(--accent);
+  --control-bg: var(--surface-3);
+  --control-radius: var(--radius-xs);
+  --menu-bg: var(--surface-2);
+  --menu-ink: var(--ink);
+  --menu-active-bg: var(--surface-3);
+  --menu-radius: var(--radius-md);
+  --tooltip-bg: #ced1d7;
+  --tooltip-ink: #191c22;
+  --tooltip-radius: var(--radius-sm);
+  --dialog-bg: #f0f0f2;
+  --dialog-border: #ced1d7;
+  --dialog-radius: var(--radius-lg);
+  --progress-track: #dcdfe3;
+  --progress-fill: #397d90;
+  --page-active-bg: var(--accent);
+  --page-active-ink: var(--accent-ink);
+  --page-radius: var(--radius-sm);
+  --chip-bg: #dcdfe3;
+  --chip-ink: #465062;
+  --chip-radius: 4px;
+  --avatar-bg: #b4bec0;
+  --avatar-ink: var(--accent-ink);
+  --avatar-radius: var(--radius-pill);
+  --scroll-track: #e9eaed;
+  --scroll-thumb: #ced1d7;
+  --map-land: var(--bg);
+  --map-water: var(--surface-2);
+  --map-road: var(--line-strong);
+  --map-building: var(--surface-3);
+  --map-label: var(--ink-dim);
+  --map-marker-stroke: var(--bg);
+  --map-popup-bg: var(--surface);
+  --map-popup-ink: var(--ink);
+  --map-popup-border: var(--line-strong);
+  --map-ctrl-bg: var(--surface);
+  --map-ctrl-ink: var(--ink);
+}

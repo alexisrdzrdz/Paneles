@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tablero · Nord · 04 ago 22:10</title>
+<!-- Las tipografías con las que se diseñó el tema. Si prefieres no
+     depender de Google, baja los .woff2 y sustituye esto por tus
+     propias reglas @font-face: el resto del paquete no cambia. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="framework.css">
+<link rel="stylesheet" href="layout.css">
+<link rel="stylesheet" href="movimiento.css">
+<script src="ui.js" defer></script>
+</head>
+<body class="ui" data-layout="sidebar" data-panel="card" data-anim="aparecer" style="margin:0">
+
+<div class="ui-shell">
+  <aside class="ui-shell-nav" id="navPrincipal">
+    <div class="ui-shell-brand">
+      <span class="ui-shell-logo">M</span>
+      <span class="ui-shell-name">Marca <b>Uno</b></span>
+    </div>
+    <nav class="ui-side ui-shell-side" aria-label="Navegación principal">
+      <div class="ui-nav-label">Trabajo</div>
+      <a href="#" class="ui-side-item active" aria-current="page"><span class="ui-side-dot"></span><span class="ui-side-text">Panel</span></a>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Registros</span><span class="ui-chip">12</span></a>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Elementos</span></a>
+      <div class="ui-nav-label">Análisis</div>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Categorías</span></a>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Informes</span></a>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Mapa</span></a>
+      <div class="ui-nav-label">Descubrir</div>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Medios</span></a>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Social</span></a>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Mercados</span></a>
+      <div class="ui-nav-label">Cuenta</div>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Equipo</span></a>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Ajustes</span></a>
+    </nav>
+    <div class="ui-nav-user">
+      <span class="ui-avatar ui-avatar-sm">AR</span>
+      <span class="ui-nav-user-text">
+        <b>Ana Ruiz</b>
+        <span>Responsable</span>
+      </span>
+    </div>
+    <button class="ui-shell-collapse" type="button" aria-label="Colapsar el menú" data-ui-collapse>&lsaquo;</button>
+  </aside>
+  <div class="ui-shell-veil" data-ui-close="nav"></div>
+  <div class="ui-shell-main">
+    <div class="ui-shell-top">
+      <button class="ui-burger" type="button" aria-label="Abrir el menú" aria-expanded="false" data-ui-nav>
+        <span></span><span></span><span></span>
+      </button>
+      <h1 class="ui-shell-title">Panel</h1>
+      <div class="ui-shell-actions">
+        <span class="ui-live"><span class="ui-live-dot"></span>EN VIVO</span>
+        <span class="mono ui-clock" data-ui-clock>09:41:22</span>
+        <button class="ui-theme-toggle" type="button" aria-label="Cambiar entre claro y oscuro" data-ui-theme>&#9680;</button>
+        <span class="ui-avatars">
+          <span class="ui-avatar ui-avatar-sm">AR</span>
+          <span class="ui-avatar ui-avatar-sm">LP</span>
+          <span class="ui-avatar ui-avatar-sm is-muted">+3</span>
+        </span>
+      </div>
+    </div>
+    <div class="ui-shell-body">
+      <div class="ui-dash">
+        <div class="ui-dash-card" style="grid-column:span 1">
+          <div class="ui-dash-head">Registros del mes</div>
+          <div class="ui-dash-body"><div class="ui-dash-big num">1.284</div><div class="ui-stat-label">últimas 24 h</div></div>
+        </div>
+        <div class="ui-dash-card" style="grid-column:span 1">
+          <div class="ui-dash-head">Elementos activos</div>
+          <div class="ui-dash-body"><div class="ui-dash-big num">342</div><div class="ui-stat-label">últimas 24 h</div></div>
+        </div>
+        <div class="ui-dash-card" style="grid-column:span 1">
+          <div class="ui-dash-head">Pendientes</div>
+          <div class="ui-dash-body"><div class="ui-dash-big num">17</div><div class="ui-stat-label">últimas 24 h</div></div>
+        </div>
+        <div class="ui-dash-card" style="grid-column:span 1">
+          <div class="ui-dash-head">Cumplimiento</div>
+          <div class="ui-dash-body"><div class="ui-dash-big num">96%</div><div class="ui-stat-label">últimas 24 h</div></div>
+        </div>
+        <div class="ui-dash-card is-tall" style="grid-column:span 2">
+          <div class="ui-dash-head">Tendencia semanal</div>
+          <div class="ui-dash-body"><div class="ui-dash-fig"><i style="height:38%"></i><i style="height:62%"></i><i style="height:45%"></i><i style="height:80%"></i><i style="height:55%"></i><i style="height:92%"></i><i style="height:70%"></i></div></div>
+        </div>
+        <div class="ui-dash-card is-tall" style="grid-column:span 2">
+          <div class="ui-dash-head">Última actividad</div>
+          <div class="ui-dash-body"><div class="ui-log"><span class="mono">14:32</span> Primera entrada del registro</div><div class="ui-log"><span class="mono">14:30</span> Segunda entrada del registro</div><div class="ui-log"><span class="mono">14:28</span> Tercera entrada del registro</div></div>
+        </div>
+      </div>
+
+      <div class="ui-alert ui-alert-info" style="margin-bottom:var(--gap)">
+        <strong>Aviso</strong> El informe de cierre se genera cada día a las 02:00.
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:var(--gap);margin-bottom:var(--gap)">
+        <div class="ui-panel">
+          <div class="ui-panel-head">
+            <span class="ui-panel-title">Últimos registros</span>
+            <span class="ui-panel-meta">ACTUALIZADO 09:41</span>
+          </div>
+          <div class="ui-table-wrap"><table class="ui-table">
+            <thead>
+              <tr>
+                <th scope="col">Referencia</th>
+                <th scope="col">Categoría</th>
+                <th scope="col">Estado</th>
+                <th scope="col" class="num">Importe</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="mono">REF-1042</td><td>Categoría A</td><td><span class="ui-badge ui-badge-ok">AL DÍA</span></td><td class="num mono">1.240</td></tr>
+              <tr><td class="mono">REF-1041</td><td>Categoría B</td><td><span class="ui-badge ui-badge-warn">EN REVISIÓN</span></td><td class="num mono">860</td></tr>
+              <tr><td class="mono">REF-1039</td><td>Categoría A</td><td><span class="ui-badge ui-badge-danger">BLOQUEADO</span></td><td class="num mono">2.315</td></tr>
+              <tr><td class="mono">REF-1036</td><td>Categoría C</td><td><span class="ui-badge ui-badge-info">NUEVO</span></td><td class="num mono">418</td></tr>
+              <tr><td class="mono">REF-1034</td><td>Categoría B</td><td><span class="ui-badge ui-badge-ok">AL DÍA</span></td><td class="num mono">972</td></tr>
+            </tbody>
+          </table></div>
+          <div class="ui-table-foot">
+            <span class="ui-meta">5 de 1.284 registros</span>
+            <div class="ui-pager">
+              <button type="button" class="ui-page" aria-label="Anterior">&lsaquo;</button>
+              <button type="button" class="ui-page is-active" aria-current="page">1</button>
+              <button type="button" class="ui-page">2</button>
+              <button type="button" class="ui-page">3</button>
+              <button type="button" class="ui-page" aria-label="Siguiente">&rsaquo;</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="ui-panel">
+          <div class="ui-panel-head">
+            <span class="ui-panel-title">Actividad</span>
+            <span class="ui-panel-meta">HOY</span>
+          </div>
+          <div class="ui-panel-body">
+            <div class="ui-stat ui-stat-spark primary" style="margin-bottom:var(--space-4)">
+              <div>
+                <div class="ui-stat-value num">4,2 h</div>
+                <div class="ui-stat-label">Tiempo medio <span class="ui-trend is-up">&#9650; 8%</span></div>
+              </div>
+              <svg class="ui-spark" viewBox="0 0 100 32" preserveAspectRatio="none" role="img" aria-label="Tendencia de los últimos ocho periodos">
+                <polyline points="0,26 14,20 28,24 42,12 56,17 70,8 84,14 100,4"/>
+              </svg>
+            </div>
+            <div>
+              <div class="ui-log"><span class="mono">09:38</span> Ana Ruiz cerró <b>REF-1042</b></div>
+              <div class="ui-log"><span class="mono">09:21</span> Luis Pardo creó <b>REF-1043</b></div>
+              <div class="ui-log"><span class="mono">08:57</span> Informe semanal generado</div>
+              <div class="ui-log"><span class="mono">08:40</span> Marta Gil actualizó la Categoría B</div>
+              <div class="ui-log"><span class="mono">08:12</span> Diego Sanz se unió al equipo</div>
+              <div class="ui-log"><span class="mono">07:55</span> Copia de seguridad completada</div>
+            </div>
+            <hr class="ui-divider">
+            <a href="#" class="ui-link">Ver toda la actividad</a>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:var(--gap);margin-bottom:var(--gap)">
+        <div class="ui-panel">
+          <div class="ui-panel-head"><span class="ui-panel-title">Progreso</span></div>
+          <div class="ui-panel-body">
+            <div class="ui-label-row"><span class="ui-meta">Categoría A</span><span class="mono">68%</span></div>
+            <div class="ui-progress"><span style="width:68%"></span></div>
+            <div class="ui-label-row" style="margin-top:var(--space-3)"><span class="ui-meta">Categoría B</span><span class="mono">34%</span></div>
+            <div class="ui-progress ui-progress-warn"><span style="width:34%"></span></div>
+            <div class="ui-label-row" style="margin-top:var(--space-3)"><span class="ui-meta">Categoría C</span><span class="mono">91%</span></div>
+            <div class="ui-progress"><span style="width:91%"></span></div>
+            <hr class="ui-divider">
+            <div class="ui-label-row"><span class="ui-meta">Objetivo del trimestre</span><span class="mono">75%</span></div>
+          </div>
+        </div>
+
+        <div class="ui-panel">
+          <div class="ui-panel-head"><span class="ui-panel-title">Equipo</span></div>
+          <div class="ui-panel-body">
+            <div class="ui-avatars" style="margin-bottom:var(--space-3)">
+              <span class="ui-avatar">AR</span>
+              <span class="ui-avatar">LP</span>
+              <span class="ui-avatar">MG</span>
+              <span class="ui-avatar is-muted">+5</span>
+            </div>
+            <dl class="ui-kv">
+              <dt>Responsable</dt><dd>Ana Ruiz</dd>
+              <dt>Miembros</dt><dd class="mono">8</dd>
+              <dt>Turno</dt><dd>Mañana</dd>
+              <dt>En línea</dt><dd class="mono">5 de 8</dd>
+            </dl>
+          </div>
+        </div>
+
+        <div class="ui-panel">
+          <div class="ui-panel-head"><span class="ui-panel-title">Seguimiento</span></div>
+          <div class="ui-panel-body">
+            <ol class="ui-timeline">
+              <li class="ui-tl-item ui-tl-ok"><span class="mono">09:38</span> Revisión aprobada</li>
+              <li class="ui-tl-item ui-tl-warn"><span class="mono">09:05</span> Pendiente de firma</li>
+              <li class="ui-tl-item ui-tl-danger"><span class="mono">08:22</span> Devuelto por el revisor</li>
+              <li class="ui-tl-item ui-tl-ok"><span class="mono">07:58</span> Jornada iniciada</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mercados · Nord · 04 ago 22:10</title>
+<!-- Las tipografías con las que se diseñó el tema. Si prefieres no
+     depender de Google, baja los .woff2 y sustituye esto por tus
+     propias reglas @font-face: el resto del paquete no cambia. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="framework.css">
+<link rel="stylesheet" href="layout.css">
+<link rel="stylesheet" href="movimiento.css">
+<script src="ui.js" defer></script>
+</head>
+<body class="ui" data-layout="sidebar" data-panel="card" data-anim="aparecer" style="margin:0">
+
+<div class="ui-shell">
+  <aside class="ui-shell-nav" id="navPrincipal">
+    <div class="ui-shell-brand">
+      <span class="ui-shell-logo">M</span>
+      <span class="ui-shell-name">Marca <b>Uno</b></span>
+    </div>
+    <nav class="ui-side ui-shell-side" aria-label="Navegación principal">
+      <div class="ui-nav-label">Trabajo</div>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Panel</span></a>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Registros</span><span class="ui-chip">12</span></a>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Elementos</span></a>
+      <div class="ui-nav-label">Análisis</div>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Categorías</span></a>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Informes</span></a>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Mapa</span></a>
+      <div class="ui-nav-label">Descubrir</div>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Medios</span></a>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Social</span></a>
+      <a href="#" class="ui-side-item active" aria-current="page"><span class="ui-side-dot"></span><span class="ui-side-text">Mercados</span></a>
+      <div class="ui-nav-label">Cuenta</div>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Equipo</span></a>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Ajustes</span></a>
+    </nav>
+    <div class="ui-nav-user">
+      <span class="ui-avatar ui-avatar-sm">AR</span>
+      <span class="ui-nav-user-text">
+        <b>Ana Ruiz</b>
+        <span>Responsable</span>
+      </span>
+    </div>
+    <button class="ui-shell-collapse" type="button" aria-label="Colapsar el menú" data-ui-collapse>&lsaquo;</button>
+  </aside>
+  <div class="ui-shell-veil" data-ui-close="nav"></div>
+  <div class="ui-shell-main">
+    <div class="ui-shell-top">
+      <button class="ui-burger" type="button" aria-label="Abrir el menú" aria-expanded="false" data-ui-nav>
+        <span></span><span></span><span></span>
+      </button>
+      <h1 class="ui-shell-title">Mercados</h1>
+      <div class="ui-shell-actions">
+        <span class="ui-live"><span class="ui-live-dot"></span>EN VIVO</span>
+        <span class="mono ui-clock" data-ui-clock>09:41:22</span>
+        <button class="ui-theme-toggle" type="button" aria-label="Cambiar entre claro y oscuro" data-ui-theme>&#9680;</button>
+        <span class="ui-avatars">
+          <span class="ui-avatar ui-avatar-sm">AR</span>
+          <span class="ui-avatar ui-avatar-sm">LP</span>
+          <span class="ui-avatar ui-avatar-sm is-muted">+3</span>
+        </span>
+      </div>
+    </div>
+    <div class="ui-shell-body">
+      <div class="ui-tickerbar">
+        <button class="ui-ticker is-active" type="button">
+          <span class="ui-ticker-sym">IND-A</span>
+          <span class="ui-ticker-price">4.812,50</span>
+          <span class="ui-delta is-up">1,24 %</span>
+        </button>
+        <button class="ui-ticker" type="button">
+          <span class="ui-ticker-sym">REF-B</span>
+          <span class="ui-ticker-price">1.208,75</span>
+          <span class="ui-delta is-down">0,48 %</span>
+        </button>
+        <button class="ui-ticker" type="button">
+          <span class="ui-ticker-sym">MAT-C</span>
+          <span class="ui-ticker-price">892,30</span>
+          <span class="ui-delta is-up">0,86 %</span>
+        </button>
+        <button class="ui-ticker" type="button">
+          <span class="ui-ticker-sym">ENE-D</span>
+          <span class="ui-ticker-price">64,18</span>
+          <span class="ui-delta is-down">2,10 %</span>
+        </button>
+        <button class="ui-ticker" type="button">
+          <span class="ui-ticker-sym">DIV-E</span>
+          <span class="ui-ticker-price">1,0842</span>
+          <span class="ui-delta is-up">0,12 %</span>
+        </button>
+      </div>
+
+      <div class="ui-panel" style="margin:var(--gap) 0">
+        <div class="ui-panel-head">
+          <span class="ui-panel-title">IND-A &middot; Índice general</span>
+          <span class="ui-panel-meta">CIERRE 17:30</span>
+          <div class="ui-segmented" style="margin-left:auto">
+            <button class="ui-seg" type="button" data-ui-seg>1D</button>
+            <button class="ui-seg" type="button" data-ui-seg>1M</button>
+            <button class="ui-seg is-on" type="button" data-ui-seg>1A</button>
+          </div>
+        </div>
+        <div class="ui-panel-body">
+          <div class="ui-chart">
+            <svg viewBox="0 0 720 260" preserveAspectRatio="xMidYMid meet" role="img"
+                 aria-label="Evolución anual del índice IND-A frente a la referencia REF-B, con el volumen mensual debajo"
+                 style="display:block;width:100%;height:auto">
+              <g class="ui-chart-grid">
+                <line x1="60" y1="20" x2="700" y2="20"/>
+                <line x1="60" y1="50" x2="700" y2="50"/>
+                <line x1="60" y1="80" x2="700" y2="80"/>
+                <line x1="60" y1="110" x2="700" y2="110"/>
+                <line x1="60" y1="140" x2="700" y2="140"/>
+                <line x1="60" y1="170" x2="700" y2="170"/>
+              </g>
+              <g class="ui-chart-axis">
+                <text x="52" y="24" text-anchor="end">180</text>
+                <text x="52" y="54" text-anchor="end">160</text>
+                <text x="52" y="84" text-anchor="end">140</text>
+                <text x="52" y="114" text-anchor="end">120</text>
+                <text x="52" y="144" text-anchor="end">100</text>
+                <text x="52" y="174" text-anchor="end">80</text>
+                <text x="60" y="254" text-anchor="middle">Ene</text>
+                <text x="176" y="254" text-anchor="middle">Mar</text>
+                <text x="292" y="254" text-anchor="middle">May</text>
+                <text x="408" y="254" text-anchor="middle">Jul</text>
+                <text x="524" y="254" text-anchor="middle">Sep</text>
+                <text x="640" y="254" text-anchor="middle">Nov</text>
+              </g>
+              <path class="ui-chart-area" d="M60 170 L60 146 L118 134 L176 140 L234 116 L292 122 L350 98 L408 92 L466 104 L524 80 L582 68 L640 74 L698 56 L698 170 Z"/>
+              <path class="ui-chart-line" d="M60 146 L118 134 L176 140 L234 116 L292 122 L350 98 L408 92 L466 104 L524 80 L582 68 L640 74 L698 56"/>
+              <path class="ui-chart-line-2" d="M60 140 L118 146 L176 134 L234 128 L292 134 L350 122 L408 116 L466 122 L524 110 L582 104 L640 110 L698 98"/>
+              <g>
+                <rect class="ui-chart-bar" x="51" y="213" width="18" height="22"/>
+                <rect class="ui-chart-bar" x="109" y="205" width="18" height="30"/>
+                <rect class="ui-chart-bar is-down" x="167" y="217" width="18" height="18"/>
+                <rect class="ui-chart-bar" x="225" y="201" width="18" height="34"/>
+                <rect class="ui-chart-bar is-down" x="283" y="211" width="18" height="24"/>
+                <rect class="ui-chart-bar" x="341" y="197" width="18" height="38"/>
+                <rect class="ui-chart-bar" x="399" y="195" width="18" height="40"/>
+                <rect class="ui-chart-bar is-down" x="457" y="209" width="18" height="26"/>
+                <rect class="ui-chart-bar" x="515" y="193" width="18" height="42"/>
+                <rect class="ui-chart-bar" x="573" y="199" width="18" height="36"/>
+                <rect class="ui-chart-bar is-down" x="631" y="215" width="18" height="20"/>
+                <rect class="ui-chart-bar" x="689" y="191" width="18" height="44"/>
+              </g>
+            </svg>
+            <div class="ui-chart-legend">
+              <span><i></i> IND-A</span>
+              <span><i class="is-info"></i> REF-B</span>
+              <span><i class="is-info" style="opacity:.75"></i> Volumen</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ui-panel">
+        <div class="ui-panel-head">
+          <span class="ui-panel-title">Instrumentos</span>
+          <span class="ui-panel-meta">SESIÓN DEL DÍA</span>
+        </div>
+        <div class="ui-table-wrap"><table class="ui-table">
+          <thead>
+            <tr>
+              <th scope="col">Instrumento</th>
+              <th scope="col" class="num">Último</th>
+              <th scope="col" class="num">Var. día</th>
+              <th scope="col" class="num">Volumen</th>
+              <th scope="col">Tendencia</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="mono">IND-A</td><td class="num mono">4.812,50</td><td class="num"><span class="ui-delta is-up">1,24 %</span></td><td class="num mono">1,2 M</td>
+              <td><svg class="ui-spark" style="width:76px;height:22px" viewBox="0 0 100 32" preserveAspectRatio="none" aria-hidden="true"><polyline style="stroke:var(--ok)" points="0,24 16,20 32,22 48,14 64,16 80,8 100,5"/></svg></td></tr>
+            <tr><td class="mono">REF-B</td><td class="num mono">1.208,75</td><td class="num"><span class="ui-delta is-down">0,48 %</span></td><td class="num mono">845 mil</td>
+              <td><svg class="ui-spark" style="width:76px;height:22px" viewBox="0 0 100 32" preserveAspectRatio="none" aria-hidden="true"><polyline style="stroke:var(--danger)" points="0,7 16,10 32,9 48,15 64,14 80,22 100,26"/></svg></td></tr>
+            <tr><td class="mono">MAT-C</td><td class="num mono">892,30</td><td class="num"><span class="ui-delta is-up">0,86 %</span></td><td class="num mono">2,1 M</td>
+              <td><svg class="ui-spark" style="width:76px;height:22px" viewBox="0 0 100 32" preserveAspectRatio="none" aria-hidden="true"><polyline style="stroke:var(--ok)" points="0,27 16,25 32,20 48,22 64,15 80,12 100,6"/></svg></td></tr>
+            <tr><td class="mono">ENE-D</td><td class="num mono">64,18</td><td class="num"><span class="ui-delta is-down">2,10 %</span></td><td class="num mono">5,4 M</td>
+              <td><svg class="ui-spark" style="width:76px;height:22px" viewBox="0 0 100 32" preserveAspectRatio="none" aria-hidden="true"><polyline style="stroke:var(--danger)" points="0,5 16,9 32,14 48,12 64,18 80,20 100,27"/></svg></td></tr>
+            <tr><td class="mono">DIV-E</td><td class="num mono">1,0842</td><td class="num"><span class="ui-delta is-up">0,12 %</span></td><td class="num mono">640 mil</td>
+              <td><svg class="ui-spark" style="width:76px;height:22px" viewBox="0 0 100 32" preserveAspectRatio="none" aria-hidden="true"><polyline style="stroke:var(--ok)" points="0,20 16,24 32,18 48,20 64,12 80,14 100,7"/></svg></td></tr>
+            <tr><td class="mono">AGR-F</td><td class="num mono">512,40</td><td class="num"><span class="ui-delta is-up">3,05 %</span></td><td class="num mono">980 mil</td>
+              <td><svg class="ui-spark" style="width:76px;height:22px" viewBox="0 0 100 32" preserveAspectRatio="none" aria-hidden="true"><polyline style="stroke:var(--ok)" points="0,28 16,22 32,25 48,17 64,19 80,9 100,4"/></svg></td></tr>
+            <tr><td class="mono">TEC-G</td><td class="num mono">2.150,00</td><td class="num"><span class="ui-delta is-down">1,35 %</span></td><td class="num mono">1,8 M</td>
+              <td><svg class="ui-spark" style="width:76px;height:22px" viewBox="0 0 100 32" preserveAspectRatio="none" aria-hidden="true"><polyline style="stroke:var(--danger)" points="0,6 16,8 32,12 48,10 64,17 80,23 100,28"/></svg></td></tr>
+          </tbody>
+        </table></div>
+        <div class="ui-table-foot">
+          <span class="ui-meta">7 de 42 instrumentos &middot; Datos con 15 minutos de retraso</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nord · 04 ago 22:10</title>
+<!-- Las tipografías con las que se diseñó el tema. Si prefieres no
+     depender de Google, baja los .woff2 y sustituye esto por tus
+     propias reglas @font-face: el resto del paquete no cambia. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="framework.css">
+<link rel="stylesheet" href="layout.css">
+<link rel="stylesheet" href="movimiento.css">
+<script src="ui.js" defer></script>
+</head>
+
+<!-- La clase ui enciende el framework; data-layout elige el armazón -->
+<body class="ui" data-layout="sidebar" data-panel="card" data-anim="aparecer" style="margin:0">
+
+<div class="ui-shell">
+  <aside class="ui-shell-nav">
+    <div class="ui-shell-brand">
+      <span class="ui-shell-logo">A</span>
+      <span class="ui-shell-name">Lorem <b>Ipsum</b></span>
+    </div>
+    <nav class="ui-side ui-shell-side">
+      <a href="#" class="ui-side-item active"><span class="ui-side-dot"></span><span class="ui-side-text">Panel</span></a>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Registros</span><span class="ui-chip">12</span></a>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Categorías</span></a>
+      <a href="#" class="ui-side-item is-disabled"><span class="ui-side-dot"></span><span class="ui-side-text">Historial</span></a>
+    </nav>
+  </aside>
+
+  <div class="ui-shell-main">
+    <div class="ui-shell-top">
+      <button class="ui-burger" type="button" aria-label="Menú"><span></span><span></span><span></span></button>
+      <span class="ui-shell-title">Panel</span>
+      <div class="ui-shell-actions">
+        <span class="ui-badge ui-badge-ok">EN VIVO</span>
+        <span class="ui-avatar">LI</span>
+      </div>
+    </div>
+
+    <div class="ui-shell-body">
+      <div class="ui-shell-grid">
+        <div class="ui-stat primary"><div class="ui-stat-value">128</div><div class="ui-stat-label">Métrica uno</div></div>
+        <div class="ui-stat"><div class="ui-stat-value">17</div><div class="ui-stat-label">Métrica dos</div></div>
+        <div class="ui-stat"><div class="ui-stat-value">4</div><div class="ui-stat-label">Métrica tres</div></div>
+        <div class="ui-stat"><div class="ui-stat-value">96%</div><div class="ui-stat-label">Métrica cuatro</div></div>
+      </div>
+
+      <div class="ui-panel">
+        <div class="ui-panel-head">
+          <span class="ui-panel-title">Lorem ipsum</span>
+          <span class="ui-panel-meta">ÚLT. 14:32</span>
+        </div>
+        <div class="ui-panel-body">
+          <p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
+             et dolore magna aliqua, con un <a href="#" class="ui-link">enlace</a> dentro.</p>
+          <p>
+            <span class="ui-badge ui-badge-danger">CRÍTICO</span>
+            <span class="ui-badge ui-badge-warn">ALTO</span>
+            <span class="ui-badge ui-badge-info">MEDIO</span>
+            <span class="ui-badge ui-badge-ok">BAJO</span>
+          </p>
+          <hr class="ui-divider">
+          <p>
+            <button class="ui-btn ui-btn-primary">Aceptar</button>
+            <button class="ui-btn">Ver detalle</button>
+            <button class="ui-btn ui-btn-ghost">Fantasma</button>
+            <button class="ui-btn ui-btn-danger">Descartar</button>
+            <button class="ui-btn" disabled>Deshabilitado</button>
+          </p>
+        </div>
+      </div>
+
+      <div class="ui-alert ui-alert-danger"><strong>Aviso uno</strong> Lorem ipsum dolor sit amet.</div>
+      <div class="ui-alert ui-alert-warn"><strong>Aviso dos</strong> Consectetur adipiscing elit.</div>
+      <div class="ui-alert ui-alert-info"><strong>Aviso tres</strong> Sed do eiusmod tempor.</div>
+      <div class="ui-alert ui-alert-ok"><strong>Aviso cuatro</strong> Incididunt ut labore.</div>
+
+      <div class="ui-panel">
+        <div class="ui-panel-body">
+          <table class="ui-table">
+            <thead><tr><th>Nº</th><th>Tipo</th><th>Estado</th><th class="num">Valor</th></tr></thead>
+            <tbody>
+              <tr><td>REG-0231</td><td>Tipo A</td><td><span class="ui-badge ui-badge-danger">CRÍTICO</span></td><td class="num">12</td></tr>
+              <tr><td>REG-0230</td><td>Tipo B</td><td><span class="ui-badge ui-badge-warn">ALTO</span></td><td class="num">7</td></tr>
+              <tr><td>REG-0229</td><td>Tipo C</td><td><span class="ui-badge ui-badge-info">MEDIO</span></td><td class="num">3</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="ui-panel">
+        <div class="ui-panel-body">
+          <div class="ui-field"><label>Campo de texto</label><input type="text" placeholder="Texto de ejemplo"></div>
+          <div class="ui-field"><label>Categoría</label><select><option>Uno</option><option>Dos</option></select></div>
+          <p>
+            <label class="ui-check"><input type="checkbox" checked><span>Primera opción</span></label>
+            <label class="ui-switch"><input type="checkbox" checked><span class="ui-switch-track"></span><span>Segunda opción</span></label>
+          </p>
+          <div class="ui-progress"><span style="width:68%"></span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,2013 @@
+{
+  "formato": "sa-disenador/sdk",
+  "version": 3,
+  "generado": "04 ago 22:10",
+  "tema": {
+    "nombre": "Nord · 04 ago 22:10",
+    "modo": "claro",
+    "temaContrario": false
+  },
+  "marca": {
+    "hex": "#85999d",
+    "h": 190,
+    "s": 11,
+    "l": 57,
+    "rgb": [
+      133,
+      153,
+      157
+    ]
+  },
+  "armazon": {
+    "tipo": "sidebar",
+    "navAncho": 232,
+    "navColapsado": 56,
+    "contenidoMax": 1360,
+    "densidad": 1,
+    "barraAlto": 54
+  },
+  "tablero": {
+    "columnas": 4,
+    "tarjetas": [
+      {
+        "id": "kpi1",
+        "titulo": "Registros del mes",
+        "columnas": 1,
+        "alta": false
+      },
+      {
+        "id": "kpi2",
+        "titulo": "Elementos activos",
+        "columnas": 1,
+        "alta": false
+      },
+      {
+        "id": "kpi3",
+        "titulo": "Pendientes",
+        "columnas": 1,
+        "alta": false
+      },
+      {
+        "id": "kpi4",
+        "titulo": "Cumplimiento",
+        "columnas": 1,
+        "alta": false
+      },
+      {
+        "id": "graf",
+        "titulo": "Tendencia semanal",
+        "columnas": 2,
+        "alta": true
+      },
+      {
+        "id": "lista",
+        "titulo": "Última actividad",
+        "columnas": 2,
+        "alta": true
+      }
+    ]
+  },
+  "mapa": {
+    "style": "mapbox://styles/mapbox/light-v11",
+    "land": "#e9eaed",
+    "water": "#dcdfe3",
+    "road": "#c8ccd2",
+    "building": "#ced1d7",
+    "label": "#465062",
+    "marker": {
+      "ok": "#485e35",
+      "info": "#3b5a78",
+      "warn": "#6e5013",
+      "danger": "#933c44",
+      "neutral": "#465062",
+      "stroke": "#e9eaed"
+    },
+    "popup": {
+      "bg": "#f0f0f2",
+      "ink": "#191c22",
+      "border": "#c8ccd2"
+    },
+    "control": {
+      "bg": "#f0f0f2",
+      "ink": "#191c22"
+    },
+    "scale": {
+      "severity": [
+        "#3b5a78",
+        "#555546",
+        "#6e5013",
+        "#81462c",
+        "#933c44",
+        "#682a30"
+      ],
+      "cool": [
+        "#c8ccd2",
+        "#8293a5",
+        "#3b5a78",
+        "#45698d",
+        "#4f79a1",
+        "#5b86ae"
+      ]
+    }
+  },
+  "tokens": {
+    "--bg": {
+      "valor": "#e9eaed",
+      "css": "#e9eaed",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Superficies",
+      "etiqueta": "Fondo",
+      "hereda": null
+    },
+    "--surface": {
+      "valor": "#f0f0f2",
+      "css": "#f0f0f2",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Superficies",
+      "etiqueta": "Superficie (paneles)",
+      "hereda": null
+    },
+    "--surface-2": {
+      "valor": "#dcdfe3",
+      "css": "#dcdfe3",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Superficies",
+      "etiqueta": "Superficie 2",
+      "hereda": null
+    },
+    "--surface-3": {
+      "valor": "#ced1d7",
+      "css": "#ced1d7",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Superficies",
+      "etiqueta": "Superficie 3 (hover)",
+      "hereda": null
+    },
+    "--line": {
+      "valor": "#dcdfe3",
+      "css": "#dcdfe3",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Líneas y forma",
+      "etiqueta": "Línea (hairline)",
+      "hereda": null
+    },
+    "--line-strong": {
+      "valor": "#c8ccd2",
+      "css": "#c8ccd2",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Líneas y forma",
+      "etiqueta": "Línea fuerte",
+      "hereda": null
+    },
+    "--border-width": {
+      "valor": 1,
+      "css": "1px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Líneas y forma",
+      "etiqueta": "Grosor de borde",
+      "hereda": null
+    },
+    "--radius": {
+      "valor": 6,
+      "css": "6px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Líneas y forma",
+      "etiqueta": "Redondeo global",
+      "hereda": null
+    },
+    "--ink": {
+      "valor": "#191c22",
+      "css": "#191c22",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Tinta (texto)",
+      "etiqueta": "Texto principal",
+      "hereda": null
+    },
+    "--ink-dim": {
+      "valor": "#465062",
+      "css": "#465062",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Tinta (texto)",
+      "etiqueta": "Texto atenuado",
+      "hereda": null
+    },
+    "--ink-faint": {
+      "valor": "#6e7888",
+      "css": "#6e7888",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Tinta (texto)",
+      "etiqueta": "Texto tenue",
+      "hereda": null
+    },
+    "--accent": {
+      "valor": "#85999d",
+      "css": "#85999d",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Acento (marca)",
+      "etiqueta": "Acento",
+      "hereda": null
+    },
+    "--accent-strong": {
+      "valor": "#4a7c7b",
+      "css": "#4a7c7b",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Acento (marca)",
+      "etiqueta": "Acento fuerte (hover)",
+      "hereda": null
+    },
+    "--accent-ink": {
+      "valor": "#ffffff",
+      "css": "#ffffff",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Acento (marca)",
+      "etiqueta": "Texto sobre acento",
+      "hereda": null
+    },
+    "--ok": {
+      "valor": "#485e35",
+      "css": "#485e35",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Semáforo (estado)",
+      "etiqueta": "OK / bajo",
+      "hereda": null
+    },
+    "--warn": {
+      "valor": "#6e5013",
+      "css": "#6e5013",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Semáforo (estado)",
+      "etiqueta": "Aviso / alto",
+      "hereda": null
+    },
+    "--danger": {
+      "valor": "#933c44",
+      "css": "#933c44",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Semáforo (estado)",
+      "etiqueta": "Peligro / crítico",
+      "hereda": null
+    },
+    "--info": {
+      "valor": "#3b5a78",
+      "css": "#3b5a78",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Semáforo (estado)",
+      "etiqueta": "Info / medio",
+      "hereda": null
+    },
+    "--font-display": {
+      "valor": "'Inter', system-ui, sans-serif",
+      "css": "'Inter', system-ui, sans-serif",
+      "tipo": "font",
+      "unidad": null,
+      "grupo": "Tipografía · familias",
+      "etiqueta": "Títulos",
+      "hereda": null
+    },
+    "--font-body": {
+      "valor": "'Inter', system-ui, sans-serif",
+      "css": "'Inter', system-ui, sans-serif",
+      "tipo": "font",
+      "unidad": null,
+      "grupo": "Tipografía · familias",
+      "etiqueta": "Cuerpo",
+      "hereda": null
+    },
+    "--font-mono": {
+      "valor": "'JetBrains Mono', monospace",
+      "css": "'JetBrains Mono', monospace",
+      "tipo": "font",
+      "unidad": null,
+      "grupo": "Tipografía · familias",
+      "etiqueta": "Datos (mono)",
+      "hereda": null
+    },
+    "--fs-base": {
+      "valor": 14,
+      "css": "14px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Tipografía · tamaños",
+      "etiqueta": "Base",
+      "hereda": null
+    },
+    "--fs-title-lg": {
+      "valor": 24,
+      "css": "24px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Tipografía · tamaños",
+      "etiqueta": "Encabezado grande",
+      "hereda": null
+    },
+    "--fs-title": {
+      "valor": 16,
+      "css": "16px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Tipografía · tamaños",
+      "etiqueta": "Título de panel",
+      "hereda": null
+    },
+    "--fs-body": {
+      "valor": 14,
+      "css": "14px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Tipografía · tamaños",
+      "etiqueta": "Párrafo",
+      "hereda": null
+    },
+    "--fs-label": {
+      "valor": 11,
+      "css": "11px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Tipografía · tamaños",
+      "etiqueta": "Etiqueta",
+      "hereda": null
+    },
+    "--fs-mono": {
+      "valor": 13,
+      "css": "13px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Tipografía · tamaños",
+      "etiqueta": "Dato / hora",
+      "hereda": null
+    },
+    "--fs-stat": {
+      "valor": 28,
+      "css": "28px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Tipografía · tamaños",
+      "etiqueta": "Valor KPI",
+      "hereda": null
+    },
+    "--fs-table": {
+      "valor": 14,
+      "css": "14px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Tipografía · tamaños",
+      "etiqueta": "Tabla",
+      "hereda": null
+    },
+    "--fs-badge": {
+      "valor": 11,
+      "css": "11px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Tipografía · tamaños",
+      "etiqueta": "Badge",
+      "hereda": null
+    },
+    "--lh-body": {
+      "valor": 1.6,
+      "css": "1.6",
+      "tipo": "num",
+      "unidad": null,
+      "grupo": "Tipografía · ritmo",
+      "etiqueta": "Interlineado cuerpo",
+      "hereda": null
+    },
+    "--lh-tight": {
+      "valor": 1.25,
+      "css": "1.25",
+      "tipo": "num",
+      "unidad": null,
+      "grupo": "Tipografía · ritmo",
+      "etiqueta": "Interlineado títulos",
+      "hereda": null
+    },
+    "--ls-title": {
+      "valor": 0,
+      "css": "0em",
+      "tipo": "num",
+      "unidad": "em",
+      "grupo": "Tipografía · ritmo",
+      "etiqueta": "Espaciado de títulos",
+      "hereda": null
+    },
+    "--heading-weight": {
+      "valor": "600",
+      "css": "600",
+      "tipo": "opt",
+      "unidad": null,
+      "grupo": "Tipografía · ritmo",
+      "etiqueta": "Peso de títulos",
+      "hereda": null
+    },
+    "--heading-transform": {
+      "valor": "none",
+      "css": "none",
+      "tipo": "opt",
+      "unidad": null,
+      "grupo": "Tipografía · ritmo",
+      "etiqueta": "Caja de títulos",
+      "hereda": null
+    },
+    "--fw-title-lg": {
+      "valor": "600",
+      "css": "600",
+      "tipo": "num",
+      "unidad": null,
+      "grupo": "Tipografía · pesos por rol",
+      "etiqueta": "Encabezado grande",
+      "auto": false,
+      "hereda": "--fw-bold"
+    },
+    "--fw-title": {
+      "valor": "600",
+      "css": "600",
+      "tipo": "num",
+      "unidad": null,
+      "grupo": "Tipografía · pesos por rol",
+      "etiqueta": "Título de panel",
+      "auto": false,
+      "hereda": "--heading-weight"
+    },
+    "--fw-body": {
+      "valor": "400",
+      "css": "400",
+      "tipo": "num",
+      "unidad": null,
+      "grupo": "Tipografía · pesos por rol",
+      "etiqueta": "Párrafo",
+      "auto": false,
+      "hereda": "--fw-normal"
+    },
+    "--fw-label": {
+      "valor": "500",
+      "css": "500",
+      "tipo": "num",
+      "unidad": null,
+      "grupo": "Tipografía · pesos por rol",
+      "etiqueta": "Etiqueta",
+      "auto": false,
+      "hereda": "--fw-medium"
+    },
+    "--fw-stat": {
+      "valor": "500",
+      "css": "500",
+      "tipo": "num",
+      "unidad": null,
+      "grupo": "Tipografía · pesos por rol",
+      "etiqueta": "Valor de KPI",
+      "auto": false,
+      "hereda": "--fw-semibold"
+    },
+    "--fw-table-head": {
+      "valor": "600",
+      "css": "600",
+      "tipo": "num",
+      "unidad": null,
+      "grupo": "Tipografía · pesos por rol",
+      "etiqueta": "Cabecera de tabla",
+      "auto": false,
+      "hereda": "--heading-weight"
+    },
+    "--fw-table": {
+      "valor": "400",
+      "css": "400",
+      "tipo": "num",
+      "unidad": null,
+      "grupo": "Tipografía · pesos por rol",
+      "etiqueta": "Celda de tabla",
+      "auto": false,
+      "hereda": "--fw-normal"
+    },
+    "--fw-btn": {
+      "valor": "500",
+      "css": "500",
+      "tipo": "num",
+      "unidad": null,
+      "grupo": "Tipografía · pesos por rol",
+      "etiqueta": "Botón",
+      "auto": false,
+      "hereda": "--fw-semibold"
+    },
+    "--fw-nav": {
+      "valor": "500",
+      "css": "500",
+      "tipo": "num",
+      "unidad": null,
+      "grupo": "Tipografía · pesos por rol",
+      "etiqueta": "Navegación",
+      "auto": false,
+      "hereda": "--fw-medium"
+    },
+    "--fw-badge": {
+      "valor": "500",
+      "css": "500",
+      "tipo": "num",
+      "unidad": null,
+      "grupo": "Tipografía · pesos por rol",
+      "etiqueta": "Badge y chip",
+      "auto": false,
+      "hereda": "--fw-medium"
+    },
+    "--fw-mono": {
+      "valor": "400",
+      "css": "400",
+      "tipo": "num",
+      "unidad": null,
+      "grupo": "Tipografía · pesos por rol",
+      "etiqueta": "Datos (mono)",
+      "auto": false,
+      "hereda": "--fw-normal"
+    },
+    "--cols": {
+      "valor": "2",
+      "css": "2",
+      "tipo": "opt",
+      "unidad": null,
+      "grupo": "Disposición",
+      "etiqueta": "Columnas",
+      "hereda": null
+    },
+    "--gap": {
+      "valor": 18,
+      "css": "18px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Disposición",
+      "etiqueta": "Separación (gap)",
+      "hereda": null
+    },
+    "--panel-pad": {
+      "valor": 18,
+      "css": "18px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Disposición",
+      "etiqueta": "Relleno de panel",
+      "hereda": null
+    },
+    "--para-space": {
+      "valor": 15,
+      "css": "15px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Disposición",
+      "etiqueta": "Espacio de párrafo",
+      "hereda": null
+    },
+    "--kind": {
+      "valor": "webapp",
+      "css": "webapp",
+      "tipo": "opt",
+      "unidad": null,
+      "grupo": "Layout del sistema",
+      "etiqueta": "Tipo de sistema",
+      "hereda": null
+    },
+    "--layout": {
+      "valor": "sidebar",
+      "css": "sidebar",
+      "tipo": "opt",
+      "unidad": null,
+      "grupo": "Layout del sistema",
+      "etiqueta": "Armazón (shell)",
+      "hereda": null
+    },
+    "--panel-style": {
+      "valor": "card",
+      "css": "card",
+      "tipo": "opt",
+      "unidad": null,
+      "grupo": "Layout del sistema",
+      "etiqueta": "Tratamiento de superficie",
+      "hereda": null
+    },
+    "--nav-w": {
+      "valor": 232,
+      "css": "232px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Layout del sistema",
+      "etiqueta": "Ancho del menú",
+      "hereda": null
+    },
+    "--nav-w-min": {
+      "valor": 56,
+      "css": "56px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Layout del sistema",
+      "etiqueta": "Ancho colapsado",
+      "hereda": null
+    },
+    "--content-max": {
+      "valor": 1360,
+      "css": "1360px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Layout del sistema",
+      "etiqueta": "Ancho máx. del contenido",
+      "hereda": null
+    },
+    "--density": {
+      "valor": 1,
+      "css": "1",
+      "tipo": "num",
+      "unidad": null,
+      "grupo": "Layout del sistema",
+      "etiqueta": "Densidad (alto de filas)",
+      "hereda": null
+    },
+    "--radius-xs": {
+      "valor": 4,
+      "css": "4px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Escalas · radios",
+      "etiqueta": "Radio mínimo (casillas)",
+      "hereda": null
+    },
+    "--radius-sm": {
+      "valor": 4,
+      "css": "4px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Escalas · radios",
+      "etiqueta": "Radio pequeño (campos)",
+      "hereda": null
+    },
+    "--radius-md": {
+      "valor": 6,
+      "css": "6px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Escalas · radios",
+      "etiqueta": "Radio medio (tarjetas)",
+      "hereda": null
+    },
+    "--radius-lg": {
+      "valor": 10,
+      "css": "10px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Escalas · radios",
+      "etiqueta": "Radio grande (paneles)",
+      "hereda": null
+    },
+    "--radius-pill": {
+      "valor": 999,
+      "css": "999px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Escalas · radios",
+      "etiqueta": "Píldora",
+      "hereda": null
+    },
+    "--space-1": {
+      "valor": 4,
+      "css": "4px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Escalas · espacio y ritmo",
+      "etiqueta": "Espacio 1",
+      "hereda": null
+    },
+    "--space-2": {
+      "valor": 8,
+      "css": "8px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Escalas · espacio y ritmo",
+      "etiqueta": "Espacio 2",
+      "hereda": null
+    },
+    "--space-3": {
+      "valor": 13,
+      "css": "13px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Escalas · espacio y ritmo",
+      "etiqueta": "Espacio 3",
+      "hereda": null
+    },
+    "--space-4": {
+      "valor": 18,
+      "css": "18px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Escalas · espacio y ritmo",
+      "etiqueta": "Espacio 4",
+      "hereda": null
+    },
+    "--space-5": {
+      "valor": 28,
+      "css": "28px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Escalas · espacio y ritmo",
+      "etiqueta": "Espacio 5",
+      "hereda": null
+    },
+    "--space-6": {
+      "valor": 40,
+      "css": "40px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Escalas · espacio y ritmo",
+      "etiqueta": "Espacio 6",
+      "hereda": null
+    },
+    "--content-pad": {
+      "valor": 24,
+      "css": "24px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Escalas · espacio y ritmo",
+      "etiqueta": "Relleno de la página",
+      "hereda": null
+    },
+    "--topbar-h": {
+      "valor": 54,
+      "css": "54px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Escalas · espacio y ritmo",
+      "etiqueta": "Alto de la barra superior",
+      "hereda": null
+    },
+    "--fw-normal": {
+      "valor": 400,
+      "css": "400",
+      "tipo": "num",
+      "unidad": null,
+      "grupo": "Escalas · pesos y alturas",
+      "etiqueta": "Peso normal",
+      "hereda": null
+    },
+    "--fw-medium": {
+      "valor": 500,
+      "css": "500",
+      "tipo": "num",
+      "unidad": null,
+      "grupo": "Escalas · pesos y alturas",
+      "etiqueta": "Peso medio",
+      "hereda": null
+    },
+    "--fw-semibold": {
+      "valor": 600,
+      "css": "600",
+      "tipo": "num",
+      "unidad": null,
+      "grupo": "Escalas · pesos y alturas",
+      "etiqueta": "Peso semi",
+      "hereda": null
+    },
+    "--fw-bold": {
+      "valor": 700,
+      "css": "700",
+      "tipo": "num",
+      "unidad": null,
+      "grupo": "Escalas · pesos y alturas",
+      "etiqueta": "Peso fuerte",
+      "hereda": null
+    },
+    "--fw-black": {
+      "valor": 700,
+      "css": "700",
+      "tipo": "num",
+      "unidad": null,
+      "grupo": "Escalas · pesos y alturas",
+      "etiqueta": "Peso máximo",
+      "hereda": null
+    },
+    "--ls-caps": {
+      "valor": 0.06,
+      "css": "0.06em",
+      "tipo": "num",
+      "unidad": "em",
+      "grupo": "Escalas · pesos y alturas",
+      "etiqueta": "Tracking de versalitas",
+      "hereda": null
+    },
+    "--btn-h": {
+      "valor": 34,
+      "css": "34px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Escalas · pesos y alturas",
+      "etiqueta": "Alto de botón",
+      "hereda": null
+    },
+    "--input-h": {
+      "valor": 36,
+      "css": "36px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Escalas · pesos y alturas",
+      "etiqueta": "Alto de campo",
+      "hereda": null
+    },
+    "--row-h": {
+      "valor": 42,
+      "css": "42px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Escalas · pesos y alturas",
+      "etiqueta": "Alto de fila",
+      "hereda": null
+    },
+    "--focus-width": {
+      "valor": 2,
+      "css": "2px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Interacción y elevación",
+      "etiqueta": "Grosor del anillo de foco",
+      "hereda": null
+    },
+    "--focus-offset": {
+      "valor": 2,
+      "css": "2px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Interacción y elevación",
+      "etiqueta": "Separación del anillo",
+      "hereda": null
+    },
+    "--shadow": {
+      "valor": "none",
+      "css": "none",
+      "tipo": "opt",
+      "unidad": null,
+      "grupo": "Interacción y elevación",
+      "etiqueta": "Elevación (sombra)",
+      "hereda": null
+    },
+    "--shadow-strength": {
+      "valor": 0,
+      "css": "0",
+      "tipo": "num",
+      "unidad": null,
+      "grupo": "Interacción y elevación",
+      "etiqueta": "Intensidad de las sombras",
+      "hereda": null
+    },
+    "--overlay": {
+      "valor": "#000000",
+      "css": "#000000",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Interacción y elevación",
+      "etiqueta": "Velo del modal",
+      "hereda": null
+    },
+    "--overlay-alpha": {
+      "valor": 0.55,
+      "css": "0.55",
+      "tipo": "num",
+      "unidad": null,
+      "grupo": "Interacción y elevación",
+      "etiqueta": "Opacidad del velo",
+      "hereda": null
+    },
+    "--alert-tint": {
+      "valor": 0.12,
+      "css": "0.12",
+      "tipo": "num",
+      "unidad": null,
+      "grupo": "Interacción y elevación",
+      "etiqueta": "Tinte de los fondos suaves",
+      "hereda": null
+    },
+    "--tint-border-alpha": {
+      "valor": 0.32,
+      "css": "0.32",
+      "tipo": "num",
+      "unidad": null,
+      "grupo": "Interacción y elevación",
+      "etiqueta": "Borde de los fondos suaves",
+      "hereda": null
+    },
+    "--blur-chrome": {
+      "valor": 0,
+      "css": "0px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Interacción y elevación",
+      "etiqueta": "Desenfoque de barras",
+      "hereda": null
+    },
+    "--chrome-alpha": {
+      "valor": 1,
+      "css": "1",
+      "tipo": "num",
+      "unidad": null,
+      "grupo": "Interacción y elevación",
+      "etiqueta": "Opacidad de barras",
+      "hereda": null
+    },
+    "--progress-h": {
+      "valor": 6,
+      "css": "6px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Interacción y elevación",
+      "etiqueta": "Alto de la barra de progreso",
+      "hereda": null
+    },
+    "--scroll-size": {
+      "valor": 10,
+      "css": "10px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Interacción y elevación",
+      "etiqueta": "Grosor del scrollbar",
+      "hereda": null
+    },
+    "--tab-indicator-h": {
+      "valor": 2,
+      "css": "2px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Interacción y elevación",
+      "etiqueta": "Grosor del indicador de pestaña",
+      "hereda": null
+    },
+    "--nav-active-bar-w": {
+      "valor": 2,
+      "css": "2px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Interacción y elevación",
+      "etiqueta": "Filo de la navegación activa",
+      "hereda": null
+    },
+    "--page-mesh": {
+      "valor": "radial-gradient(1000px 560px at 78% -10%, rgba(136,192,208,0.10), transparent 60%)",
+      "css": "radial-gradient(1000px 560px at 78% -10%, rgba(136,192,208,0.10), transparent 60%)",
+      "tipo": "opt",
+      "unidad": null,
+      "grupo": "Interacción y elevación",
+      "etiqueta": "Fondo compuesto de la página",
+      "hereda": null
+    },
+    "--gradient-brand": {
+      "valor": "linear-gradient(135deg, #88c0d0 0%, #81a1c1 70%, #5e81ac 100%)",
+      "css": "linear-gradient(135deg, #88c0d0 0%, #81a1c1 70%, #5e81ac 100%)",
+      "tipo": "opt",
+      "unidad": null,
+      "grupo": "Interacción y elevación",
+      "etiqueta": "Degradado de marca",
+      "hereda": null
+    },
+    "--anim-enter": {
+      "valor": "aparecer",
+      "css": "aparecer",
+      "tipo": "opt",
+      "unidad": null,
+      "grupo": "Movimiento",
+      "etiqueta": "Entrada del contenido",
+      "hereda": null
+    },
+    "--anim-enter-dur": {
+      "valor": 400,
+      "css": "400ms",
+      "tipo": "num",
+      "unidad": "ms",
+      "grupo": "Movimiento",
+      "etiqueta": "Duración de la entrada",
+      "hereda": null
+    },
+    "--anim-stagger": {
+      "valor": 45,
+      "css": "45ms",
+      "tipo": "num",
+      "unidad": "ms",
+      "grupo": "Movimiento",
+      "etiqueta": "Escalonado entre bloques",
+      "hereda": null
+    },
+    "--hover-lift": {
+      "valor": 2,
+      "css": "2px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Movimiento",
+      "etiqueta": "Elevación al pasar el cursor",
+      "hereda": null
+    },
+    "--dur-fast": {
+      "valor": 150,
+      "css": "150ms",
+      "tipo": "num",
+      "unidad": "ms",
+      "grupo": "Movimiento",
+      "etiqueta": "Transición rápida",
+      "hereda": null
+    },
+    "--dur-base": {
+      "valor": 250,
+      "css": "250ms",
+      "tipo": "num",
+      "unidad": "ms",
+      "grupo": "Movimiento",
+      "etiqueta": "Transición normal",
+      "hereda": null
+    },
+    "--dur-slow": {
+      "valor": 320,
+      "css": "320ms",
+      "tipo": "num",
+      "unidad": "ms",
+      "grupo": "Movimiento",
+      "etiqueta": "Transición lenta (paneles y cajones)",
+      "hereda": null
+    },
+    "--ease-standard": {
+      "valor": "cubic-bezier(0.2, 0, 0.2, 1)",
+      "css": "cubic-bezier(0.2, 0, 0.2, 1)",
+      "tipo": "opt",
+      "unidad": null,
+      "grupo": "Movimiento",
+      "etiqueta": "Curva estándar (estados)",
+      "hereda": null
+    },
+    "--ease-out": {
+      "valor": "cubic-bezier(0, 0, 0.2, 1)",
+      "css": "cubic-bezier(0, 0, 0.2, 1)",
+      "tipo": "opt",
+      "unidad": null,
+      "grupo": "Movimiento",
+      "etiqueta": "Curva de salida (aparecer)",
+      "hereda": null
+    },
+    "--ease-in": {
+      "valor": "cubic-bezier(0.4, 0, 1, 1)",
+      "css": "cubic-bezier(0.4, 0, 1, 1)",
+      "tipo": "opt",
+      "unidad": null,
+      "grupo": "Movimiento",
+      "etiqueta": "Curva de entrada (irse)",
+      "hereda": null
+    },
+    "--ease-emphasis": {
+      "valor": "cubic-bezier(0.25, 0.1, 0.25, 1)",
+      "css": "cubic-bezier(0.25, 0.1, 0.25, 1)",
+      "tipo": "opt",
+      "unidad": null,
+      "grupo": "Movimiento",
+      "etiqueta": "Curva de énfasis (paneles)",
+      "hereda": null
+    },
+    "--bg-anim": {
+      "valor": "ninguno",
+      "css": "ninguno",
+      "tipo": "opt",
+      "unidad": null,
+      "grupo": "Fondo animado",
+      "etiqueta": "Animación de fondo",
+      "hereda": null
+    },
+    "--bg-anim-speed": {
+      "valor": 1,
+      "css": "1",
+      "tipo": "num",
+      "unidad": null,
+      "grupo": "Fondo animado",
+      "etiqueta": "Velocidad",
+      "hereda": null
+    },
+    "--bg-anim-density": {
+      "valor": 1,
+      "css": "1",
+      "tipo": "num",
+      "unidad": null,
+      "grupo": "Fondo animado",
+      "etiqueta": "Densidad",
+      "hereda": null
+    },
+    "--bg-anim-opacity": {
+      "valor": 0.5,
+      "css": "0.5",
+      "tipo": "num",
+      "unidad": null,
+      "grupo": "Fondo animado",
+      "etiqueta": "Opacidad",
+      "hereda": null
+    },
+    "--bg-anim-scale": {
+      "valor": 1,
+      "css": "1",
+      "tipo": "num",
+      "unidad": null,
+      "grupo": "Fondo animado",
+      "etiqueta": "Escala del patrón",
+      "hereda": null
+    },
+    "--z-sticky": {
+      "valor": 100,
+      "css": "100",
+      "tipo": "num",
+      "unidad": null,
+      "grupo": "Capas (z-index)",
+      "etiqueta": "Pegajoso",
+      "hereda": null
+    },
+    "--z-drawer": {
+      "valor": 200,
+      "css": "200",
+      "tipo": "num",
+      "unidad": null,
+      "grupo": "Capas (z-index)",
+      "etiqueta": "Cajón",
+      "hereda": null
+    },
+    "--z-dropdown": {
+      "valor": 300,
+      "css": "300",
+      "tipo": "num",
+      "unidad": null,
+      "grupo": "Capas (z-index)",
+      "etiqueta": "Desplegable",
+      "hereda": null
+    },
+    "--z-modal": {
+      "valor": 400,
+      "css": "400",
+      "tipo": "num",
+      "unidad": null,
+      "grupo": "Capas (z-index)",
+      "etiqueta": "Modal",
+      "hereda": null
+    },
+    "--z-toast": {
+      "valor": 500,
+      "css": "500",
+      "tipo": "num",
+      "unidad": null,
+      "grupo": "Capas (z-index)",
+      "etiqueta": "Aviso flotante",
+      "hereda": null
+    },
+    "--z-tooltip": {
+      "valor": 600,
+      "css": "600",
+      "tipo": "num",
+      "unidad": null,
+      "grupo": "Capas (z-index)",
+      "etiqueta": "Tooltip",
+      "hereda": null
+    },
+    "--bp-sm": {
+      "valor": 640,
+      "css": "640px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Puntos de quiebre",
+      "etiqueta": "Móvil",
+      "hereda": null
+    },
+    "--bp-md": {
+      "valor": 768,
+      "css": "768px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Puntos de quiebre",
+      "etiqueta": "Tableta",
+      "hereda": null
+    },
+    "--bp-lg": {
+      "valor": 1024,
+      "css": "1024px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Puntos de quiebre",
+      "etiqueta": "Portátil",
+      "hereda": null
+    },
+    "--bp-xl": {
+      "valor": 1280,
+      "css": "1280px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Puntos de quiebre",
+      "etiqueta": "Escritorio",
+      "hereda": null
+    },
+    "--dash-cols": {
+      "valor": 4,
+      "css": "4",
+      "tipo": "num",
+      "unidad": null,
+      "grupo": "Puntos de quiebre",
+      "etiqueta": "Columnas del tablero",
+      "hereda": null
+    },
+    "--accent-soft": {
+      "valor": "#85999d",
+      "css": "color-mix(in srgb, var(--accent) calc(var(--alert-tint) * 100%), var(--surface))",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Fondos suaves (tintes)",
+      "etiqueta": "Acento suave",
+      "auto": true,
+      "hereda": "--accent"
+    },
+    "--ok-soft": {
+      "valor": "#485e35",
+      "css": "color-mix(in srgb, var(--ok) calc(var(--alert-tint) * 100%), var(--surface))",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Fondos suaves (tintes)",
+      "etiqueta": "OK suave",
+      "auto": true,
+      "hereda": "--ok"
+    },
+    "--warn-soft": {
+      "valor": "#6e5013",
+      "css": "color-mix(in srgb, var(--warn) calc(var(--alert-tint) * 100%), var(--surface))",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Fondos suaves (tintes)",
+      "etiqueta": "Aviso suave",
+      "auto": true,
+      "hereda": "--warn"
+    },
+    "--danger-soft": {
+      "valor": "#933c44",
+      "css": "color-mix(in srgb, var(--danger) calc(var(--alert-tint) * 100%), var(--surface))",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Fondos suaves (tintes)",
+      "etiqueta": "Peligro suave",
+      "auto": true,
+      "hereda": "--danger"
+    },
+    "--info-soft": {
+      "valor": "#3b5a78",
+      "css": "color-mix(in srgb, var(--info) calc(var(--alert-tint) * 100%), var(--surface))",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Fondos suaves (tintes)",
+      "etiqueta": "Info suave",
+      "auto": true,
+      "hereda": "--info"
+    },
+    "--surface-inset": {
+      "valor": "#e9eaed",
+      "css": "var(--bg)",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Fondos suaves (tintes)",
+      "etiqueta": "Superficie hundida",
+      "auto": true,
+      "hereda": "--bg"
+    },
+    "--ink-strong": {
+      "valor": "#191c22",
+      "css": "var(--ink)",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Fondos suaves (tintes)",
+      "etiqueta": "Texto de titular",
+      "auto": true,
+      "hereda": "--ink"
+    },
+    "--link": {
+      "valor": "#337081",
+      "css": "#337081",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Enlaces y foco",
+      "etiqueta": "Enlace",
+      "auto": false,
+      "hereda": "--accent"
+    },
+    "--link-hover": {
+      "valor": "#4a7c7b",
+      "css": "#4a7c7b",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Enlaces y foco",
+      "etiqueta": "Enlace (hover)",
+      "auto": false,
+      "hereda": "--accent-strong"
+    },
+    "--focus-ring": {
+      "valor": "#b4bec0",
+      "css": "#b4bec0",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Enlaces y foco",
+      "etiqueta": "Anillo de foco",
+      "auto": false,
+      "hereda": "--accent"
+    },
+    "--topbar-bg": {
+      "valor": "#f0f0f2",
+      "css": "#f0f0f2",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Barra superior",
+      "etiqueta": "Fondo",
+      "auto": false,
+      "hereda": "--surface"
+    },
+    "--topbar-accent": {
+      "valor": "#397d90",
+      "css": "#397d90",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Barra superior",
+      "etiqueta": "Acento (franja/sigla)",
+      "auto": false,
+      "hereda": "--accent"
+    },
+    "--panel-bg": {
+      "valor": "#f0f0f2",
+      "css": "#f0f0f2",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Panel / recuadro",
+      "etiqueta": "Fondo",
+      "auto": false,
+      "hereda": "--surface"
+    },
+    "--panel-border": {
+      "valor": "#dcdfe3",
+      "css": "#dcdfe3",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Panel / recuadro",
+      "etiqueta": "Borde",
+      "auto": false,
+      "hereda": "--line"
+    },
+    "--panel-border-width": {
+      "valor": 1,
+      "css": "var(--border-width)",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Componente · Panel / recuadro",
+      "etiqueta": "Grosor de borde",
+      "auto": true,
+      "hereda": "--border-width"
+    },
+    "--panel-radius": {
+      "valor": 6,
+      "css": "6px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Componente · Panel / recuadro",
+      "etiqueta": "Redondeo",
+      "auto": false,
+      "hereda": "--radius-lg"
+    },
+    "--panel-tick": {
+      "valor": "#85999d",
+      "css": "var(--accent)",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Panel / recuadro",
+      "etiqueta": "Marca del título",
+      "auto": true,
+      "hereda": "--accent"
+    },
+    "--btn-radius": {
+      "valor": 5,
+      "css": "5px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Componente · Botón",
+      "etiqueta": "Redondeo",
+      "auto": false,
+      "hereda": "--radius-sm"
+    },
+    "--btn-border-width": {
+      "valor": 1,
+      "css": "1px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Componente · Botón",
+      "etiqueta": "Grosor de borde",
+      "auto": false,
+      "hereda": "--border-width"
+    },
+    "--btn-primary-bg": {
+      "valor": "#b4bec0",
+      "css": "#b4bec0",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Botón",
+      "etiqueta": "Primario · fondo",
+      "auto": false,
+      "hereda": "--accent"
+    },
+    "--btn-primary-ink": {
+      "valor": "#ffffff",
+      "css": "#ffffff",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Botón",
+      "etiqueta": "Primario · texto",
+      "auto": false,
+      "hereda": "--accent-ink"
+    },
+    "--btn-primary-border": {
+      "valor": "#b4bec0",
+      "css": "#b4bec0",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Botón",
+      "etiqueta": "Primario · borde",
+      "auto": false,
+      "hereda": "--accent"
+    },
+    "--btn-bg": {
+      "valor": "#dcdfe3",
+      "css": "#dcdfe3",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Botón",
+      "etiqueta": "Secundario · fondo",
+      "auto": false,
+      "hereda": "--surface-2"
+    },
+    "--btn-ink": {
+      "valor": "#191c22",
+      "css": "#191c22",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Botón",
+      "etiqueta": "Secundario · texto",
+      "auto": false,
+      "hereda": "--ink"
+    },
+    "--btn-border": {
+      "valor": "#ced1d7",
+      "css": "#ced1d7",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Botón",
+      "etiqueta": "Secundario · borde",
+      "auto": false,
+      "hereda": "--line-strong"
+    },
+    "--input-bg": {
+      "valor": "#e9eaed",
+      "css": "#e9eaed",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Campo / select",
+      "etiqueta": "Fondo",
+      "auto": false,
+      "hereda": "--bg"
+    },
+    "--input-border": {
+      "valor": "#ced1d7",
+      "css": "#ced1d7",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Campo / select",
+      "etiqueta": "Borde",
+      "auto": false,
+      "hereda": "--line-strong"
+    },
+    "--input-border-width": {
+      "valor": 1,
+      "css": "var(--border-width)",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Componente · Campo / select",
+      "etiqueta": "Grosor de borde",
+      "auto": true,
+      "hereda": "--border-width"
+    },
+    "--input-radius": {
+      "valor": 5,
+      "css": "5px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Componente · Campo / select",
+      "etiqueta": "Redondeo",
+      "auto": false,
+      "hereda": "--radius-sm"
+    },
+    "--input-focus": {
+      "valor": "#85999d",
+      "css": "var(--accent)",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Campo / select",
+      "etiqueta": "Color de foco",
+      "auto": true,
+      "hereda": "--accent"
+    },
+    "--badge-radius": {
+      "valor": 4,
+      "css": "4px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Componente · Badge y KPI",
+      "etiqueta": "Badge · redondeo",
+      "auto": false,
+      "hereda": "--radius-pill"
+    },
+    "--stat-accent": {
+      "valor": "#397d90",
+      "css": "#397d90",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Badge y KPI",
+      "etiqueta": "KPI · filo primario",
+      "auto": false,
+      "hereda": "--accent"
+    },
+    "--nav-bg": {
+      "valor": "#e9eaed",
+      "css": "#e9eaed",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Navegación lateral",
+      "etiqueta": "Fondo",
+      "auto": false,
+      "hereda": "--surface"
+    },
+    "--nav-ink": {
+      "valor": "#465062",
+      "css": "#465062",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Navegación lateral",
+      "etiqueta": "Texto",
+      "auto": false,
+      "hereda": "--ink-dim"
+    },
+    "--nav-active-bg": {
+      "valor": "#dcdfe3",
+      "css": "#dcdfe3",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Navegación lateral",
+      "etiqueta": "Activo · fondo",
+      "auto": false,
+      "hereda": "--surface-3"
+    },
+    "--nav-active-ink": {
+      "valor": "#4b6082",
+      "css": "#4b6082",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Navegación lateral",
+      "etiqueta": "Activo · texto",
+      "auto": false,
+      "hereda": "--accent"
+    },
+    "--nav-radius": {
+      "valor": 4,
+      "css": "var(--radius-sm)",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Componente · Navegación lateral",
+      "etiqueta": "Redondeo del ítem",
+      "auto": true,
+      "hereda": "--radius-sm"
+    },
+    "--tab-ink": {
+      "valor": "#465062",
+      "css": "var(--ink-dim)",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Pestañas",
+      "etiqueta": "Texto",
+      "auto": true,
+      "hereda": "--ink-dim"
+    },
+    "--tab-active-ink": {
+      "valor": "#191c22",
+      "css": "#191c22",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Pestañas",
+      "etiqueta": "Activa · texto",
+      "auto": false,
+      "hereda": "--ink"
+    },
+    "--tab-indicator": {
+      "valor": "#397d90",
+      "css": "#397d90",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Pestañas",
+      "etiqueta": "Activa · indicador",
+      "auto": false,
+      "hereda": "--accent"
+    },
+    "--alert-radius": {
+      "valor": 6,
+      "css": "var(--radius-md)",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Componente · Avisos (alertas)",
+      "etiqueta": "Redondeo",
+      "auto": true,
+      "hereda": "--radius-md"
+    },
+    "--control-accent": {
+      "valor": "#85999d",
+      "css": "var(--accent)",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Casillas e interruptor",
+      "etiqueta": "Color activo",
+      "auto": true,
+      "hereda": "--accent"
+    },
+    "--control-bg": {
+      "valor": "#ced1d7",
+      "css": "var(--surface-3)",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Casillas e interruptor",
+      "etiqueta": "Fondo inactivo",
+      "auto": true,
+      "hereda": "--surface-3"
+    },
+    "--control-radius": {
+      "valor": 4,
+      "css": "var(--radius-xs)",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Componente · Casillas e interruptor",
+      "etiqueta": "Redondeo de la casilla",
+      "auto": true,
+      "hereda": "--radius-xs"
+    },
+    "--menu-bg": {
+      "valor": "#dcdfe3",
+      "css": "var(--surface-2)",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Menú y tooltip",
+      "etiqueta": "Menú · fondo",
+      "auto": true,
+      "hereda": "--surface-2"
+    },
+    "--menu-ink": {
+      "valor": "#191c22",
+      "css": "var(--ink)",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Menú y tooltip",
+      "etiqueta": "Menú · texto",
+      "auto": true,
+      "hereda": "--ink"
+    },
+    "--menu-active-bg": {
+      "valor": "#ced1d7",
+      "css": "var(--surface-3)",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Menú y tooltip",
+      "etiqueta": "Menú · fila activa",
+      "auto": true,
+      "hereda": "--surface-3"
+    },
+    "--menu-radius": {
+      "valor": 6,
+      "css": "var(--radius-md)",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Componente · Menú y tooltip",
+      "etiqueta": "Menú · redondeo",
+      "auto": true,
+      "hereda": "--radius-md"
+    },
+    "--tooltip-bg": {
+      "valor": "#ced1d7",
+      "css": "#ced1d7",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Menú y tooltip",
+      "etiqueta": "Tooltip · fondo",
+      "auto": false,
+      "hereda": "--ink"
+    },
+    "--tooltip-ink": {
+      "valor": "#191c22",
+      "css": "#191c22",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Menú y tooltip",
+      "etiqueta": "Tooltip · texto",
+      "auto": false,
+      "hereda": "--bg"
+    },
+    "--tooltip-radius": {
+      "valor": 4,
+      "css": "var(--radius-sm)",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Componente · Menú y tooltip",
+      "etiqueta": "Tooltip · redondeo",
+      "auto": true,
+      "hereda": "--radius-sm"
+    },
+    "--dialog-bg": {
+      "valor": "#f0f0f2",
+      "css": "#f0f0f2",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Diálogo (modal)",
+      "etiqueta": "Fondo",
+      "auto": false,
+      "hereda": "--surface"
+    },
+    "--dialog-border": {
+      "valor": "#ced1d7",
+      "css": "#ced1d7",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Diálogo (modal)",
+      "etiqueta": "Borde",
+      "auto": false,
+      "hereda": "--line-strong"
+    },
+    "--dialog-radius": {
+      "valor": 10,
+      "css": "var(--radius-lg)",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Componente · Diálogo (modal)",
+      "etiqueta": "Redondeo",
+      "auto": true,
+      "hereda": "--radius-lg"
+    },
+    "--progress-track": {
+      "valor": "#dcdfe3",
+      "css": "#dcdfe3",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Progreso y paginación",
+      "etiqueta": "Progreso · pista",
+      "auto": false,
+      "hereda": "--surface-3"
+    },
+    "--progress-fill": {
+      "valor": "#397d90",
+      "css": "#397d90",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Progreso y paginación",
+      "etiqueta": "Progreso · relleno",
+      "auto": false,
+      "hereda": "--accent"
+    },
+    "--page-active-bg": {
+      "valor": "#85999d",
+      "css": "var(--accent)",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Progreso y paginación",
+      "etiqueta": "Página activa · fondo",
+      "auto": true,
+      "hereda": "--accent"
+    },
+    "--page-active-ink": {
+      "valor": "#ffffff",
+      "css": "var(--accent-ink)",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Progreso y paginación",
+      "etiqueta": "Página activa · texto",
+      "auto": true,
+      "hereda": "--accent-ink"
+    },
+    "--page-radius": {
+      "valor": 4,
+      "css": "var(--radius-sm)",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Componente · Progreso y paginación",
+      "etiqueta": "Redondeo",
+      "auto": true,
+      "hereda": "--radius-sm"
+    },
+    "--chip-bg": {
+      "valor": "#dcdfe3",
+      "css": "#dcdfe3",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Chips y avatar",
+      "etiqueta": "Chip · fondo",
+      "auto": false,
+      "hereda": "--surface-2"
+    },
+    "--chip-ink": {
+      "valor": "#465062",
+      "css": "#465062",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Chips y avatar",
+      "etiqueta": "Chip · texto",
+      "auto": false,
+      "hereda": "--ink-dim"
+    },
+    "--chip-radius": {
+      "valor": 4,
+      "css": "4px",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Componente · Chips y avatar",
+      "etiqueta": "Chip · redondeo",
+      "auto": false,
+      "hereda": "--radius-pill"
+    },
+    "--avatar-bg": {
+      "valor": "#b4bec0",
+      "css": "#b4bec0",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Chips y avatar",
+      "etiqueta": "Avatar · fondo",
+      "auto": false,
+      "hereda": "--accent"
+    },
+    "--avatar-ink": {
+      "valor": "#ffffff",
+      "css": "var(--accent-ink)",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Chips y avatar",
+      "etiqueta": "Avatar · texto",
+      "auto": true,
+      "hereda": "--accent-ink"
+    },
+    "--avatar-radius": {
+      "valor": 999,
+      "css": "var(--radius-pill)",
+      "tipo": "num",
+      "unidad": "px",
+      "grupo": "Componente · Chips y avatar",
+      "etiqueta": "Avatar · redondeo",
+      "auto": true,
+      "hereda": "--radius-pill"
+    },
+    "--scroll-track": {
+      "valor": "#e9eaed",
+      "css": "#e9eaed",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Barra de desplazamiento",
+      "etiqueta": "Pista",
+      "auto": false,
+      "hereda": "--surface"
+    },
+    "--scroll-thumb": {
+      "valor": "#ced1d7",
+      "css": "#ced1d7",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Barra de desplazamiento",
+      "etiqueta": "Pulgar",
+      "auto": false,
+      "hereda": "--line-strong"
+    },
+    "--map-style": {
+      "valor": "auto",
+      "css": "auto",
+      "tipo": "opt",
+      "unidad": null,
+      "grupo": "Componente · Mapa (Mapbox)",
+      "etiqueta": "Estilo base",
+      "hereda": null
+    },
+    "--map-land": {
+      "valor": "#e9eaed",
+      "css": "var(--bg)",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Mapa (Mapbox)",
+      "etiqueta": "Suelo",
+      "auto": true,
+      "hereda": "--bg"
+    },
+    "--map-water": {
+      "valor": "#dcdfe3",
+      "css": "var(--surface-2)",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Mapa (Mapbox)",
+      "etiqueta": "Agua",
+      "auto": true,
+      "hereda": "--surface-2"
+    },
+    "--map-road": {
+      "valor": "#c8ccd2",
+      "css": "var(--line-strong)",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Mapa (Mapbox)",
+      "etiqueta": "Calles",
+      "auto": true,
+      "hereda": "--line-strong"
+    },
+    "--map-building": {
+      "valor": "#ced1d7",
+      "css": "var(--surface-3)",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Mapa (Mapbox)",
+      "etiqueta": "Manzanas / edificios",
+      "auto": true,
+      "hereda": "--surface-3"
+    },
+    "--map-label": {
+      "valor": "#465062",
+      "css": "var(--ink-dim)",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Mapa (Mapbox)",
+      "etiqueta": "Etiquetas",
+      "auto": true,
+      "hereda": "--ink-dim"
+    },
+    "--map-marker-stroke": {
+      "valor": "#e9eaed",
+      "css": "var(--bg)",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Mapa (Mapbox)",
+      "etiqueta": "Filo de marcadores",
+      "auto": true,
+      "hereda": "--bg"
+    },
+    "--map-popup-bg": {
+      "valor": "#f0f0f2",
+      "css": "var(--surface)",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Mapa (Mapbox)",
+      "etiqueta": "Popup · fondo",
+      "auto": true,
+      "hereda": "--surface"
+    },
+    "--map-popup-ink": {
+      "valor": "#191c22",
+      "css": "var(--ink)",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Mapa (Mapbox)",
+      "etiqueta": "Popup · texto",
+      "auto": true,
+      "hereda": "--ink"
+    },
+    "--map-popup-border": {
+      "valor": "#c8ccd2",
+      "css": "var(--line-strong)",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Mapa (Mapbox)",
+      "etiqueta": "Popup · borde",
+      "auto": true,
+      "hereda": "--line-strong"
+    },
+    "--map-ctrl-bg": {
+      "valor": "#f0f0f2",
+      "css": "var(--surface)",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Mapa (Mapbox)",
+      "etiqueta": "Controles · fondo",
+      "auto": true,
+      "hereda": "--surface"
+    },
+    "--map-ctrl-ink": {
+      "valor": "#191c22",
+      "css": "var(--ink)",
+      "tipo": "color",
+      "unidad": null,
+      "grupo": "Componente · Mapa (Mapbox)",
+      "etiqueta": "Controles · icono",
+      "auto": true,
+      "hereda": "--ink"
+    }
+  }
+}

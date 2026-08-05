@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Registros · Nord · 04 ago 22:10</title>
+<!-- Las tipografías con las que se diseñó el tema. Si prefieres no
+     depender de Google, baja los .woff2 y sustituye esto por tus
+     propias reglas @font-face: el resto del paquete no cambia. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="framework.css">
+<link rel="stylesheet" href="layout.css">
+<link rel="stylesheet" href="movimiento.css">
+<script src="ui.js" defer></script>
+</head>
+<body class="ui" data-layout="sidebar" data-panel="card" data-anim="aparecer" style="margin:0">
+
+<div class="ui-shell">
+  <aside class="ui-shell-nav" id="navPrincipal">
+    <div class="ui-shell-brand">
+      <span class="ui-shell-logo">M</span>
+      <span class="ui-shell-name">Marca <b>Uno</b></span>
+    </div>
+    <nav class="ui-side ui-shell-side" aria-label="Navegación principal">
+      <div class="ui-nav-label">Trabajo</div>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Panel</span></a>
+      <a href="#" class="ui-side-item active" aria-current="page"><span class="ui-side-dot"></span><span class="ui-side-text">Registros</span><span class="ui-chip">12</span></a>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Elementos</span></a>
+      <div class="ui-nav-label">Análisis</div>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Categorías</span></a>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Informes</span></a>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Mapa</span></a>
+      <div class="ui-nav-label">Descubrir</div>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Medios</span></a>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Social</span></a>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Mercados</span></a>
+      <div class="ui-nav-label">Cuenta</div>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Equipo</span></a>
+      <a href="#" class="ui-side-item"><span class="ui-side-dot"></span><span class="ui-side-text">Ajustes</span></a>
+    </nav>
+    <div class="ui-nav-user">
+      <span class="ui-avatar ui-avatar-sm">AR</span>
+      <span class="ui-nav-user-text">
+        <b>Ana Ruiz</b>
+        <span>Responsable</span>
+      </span>
+    </div>
+    <button class="ui-shell-collapse" type="button" aria-label="Colapsar el menú" data-ui-collapse>&lsaquo;</button>
+  </aside>
+  <div class="ui-shell-veil" data-ui-close="nav"></div>
+  <div class="ui-shell-main">
+    <div class="ui-shell-top">
+      <button class="ui-burger" type="button" aria-label="Abrir el menú" aria-expanded="false" data-ui-nav>
+        <span></span><span></span><span></span>
+      </button>
+      <h1 class="ui-shell-title">Registros</h1>
+      <div class="ui-shell-actions">
+        <span class="ui-live"><span class="ui-live-dot"></span>EN VIVO</span>
+        <span class="mono ui-clock" data-ui-clock>09:41:22</span>
+        <button class="ui-theme-toggle" type="button" aria-label="Cambiar entre claro y oscuro" data-ui-theme>&#9680;</button>
+        <span class="ui-avatars">
+          <span class="ui-avatar ui-avatar-sm">AR</span>
+          <span class="ui-avatar ui-avatar-sm">LP</span>
+          <span class="ui-avatar ui-avatar-sm is-muted">+3</span>
+        </span>
+      </div>
+    </div>
+    <div class="ui-shell-body">
+      <div class="ui-breadcrumb"><a href="#">Inicio</a><span>/</span><a href="#">Trabajo</a><span>/</span><span class="is-current">Registros</span></div>
+      <div class="ui-tabs" data-ui-tabs>
+        <button type="button" class="ui-tab active" data-ui-tab="tab-todos" aria-selected="true">Todos</button>
+        <button type="button" class="ui-tab" data-ui-tab="tab-abiertos" aria-selected="false">Abiertos</button>
+        <button type="button" class="ui-tab" data-ui-tab="tab-archivo" aria-selected="false">Archivo</button>
+      </div>
+
+      <div data-ui-panel="tab-todos">
+        <div class="ui-panel" style="margin-top:var(--gap)">
+          <div class="ui-toolbar">
+            <div class="ui-search ui-search-sm">
+              <span class="ui-search-icon">&#8981;</span>
+              <label class="ui-label" for="mod-filtro" hidden>Filtrar</label>
+              <input type="search" id="mod-filtro" placeholder="Filtrar registros…">
+            </div>
+            <span class="ui-chip">Categoría: A</span>
+            <span class="ui-chip is-on">Estado: abierto</span>
+            <button class="ui-btn ui-btn-ghost" type="button">Limpiar</button>
+            <button class="ui-btn" type="button" data-ui-drawer="cajonFiltros">Más filtros</button>
+            <button class="ui-btn ui-btn-primary" type="button">Nuevo registro</button>
+          </div>
+          <div class="ui-table-wrap"><table class="ui-table ui-table-work" data-ui-table>
+            <thead>
+              <tr>
+                <th class="ui-th-check" scope="col">
+                  <input type="checkbox" data-ui-check-all aria-label="Seleccionar todos los registros">
+                </th>
+                <th scope="col" class="is-sorted" data-ui-sort>Referencia <span class="ui-sort">&#9650;</span></th>
+                <th scope="col" data-ui-sort>Nombre</th>
+                <th scope="col" data-ui-sort>Categoría</th>
+                <th scope="col">Responsable</th>
+                <th scope="col">Estado</th>
+                <th scope="col" class="num" data-ui-sort>Importe</th>
+                <th class="ui-th-act" scope="col"><span hidden>Acciones</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input type="checkbox" data-ui-check aria-label="Seleccionar REF-1042"></td>
+                <td class="mono">REF-1042</td><td>Elemento uno</td><td>Categoría A</td>
+                <td><span class="ui-avatar ui-avatar-sm">AR</span></td>
+                <td><span class="ui-badge ui-badge-ok">AL DÍA</span></td>
+                <td class="num mono">1.240</td>
+                <td class="ui-td-act"><button class="ui-row-menu" type="button" aria-label="Acciones de REF-1042">&ctdot;</button></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" data-ui-check aria-label="Seleccionar REF-1041"></td>
+                <td class="mono">REF-1041</td><td>Elemento dos</td><td>Categoría B</td>
+                <td><span class="ui-avatar ui-avatar-sm">LP</span></td>
+                <td><span class="ui-badge ui-badge-warn">EN REVISIÓN</span></td>
+                <td class="num mono">860</td>
+                <td class="ui-td-act"><button class="ui-row-menu" type="button" aria-label="Acciones de REF-1041">&ctdot;</button></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" data-ui-check aria-label="Seleccionar REF-1039"></td>
+                <td class="mono">REF-1039</td><td>Elemento tres</td><td>Categoría A</td>
+                <td><span class="ui-avatar ui-avatar-sm">MG</span></td>
+                <td><span class="ui-badge ui-badge-danger">BLOQUEADO</span></td>
+                <td class="num mono">2.315</td>
+                <td class="ui-td-act"><button class="ui-row-menu" type="button" aria-label="Acciones de REF-1039">&ctdot;</button></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" data-ui-check aria-label="Seleccionar REF-1036"></td>
+                <td class="mono">REF-1036</td><td>Elemento cuatro</td><td>Categoría C</td>
+                <td><span class="ui-avatar ui-avatar-sm">DS</span></td>
+                <td><span class="ui-badge ui-badge-info">NUEVO</span></td>
+                <td class="num mono">418</td>
+                <td class="ui-td-act"><button class="ui-row-menu" type="button" aria-label="Acciones de REF-1036">&ctdot;</button></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" data-ui-check aria-label="Seleccionar REF-1034"></td>
+                <td class="mono">REF-1034</td><td>Elemento cinco</td><td>Categoría B</td>
+                <td><span class="ui-avatar ui-avatar-sm">&mdash;</span></td>
+                <td><span class="ui-badge ui-badge-ok">AL DÍA</span></td>
+                <td class="num mono">972</td>
+                <td class="ui-td-act"><button class="ui-row-menu" type="button" aria-label="Acciones de REF-1034">&ctdot;</button></td>
+              </tr>
+            </tbody>
+          </table></div>
+          <div class="ui-table-foot">
+            <span class="ui-meta" data-ui-count>0 seleccionados &middot; 1.284 registros</span>
+            <div class="ui-pager">
+              <button type="button" class="ui-page" aria-label="Anterior">&lsaquo;</button>
+              <button type="button" class="ui-page is-active" aria-current="page">1</button>
+              <button type="button" class="ui-page">2</button>
+              <button type="button" class="ui-page">3</button>
+              <button type="button" class="ui-page" aria-label="Siguiente">&rsaquo;</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:var(--gap);margin:var(--gap) 0">
+          <div class="ui-panel">
+            <div class="ui-panel-head"><span class="ui-panel-title">Detalle</span></div>
+            <div class="ui-panel-body">
+              <dl class="ui-kv">
+                <dt>Referencia</dt><dd class="mono">REF-1042</dd>
+                <dt>Categoría</dt><dd><span class="ui-badge ui-badge-ok">AL DÍA</span></dd>
+                <dt>Responsable</dt><dd>Ana Ruiz</dd>
+                <dt>Actualizado</dt><dd class="mono">09:38</dd>
+              </dl>
+              <hr class="ui-divider">
+              <div class="ui-stepper">
+                <div class="ui-step is-done"><span class="ui-step-dot">1</span>Creado</div>
+                <div class="ui-step is-current"><span class="ui-step-dot">2</span>En revisión</div>
+                <div class="ui-step"><span class="ui-step-dot">3</span>Cerrado</div>
+              </div>
+              <hr class="ui-divider">
+              <div style="display:flex;gap:var(--space-2);flex-wrap:wrap">
+                <button class="ui-btn ui-btn-primary" type="button">Guardar</button>
+                <button class="ui-btn" type="button">Duplicar</button>
+                <button class="ui-btn ui-btn-danger" type="button" data-ui-dialog="dlgCerrar">Cerrar registro</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="ui-panel">
+            <div class="ui-panel-head"><span class="ui-panel-title">Editar</span></div>
+            <div class="ui-panel-body">
+              <div class="ui-form">
+                <div class="ui-field">
+                  <label class="ui-label" for="mod-nombre">Nombre <span class="ui-req">*</span></label>
+                  <input type="text" id="mod-nombre" value="Elemento uno">
+                </div>
+                <div class="ui-field">
+                  <label class="ui-label" for="mod-cat">Categoría</label>
+                  <select id="mod-cat">
+                    <option>Categoría A</option>
+                    <option>Categoría B</option>
+                    <option>Categoría C</option>
+                  </select>
+                </div>
+                <div class="ui-field">
+                  <label class="ui-label" for="mod-correo">Correo</label>
+                  <div class="ui-input-group">
+                    <span class="ui-addon">@</span>
+                    <input type="text" id="mod-correo" value="ana.ruiz" class="is-valid">
+                  </div>
+                  <span class="ui-field-ok">Disponible</span>
+                </div>
+                <div class="ui-field">
+                  <label class="ui-label" for="mod-notas">Notas</label>
+                  <textarea id="mod-notas" rows="2" placeholder="Escribe aquí…"></textarea>
+                </div>
+              </div>
+              <div class="ui-segmented" style="margin-bottom:var(--space-3)">
+                <button class="ui-seg is-on" type="button" data-ui-seg>Hoy</button>
+                <button class="ui-seg" type="button" data-ui-seg>Semana</button>
+                <button class="ui-seg" type="button" data-ui-seg>Mes</button>
+              </div>
+              <label class="ui-switch"><input type="checkbox" checked><span class="ui-switch-track"></span><span>Avisarme de los cambios</span></label>
+              <hr class="ui-divider">
+              <div class="ui-log"><span class="mono">09:38</span> Nota añadida por Ana Ruiz</div>
+              <div class="ui-log"><span class="mono">09:05</span> Enviado a revisión</div>
+              <div class="ui-log"><span class="mono">08:22</span> Importe corregido a 1.240</div>
+            </div>
+          </div>
+        </div>
+
+        <details class="ui-accordion" style="margin-top:var(--gap)">
+          <summary>¿Qué significa cada estado?</summary>
+          <p>Al día, en revisión, bloqueado y nuevo. El estado lo fija el responsable
+            y queda registrado en el seguimiento.</p>
+        </details>
+        <details class="ui-accordion">
+          <summary>¿Quién puede cerrar un registro?</summary>
+          <p>El responsable asignado o cualquier miembro con permiso de administración.</p>
+        </details>
+      </div>
+
+      <div data-ui-panel="tab-abiertos" hidden>
+        <div class="ui-panel" style="margin-top:var(--gap)">
+          <div class="ui-panel-body">
+            <div class="ui-empty">
+              <div class="ui-empty-icon">&#9677;</div>
+              <div class="ui-empty-title">No hay registros abiertos</div>
+              <p class="ui-empty-text">Cuando alguien abra uno, aparecerá aquí con su categoría y su responsable.</p>
+              <button class="ui-btn ui-btn-primary" type="button">Crear el primero</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div data-ui-panel="tab-archivo" hidden>
+        <div class="ui-panel" style="margin-top:var(--gap)">
+          <div class="ui-panel-body">
+            <div class="ui-dropzone">
+              <div class="ui-dropzone-icon">&#8682;</div>
+              <b>Arrastra el archivo aquí</b>
+              <span class="ui-meta">CSV o XLSX, hasta 10 MB</span>
+            </div>
+            <div class="ui-skeleton-group" style="margin-top:var(--space-4)">
+              <span class="ui-skeleton" style="width:60%"></span>
+              <span class="ui-skeleton" style="width:40%"></span>
+              <span class="ui-skeleton" style="width:75%"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="ui-drawer" id="cajonFiltros" style="position:fixed" hidden aria-label="Más filtros">
+        <div class="ui-drawer-head">Más filtros
+          <button class="ui-row-menu" type="button" data-ui-close aria-label="Cerrar los filtros">&times;</button>
+        </div>
+        <div class="ui-drawer-body">
+          <label class="ui-check"><input type="checkbox" checked><span>Sólo los míos</span></label>
+          <label class="ui-check"><input type="checkbox"><span>Con responsable asignado</span></label>
+          <label class="ui-check"><input type="checkbox"><span>Modificados esta semana</span></label>
+          <div class="ui-field">
+            <label class="ui-label" for="flt-desde">Desde</label>
+            <input type="date" id="flt-desde">
+          </div>
+          <button class="ui-btn ui-btn-primary ui-btn-block" type="button" data-ui-close>Aplicar</button>
+        </div>
+      </aside>
+
+      <div class="ui-stage-veil" style="position:fixed" hidden data-ui-veil></div>
+
+      <div id="dlgCerrar" hidden role="dialog" aria-modal="true" aria-labelledby="dlgCerrarTitulo"
+           style="position:fixed;inset:0;z-index:var(--z-modal);display:grid;place-items:center;padding:var(--space-4)">
+        <div class="ui-dialog">
+          <div class="ui-dialog-head" id="dlgCerrarTitulo">Confirmar cierre</div>
+          <div class="ui-dialog-body">
+            <p>¿Cerrar el registro <span class="mono">REF-1042</span>? La acción queda anotada
+              en el seguimiento y no se puede deshacer.</p>
+          </div>
+          <div class="ui-dialog-foot">
+            <button type="button" class="ui-btn" data-ui-close>Cancelar</button>
+            <button type="button" class="ui-btn ui-btn-primary" data-ui-close>Confirmar</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="ui-toasts" style="position:fixed;right:var(--space-4);bottom:var(--space-4);z-index:var(--z-toast)" data-ui-toasts></div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

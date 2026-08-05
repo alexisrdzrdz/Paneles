@@ -1,0 +1,41 @@
+<section class="section">
+  <div class="section-head">
+    <div class="eyebrow">Contacto</div>
+    <h2 class="h2">Hablemos de tu proyecto</h2>
+    <p class="lead">Lo más rápido es cotizar en línea. Si prefieres, escríbenos y te respondemos en 24 h.</p>
+  </div>
+
+  <div class="grid grid-2" style="align-items:start">
+    <div class="ui-panel"><div class="ui-panel-body">
+      <b>Datos de contacto</b>
+      <div style="margin-top:var(--space-3);display:flex;flex-direction:column;gap:var(--space-3)">
+        <div><div class="ui-label">Teléfono</div><a class="ui-link" href="tel:+525555555555">+52 55 5555 5555</a></div>
+        <div><div class="ui-label">WhatsApp</div><a class="ui-link" href="https://wa.me/525555555555">Enviar mensaje</a></div>
+        <div><div class="ui-label">Correo</div><a class="ui-link" href="mailto:hola@mauricios.mx">hola@mauricios.mx</a></div>
+        <div><div class="ui-label">Horario</div><span class="ui-meta">Lun a Vie · 9:00 – 18:00</span></div>
+      </div>
+      <div class="ui-alert ui-alert-info" style="margin-top:var(--space-4)">
+        ¿Tienes un plano? Adjúntalo en tu mensaje y te devolvemos una propuesta en 24 h hábiles.
+      </div>
+    </div></div>
+
+    <div class="ui-panel"><div class="ui-panel-body">
+      <b>Envíanos un mensaje</b>
+      <form style="margin-top:var(--space-3)" onsubmit="event.preventDefault(); (window.UI&&UI.toast)?UI.toast('Mensaje enviado. Te contactamos en 24 h.','ok'):alert('Mensaje enviado (demo)'); this.reset();">
+        <div class="ui-form">
+          <div class="ui-field"><label>Nombre</label><input required type="text" placeholder="Tu nombre"></div>
+          <div class="ui-field"><label>Empresa</label><input type="text" placeholder="Opcional"></div>
+        </div>
+        <div class="ui-form">
+          <div class="ui-field"><label>Correo</label><input required type="email" placeholder="tu@correo.com"></div>
+          <div class="ui-field"><label>Teléfono</label><input type="tel" placeholder="Opcional"></div>
+        </div>
+        <div class="ui-field"><label>Mensaje</label>
+          <textarea rows="4" placeholder="Cuéntanos sobre tu proyecto (nº de baños, sector, material…)"></textarea></div>
+        <button class="ui-btn ui-btn-primary ui-btn-block" type="submit">Enviar mensaje</button>
+      </form>
+    </div></div>
+  </div>
+</section>
+
+<div class="ui-toasts" data-ui-toasts style="position:fixed;right:16px;bottom:16px;z-index:500"></div>

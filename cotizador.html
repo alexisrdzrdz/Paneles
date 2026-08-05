@@ -163,6 +163,15 @@
     .wiz-left,.wiz-right{position:static}
     .panel-scroll{max-height:none}
   }
+  /* El panel del menú colapsado se ancla a la BARRA, no al botón: site.js lo
+     inserta al inicio de la fila derecha y, anclado al botón, abría fuera de
+     la pantalla por la izquierda. */
+  .ui-topbar{position:relative}
+  .ui-topbar .nav-mobile{position:static}
+  .ui-topbar .nav-mobile .ui-menu{
+    position:absolute;top:calc(100% - 2px);right:var(--space-4);left:auto;
+    max-width:calc(100vw - 2 * var(--space-4));
+  }
   /* Teléfono: el logotipo con la palabra completa se salía del ancho. Se
      encoge la sigla y se permite que la barra parta en dos líneas. */
   @media (max-width:480px){

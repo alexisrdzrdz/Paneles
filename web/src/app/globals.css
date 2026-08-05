@@ -130,3 +130,45 @@ body { margin: 0; }
   .tbl-head { flex-wrap: wrap; gap: var(--space-2); }
   .tbl-scroll > .cat-tbl { min-width: 560px; }
 }
+
+/* ── Bloque de cuenta en la barra del sitio ───────────────────────────────
+   Vive dentro del encabezado del sitio, no en una barra aparte: el usuario ve
+   un solo sitio que además reconoce su sesión. */
+.cuenta { display: flex; align-items: center; gap: var(--space-3); }
+.cuenta form { display: inline; }
+
+/* El contenedor de las páginas de cuenta y del panel. Las páginas públicas
+   traen sus propias .section, así que esto solo aplica adentro. */
+.app-main { padding: var(--space-5) var(--space-4); max-width: 1180px; margin: 0 auto; }
+
+.auth-card { max-width: min(440px, 100%); }
+
+@media (max-width: 920px) {
+  /* Con el menú colapsado a hamburguesa, «Entrar» y «Crear cuenta» se quedan
+     visibles: son la puerta a la cuenta y no deben esconderse en el menú. */
+  .cuenta { gap: var(--space-2); }
+  .cuenta .ui-btn { padding: 0 12px; }
+}
+@media (max-width: 560px) {
+  .app-main { padding: var(--space-4) var(--space-3); }
+  /* El acceso a la cuenta NO se oculta: el menú hamburguesa se construye solo
+     con los enlaces de .site-nav, así que esconderlo aquí lo dejaría
+     inalcanzable. En su lugar la barra parte en dos líneas. */
+  .site-topbar { flex-wrap: wrap; row-gap: 8px; }
+  .ui-topbar-right { flex-wrap: wrap; }
+  .cuenta { gap: 10px; }
+  .cuenta .ui-btn { font-size: .9rem; }
+}
+
+/* El panel del menú colapsado se ancla a la BARRA, no al botón. Anclado al
+   botón se salía por la izquierda en cuanto el botón dejaba de estar pegado al
+   borde derecho —por un enlace extra de admin o por saltar de línea. */
+.ui-topbar { position: relative; }
+.ui-topbar .nav-mobile { position: static; }
+.ui-topbar .nav-mobile .ui-menu {
+  position: absolute;
+  top: calc(100% - 2px);
+  right: var(--space-4);
+  left: auto;
+  max-width: calc(100vw - 2 * var(--space-4));
+}

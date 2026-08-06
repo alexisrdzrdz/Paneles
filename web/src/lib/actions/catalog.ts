@@ -6,6 +6,7 @@ import { revalidatePath } from 'next/cache';
 import { db } from '@/db';
 import { catalogItems, assemblyRules } from '@/db/schema';
 import { currentUser, isAdmin } from '@/lib/auth';
+import { MATERIALES } from '@/lib/materiales';
 
 /* Toda acción del tabulador pasa por aquí. Si esta comprobación falla, el
    cliente podría reescribir los precios: es la puerta, no un adorno. */
@@ -63,6 +64,11 @@ const itemSchema = z.object({
   stockLengthMm: mmOpt,
   stockWidthMm: mmOpt,
   wastePolicy: z.enum(WASTE),
+  /* Vacío = la pieza sirve para cualquier material (herrajes, flete). Con
+     material, el motor solo la usa cuando el proyecto es de ese material. */
+  materialId: z.string().trim().max(40).optional()
+    .transform((v) => v || null)
+    .refine((v) => v === null || MATERIALES.some((m) => m.id === v), 'Material desconocido'),
   notes: z.string().trim().max(300).optional(),
 });
 

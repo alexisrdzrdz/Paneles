@@ -9,6 +9,7 @@ import { users } from '@/db/schema';
 import {
   hashPassword, verifyPassword, createSession, destroySession,
   issueToken, consumeToken, normalizeEmail, purgeExpired,
+  rateLimit, clearRateLimit,
 } from '@/lib/auth';
 import { verificationMail, passwordResetMail } from '@/lib/mail';
 
@@ -37,11 +38,22 @@ async function meta() {
   };
 }
 
+/* Mismo mensaje para cualquier tope: no dice cuál se alcanzó ni de cuánto
+   es, porque esa información solo le sirve a quien está probando límites. */
+const TOO_MANY = 'Demasiados intentos. Espera unos minutos e inténtalo de nuevo.';
+
 export async function register(_prev: FormState, form: FormData): Promise<FormState> {
   const parsed = registerSchema.safeParse(Object.fromEntries(form));
   if (!parsed.success) return { error: parsed.error.issues[0].message };
   const { name, email, company, phone, password: pw } = parsed.data;
   const mail = normalizeEmail(email);
+
+  /* Crear cuentas manda correo: sin tope, una IP podría llenar la base de
+     cuentas basura y quemar la reputación del remitente. */
+  const m = await meta();
+  if (m.ip && !(await rateLimit(`registro:ip:${m.ip}`, 10, 60))) {
+    return { error: TOO_MANY };
+  }
 
   const existing = await db.query.users.findFirst({ where: eq(users.email, mail) });
   if (existing) {
@@ -71,6 +83,18 @@ export async function login(_prev: FormState, form: FormData): Promise<FormState
   if (!parsed.success) return { error: 'Correo o contraseña incorrectos' };
 
   const mail = normalizeEmail(parsed.data.email);
+
+  /* El tope va antes de tocar la base o la contraseña. Por IP frena al que
+     rota correos; por correo, al que rota IPs contra una misma cuenta. La
+     llave usa el correo tecleado exista o no la cuenta, así el mensaje de
+     tope tampoco delata quién está registrado. */
+  const m = await meta();
+  const allowed = await Promise.all([
+    m.ip ? rateLimit(`login:ip:${m.ip}`, 20, 15) : true,
+    rateLimit(`login:correo:${mail}`, 8, 15),
+  ]);
+  if (allowed.includes(false)) return { error: TOO_MANY };
+
   const user = await db.query.users.findFirst({ where: eq(users.email, mail) });
 
   /* Mismo mensaje exista o no la cuenta, para no delatar qué correos hay
@@ -85,9 +109,15 @@ export async function login(_prev: FormState, form: FormData): Promise<FormState
     return { error: 'Todavía no confirmas tu correo. Revisa tu bandeja o pide otro enlace.' };
   }
 
-  await createSession(user.id, await meta());
+  /* Se perdona solo el contador de la cuenta; el de la IP sigue contando. */
+  await clearRateLimit(`login:correo:${mail}`);
+  await createSession(user.id, m);
   await purgeExpired();
-  redirect('/portal');
+
+  /* `next` regresa a quien venía de en medio de algo (p. ej. el cotizador con
+     una solicitud lista). Solo rutas propias: nada de mandar a otro dominio. */
+  const next = String(form.get('next') ?? '');
+  redirect(next.startsWith('/') && !next.startsWith('//') ? next : '/portal');
 }
 
 export async function logout() {
@@ -107,6 +137,16 @@ export async function verifyEmail(token: string) {
 
 export async function resendVerification(_prev: FormState, form: FormData): Promise<FormState> {
   const mail = normalizeEmail(String(form.get('email') ?? ''));
+
+  /* El tope por buzón evita que alguien use el formulario para inundar el
+     correo de un cliente; el de IP, que lo intente con muchos buzones. */
+  const m = await meta();
+  const allowed = await Promise.all([
+    m.ip ? rateLimit(`reenviar:ip:${m.ip}`, 10, 15) : true,
+    rateLimit(`reenviar:correo:${mail}`, 3, 15),
+  ]);
+  if (allowed.includes(false)) return { error: TOO_MANY };
+
   const user = await db.query.users.findFirst({ where: eq(users.email, mail) });
   if (user && !user.emailVerifiedAt) {
     const token = await issueToken(user.id, 'email_verification', 60 * 24);
@@ -117,6 +157,14 @@ export async function resendVerification(_prev: FormState, form: FormData): Prom
 
 export async function requestReset(_prev: FormState, form: FormData): Promise<FormState> {
   const mail = normalizeEmail(String(form.get('email') ?? ''));
+
+  const m = await meta();
+  const allowed = await Promise.all([
+    m.ip ? rateLimit(`recuperar:ip:${m.ip}`, 10, 15) : true,
+    rateLimit(`recuperar:correo:${mail}`, 3, 15),
+  ]);
+  if (allowed.includes(false)) return { error: TOO_MANY };
+
   const user = await db.query.users.findFirst({ where: eq(users.email, mail) });
   if (user) {
     const token = await issueToken(user.id, 'password_reset', 60);

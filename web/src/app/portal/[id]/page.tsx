@@ -2,9 +2,25 @@ import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { and, asc, eq } from 'drizzle-orm';
 import { db } from '@/db';
-import { quotes, quoteEvents, users } from '@/db/schema';
+import { quotes, quoteEvents, quoteLines, users, payments } from '@/db/schema';
 import { currentUser, isAdmin } from '@/lib/auth';
 import { STATUS, FLOW, money, when } from '@/lib/quotes';
+import { MATERIAL_NOMBRE } from '@/lib/materiales';
+import type { Direccion as Dir } from '@/lib/actions/quotes';
+import { Gestion } from './Gestion';
+import { Decision } from './Decision';
+import { AbrirEnCotizador } from './AbrirEnCotizador';
+import { Direccion } from './Direccion';
+import { PagoForm } from './PagoForm';
+
+const METODO: Record<string, string> = {
+  transferencia: 'Transferencia', deposito: 'Depósito',
+  efectivo: 'Efectivo', tarjeta: 'Tarjeta', otro: 'Otro',
+};
+
+/* Cantidades en milésimas → texto: 2000 = "2", 6250 = "6.25". */
+const qty = (milli: number) =>
+  (milli / 1000).toFixed(2).replace(/\.?0+$/, '');
 
 export default async function QuoteDetail({ params }: { params: Promise<{ id: string }> }) {
   const user = await currentUser();
@@ -15,6 +31,21 @@ export default async function QuoteDetail({ params }: { params: Promise<{ id: st
   /* Un cliente solo ve lo suyo. El staff ve todo; por eso la comprobación es
      de pertenencia O de rol, y va antes de cargar nada más. */
   if (!quote || (quote.userId !== user.id && !isAdmin(user))) notFound();
+
+  const admin = isAdmin(user);
+  const owner = admin && quote.userId !== user.id
+    ? await db.query.users.findFirst({ where: eq(users.id, quote.userId) })
+    : null;
+
+  const lines = await db.query.quoteLines.findMany({
+    where: eq(quoteLines.quoteId, id), orderBy: [asc(quoteLines.sortOrder)],
+  });
+
+  const pagos = await db.query.payments.findMany({
+    where: eq(payments.quoteId, id), orderBy: [asc(payments.paidAt)],
+  });
+  const pagado = pagos.reduce((s, p) => s + p.amountCents, 0);
+  const saldo = Math.max(0, quote.totalCents - pagado);
 
   const events = await db
     .select({
@@ -35,7 +66,9 @@ export default async function QuoteDetail({ params }: { params: Promise<{ id: st
   return (
     <>
       <p style={{ margin: '0 0 var(--space-3)' }}>
-        <Link href="/portal" style={{ color: 'var(--link)' }}>← Mis proyectos</Link>
+        {admin
+          ? <Link href="/admin/solicitudes" style={{ color: 'var(--link)' }}>← Solicitudes</Link>
+          : <Link href="/portal" style={{ color: 'var(--link)' }}>← Mis proyectos</Link>}
       </p>
 
       <div className="portal-head">
@@ -44,7 +77,7 @@ export default async function QuoteDetail({ params }: { params: Promise<{ id: st
             {quote.reference}
           </span>
           <h1>{quote.name}</h1>
-          <p>{s.hint}</p>
+          <p>{owner ? <>De <b>{owner.name}</b>{owner.company ? ` · ${owner.company}` : ''} — </> : null}{s.hint}</p>
         </div>
         <div style={{ textAlign: 'right' }}>
           <span className={`ui-badge ${s.tone}`}>{s.label}</span>
@@ -54,9 +87,82 @@ export default async function QuoteDetail({ params }: { params: Promise<{ id: st
         </div>
       </div>
 
+      {admin && <Gestion quoteId={quote.id} estado={quote.status} />}
+      {quote.userId === user.id && quote.status === 'quoted' && (
+        <Decision quoteId={quote.id} totalTxt={money(quote.totalCents, quote.currency)} />
+      )}
+
       <div className="two-col">
         <section>
-          <h2 style={{ fontSize: 16, marginTop: 0 }}>Seguimiento</h2>
+          {lines.length > 0 && (
+            <>
+              <h2 style={{ fontSize: 16, marginTop: 0 }}>Desglose</h2>
+              <div className="desglose-wrap">
+                <table className="desglose">
+                  <thead>
+                    <tr><th>Pieza</th><th>Cantidad</th><th>P. unitario</th><th>Importe</th></tr>
+                  </thead>
+                  <tbody>
+                    {lines.map((l) => (
+                      <tr key={l.id}>
+                        <td>
+                          {l.name}
+                          {l.billedMilli > l.neededMilli && (
+                            <small> — usas {qty(l.neededMilli)} {l.unit}; se surte en piezas completas</small>
+                          )}
+                        </td>
+                        <td className="num">{qty(l.billedMilli)} {l.unit}</td>
+                        <td className="num">{money(l.unitPriceCents, quote.currency)}</td>
+                        <td className="num">{money(l.totalCents, quote.currency)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <td colSpan={3}>Total{quote.status === 'submitted' || quote.status === 'reviewing' ? ' estimado' : ''}</td>
+                      <td className="num">{money(quote.totalCents, quote.currency)}</td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </>
+          )}
+
+          {(pagos.length > 0 || admin) && (
+            <>
+              <h2 style={{ fontSize: 16, marginTop: lines.length ? 'var(--space-5)' : 0 }}>Pagos</h2>
+              {pagos.length === 0 ? (
+                <p style={{ color: 'var(--ink-dim)' }}>Sin pagos registrados.</p>
+              ) : (
+                <div className="desglose-wrap">
+                  <table className="desglose">
+                    <thead>
+                      <tr><th>Fecha</th><th>Método</th><th>Referencia</th><th>Monto</th></tr>
+                    </thead>
+                    <tbody>
+                      {pagos.map((p) => (
+                        <tr key={p.id}>
+                          <td>{when(p.paidAt)}{p.note && <small>{p.note}</small>}</td>
+                          <td>{METODO[p.method]}</td>
+                          <td className="num">{p.reference ?? '—'}</td>
+                          <td className="num">{money(p.amountCents, quote.currency)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                    <tfoot>
+                      <tr>
+                        <td colSpan={3}>Pagado {money(pagado, quote.currency)} · Saldo</td>
+                        <td className="num">{money(saldo, quote.currency)}</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              )}
+              {admin && <PagoForm quoteId={quote.id} />}
+            </>
+          )}
+
+          <h2 style={{ fontSize: 16, marginTop: 'var(--space-5)' }}>Seguimiento</h2>
           {events.length === 0 ? (
             <p style={{ color: 'var(--ink-dim)' }}>Aún no hay movimientos registrados.</p>
           ) : (
@@ -99,10 +205,21 @@ export default async function QuoteDetail({ params }: { params: Promise<{ id: st
             <hr style={{ border: 0, borderTop: 'var(--border-width) solid var(--line)', margin: 'var(--space-3) 0' }} />
             <div style={{ fontSize: 'var(--fs-label)', color: 'var(--ink-dim)', lineHeight: 1.8 }}>
               <div>Unidades: <b>{quote.unitCount}</b></div>
-              <div>Material: <b>{quote.materialId ?? '—'}</b></div>
+              <div>Material: <b>{quote.materialId ? (MATERIAL_NOMBRE[quote.materialId] ?? quote.materialId) : '—'}</b></div>
               <div>Creado: {when(quote.createdAt)}</div>
             </div>
+            {(() => {
+              const estado = (quote.payload as { estado?: unknown } | null)?.estado;
+              return estado ? <AbrirEnCotizador estado={estado} /> : null;
+            })()}
           </div>
+
+          <Direccion
+            quoteId={quote.id}
+            actual={(quote.shipping as Dir | null) ?? null}
+            editable={(quote.userId === user.id || admin)
+              && !['shipped', 'delivered', 'cancelled'].includes(quote.status)}
+          />
         </aside>
       </div>
     </>

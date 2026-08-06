@@ -1,5 +1,6 @@
 import {
   pgTable, uuid, text, timestamp, integer, jsonb, index, pgEnum, boolean,
+  pgSequence,
 } from 'drizzle-orm/pg-core';
 
 /* ── Cuentas ────────────────────────────────────────────────────────────
@@ -46,6 +47,16 @@ export const authTokens = pgTable('auth_tokens', {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 }, (t) => [index('auth_tokens_user_idx').on(t.userId, t.purpose)]);
 
+/* ── Freno de intentos ──────────────────────────────────────────────────
+   Contador por ventana fija para login y formularios que mandan correo.
+   Vive en la base y no en memoria: el tope sigue contando aunque el sitio
+   se reinicie o corra en varios procesos a la vez. */
+export const rateLimits = pgTable('rate_limits', {
+  key: text('key').primaryKey(),               // p. ej. "login:ip:187.190.1.2"
+  count: integer('count').notNull().default(0),
+  resetAt: timestamp('reset_at', { withTimezone: true }).notNull(),
+});
+
 /* ── Proyectos del cliente ──────────────────────────────────────────────
    Un "quote" es lo que el cotizador produce. `payload` guarda el estado
    completo del configurador para poder reabrirlo tal cual; `totalCents`
@@ -63,6 +74,10 @@ export const quoteStatus = pgEnum('quote_status', [
   'cancelled',
 ]);
 
+/* Consecutivo del folio MAU-000123. Secuencia de Postgres y no un count():
+   dos solicitudes simultáneas jamás sacan el mismo número. */
+export const quoteRefSeq = pgSequence('quote_ref_seq', { startWith: 101 });
+
 export const quotes = pgTable('quotes', {
   id: uuid('id').primaryKey().defaultRandom(),
   userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
@@ -78,12 +93,39 @@ export const quotes = pgTable('quotes', {
   unitCount: integer('unit_count').notNull().default(0),
   /* Token opcional para compartir por enlace sin exigir cuenta. */
   shareToken: text('share_token').unique(),
+  /* Dirección de envío del pedido: calle, colonia, ciudad, estado, cp,
+     contacto, teléfono, notas. Por pedido y no por usuario: una empresa
+     manda cada baño a una obra distinta. */
+  shipping: jsonb('shipping'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 }, (t) => [
   index('quotes_user_idx').on(t.userId, t.updatedAt),
   index('quotes_status_idx').on(t.status),
 ]);
+
+/* ── Pagos ──────────────────────────────────────────────────────────────
+   Registro de pagos recibidos (transferencia, depósito…), capturado por el
+   staff. No es una pasarela: es la contabilidad del pedido, append-only para
+   que el saldo siempre pueda explicarse. */
+export const paymentMethod = pgEnum('payment_method', [
+  'transferencia', 'deposito', 'efectivo', 'tarjeta', 'otro',
+]);
+
+export const payments = pgTable('payments', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  quoteId: uuid('quote_id').notNull().references(() => quotes.id, { onDelete: 'cascade' }),
+  amountCents: integer('amount_cents').notNull(),
+  method: paymentMethod('method').notNull().default('transferencia'),
+  reference: text('reference'),          // folio del banco, últimos dígitos…
+  note: text('note'),
+  /* Quién lo capturó. Nulo si esa cuenta de staff se elimina después. */
+  createdBy: uuid('created_by').references(() => users.id, { onDelete: 'set null' }),
+  paidAt: timestamp('paid_at', { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [index('payments_quote_idx').on(t.quoteId, t.paidAt)]);
+
+export type Payment = typeof payments.$inferSelect;
 
 /* ── Seguimiento ────────────────────────────────────────────────────────
    El historial es una bitácora append-only, no un campo que se sobrescribe.

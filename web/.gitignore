@@ -19,6 +19,8 @@
 
 # production
 /build
+/dist-cpanel
+/.cache-bindings
 
 # misc
 .DS_Store

@@ -69,6 +69,91 @@ export function verificationMail(to: string, name: string, token: string) {
   });
 }
 
+/* ── Correos del ciclo de cotización ──────────────────────────────────── */
+
+export function solicitudClienteMail(to: string, name: string, ref: string, quoteUrl: string) {
+  const href = `${APP_URL}${quoteUrl}`;
+  return sendMail({
+    to,
+    subject: `Recibimos tu solicitud ${ref} · Mauricios Particiones`,
+    html: shell('Solicitud recibida', `
+      <p>Hola ${name}, tu solicitud <b>${ref}</b> ya está con nosotros y entra a
+         revisión. Te avisamos por aquí en cada avance, y siempre puedes ver el
+         estado en tu portal.</p>
+      ${button(href, 'Ver mi proyecto')}`),
+    text: `Hola ${name}, recibimos tu solicitud ${ref}. Síguela en ${href}`,
+  });
+}
+
+export function solicitudAdminMail(
+  to: string, adminName: string,
+  ref: string, clientName: string, company: string | null, totalTxt: string, quoteUrl: string,
+) {
+  const href = `${APP_URL}${quoteUrl}`;
+  const quien = company ? `${clientName} (${company})` : clientName;
+  return sendMail({
+    to,
+    subject: `Nueva solicitud ${ref} de ${quien}`,
+    html: shell('Nueva solicitud de cotización', `
+      <p>Hola ${adminName}: entró la solicitud <b>${ref}</b> de <b>${quien}</b>
+         con un estimado del tabulador de <b>${totalTxt}</b>.</p>
+      ${button(href, 'Revisar la solicitud')}`),
+    text: `Nueva solicitud ${ref} de ${quien} — estimado ${totalTxt}. Revísala en ${href}`,
+  });
+}
+
+export function estadoMail(
+  to: string, name: string,
+  ref: string, statusLabel: string, statusHint: string, message: string | null, quoteUrl: string,
+) {
+  const href = `${APP_URL}${quoteUrl}`;
+  return sendMail({
+    to,
+    subject: `${ref}: ${statusLabel} · Mauricios Particiones`,
+    html: shell('Avance de tu proyecto', `
+      <p>Hola ${name}, tu proyecto <b>${ref}</b> cambió a
+         <b>${statusLabel}</b>. ${statusHint}</p>
+      ${message ? `<p style="border-left:3px solid #4a7c7b;padding-left:12px;color:#3a4149">${message}</p>` : ''}
+      ${button(href, 'Ver el detalle')}`),
+    text: `Tu proyecto ${ref} cambió a ${statusLabel}. ${message ?? ''} Detalle: ${href}`,
+  });
+}
+
+export function decisionAdminMail(
+  to: string, adminName: string,
+  ref: string, clientName: string, aprobado: boolean, quoteUrl: string,
+) {
+  const href = `${APP_URL}${quoteUrl}`;
+  return sendMail({
+    to,
+    subject: aprobado
+      ? `✔ ${clientName} aprobó la cotización ${ref}`
+      : `${clientName} no continuará con ${ref}`,
+    html: shell(aprobado ? 'Cotización aprobada' : 'Proyecto descartado', `
+      <p>Hola ${adminName}: <b>${clientName}</b> ${aprobado
+        ? `aprobó la cotización <b>${ref}</b>. Sigue pasarla a fabricación.`
+        : `decidió no continuar con <b>${ref}</b>.`}</p>
+      ${button(href, 'Ver el proyecto')}`),
+    text: `${clientName} ${aprobado ? 'aprobó' : 'no continuará con'} ${ref}. Detalle: ${href}`,
+  });
+}
+
+export function pagoClienteMail(
+  to: string, name: string,
+  ref: string, montoTxt: string, saldoTxt: string, quoteUrl: string,
+) {
+  const href = `${APP_URL}${quoteUrl}`;
+  return sendMail({
+    to,
+    subject: `Pago recibido en ${ref} · Mauricios Particiones`,
+    html: shell('Pago registrado', `
+      <p>Hola ${name}, registramos un pago de <b>${montoTxt}</b> en tu proyecto
+         <b>${ref}</b>. Saldo pendiente: <b>${saldoTxt}</b>.</p>
+      ${button(href, 'Ver mis pagos')}`),
+    text: `Hola ${name}, registramos un pago de ${montoTxt} en ${ref}. Saldo: ${saldoTxt}. Detalle: ${href}`,
+  });
+}
+
 export function passwordResetMail(to: string, name: string, token: string) {
   const href = `${APP_URL}/restablecer?token=${encodeURIComponent(token)}`;
   return sendMail({

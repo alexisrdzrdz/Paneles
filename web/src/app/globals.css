@@ -101,6 +101,31 @@ body { margin: 0; }
   .ui-form.two, .ui-form.three, .ui-form.four { grid-template-columns: 1fr; }
 }
 
+/* Desglose de una cotización: misma familia visual que el tabulador. En
+   teléfono la tabla no se aprieta: se desplaza dentro de su contenedor. */
+.desglose-wrap { overflow-x: auto; }
+.desglose { width: 100%; border-collapse: collapse; font-size: var(--fs-body); min-width: 480px; }
+.desglose th {
+  text-align: left; font-size: var(--fs-label); text-transform: uppercase;
+  letter-spacing: .04em; color: var(--ink-faint); font-weight: 600;
+  padding: 8px 10px; border-bottom: var(--border-width) solid var(--line-strong);
+}
+.desglose td { padding: 9px 10px; border-bottom: var(--border-width) solid var(--line); vertical-align: top; }
+.desglose td small { display: block; color: var(--ink-faint); }
+.desglose .num { font-family: var(--font-mono); text-align: right; white-space: nowrap; }
+.desglose th:not(:first-child) { text-align: right; }
+.desglose tfoot td { border-bottom: 0; font-weight: 700; padding-top: var(--space-3); }
+.desglose tfoot td:first-child { text-align: right; }
+
+/* Gestión (staff): estado y total lado a lado; el mensaje a lo ancho. */
+.gestion-form { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
+@media (max-width: 640px) { .gestion-form { grid-template-columns: 1fr; } }
+
+/* Captura de pagos plegada: un botón que se abre en formulario. */
+.pago-form { margin-top: var(--space-3); }
+.pago-form summary { display: inline-block; cursor: pointer; list-style: none; }
+.pago-form summary::-webkit-details-marker { display: none; }
+
 /* Calculadora: el formulario va angosto y el despiece se queda con el ancho,
    al revés que .two-col (donde la bitácora manda). */
 .calc-cols { display: grid; grid-template-columns: 340px 1fr; gap: var(--space-5); align-items: start; }

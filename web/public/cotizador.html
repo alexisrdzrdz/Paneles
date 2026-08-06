@@ -423,7 +423,8 @@ function editTargets(){
 const PL = 3;                          // grosor de pilastra (pulgadas)
 const S = 1/12;                        // pulgadas -> pies (3D)
 const feetInches = i => { const f=Math.floor(i/12), n=Math.round(i-f*12); return `${f}'-${n}"`; };
-const money = n => '$'+Math.round(n).toLocaleString('en-US');
+/* Dinero SIEMPRE en centavos de peso y siempre venido del servidor. */
+const moneyCents = c => new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN',maximumFractionDigits:0}).format(c/100);
 
 /* ═══════════════ Motor de distribución (runs axis-aligned) ═══════════════ */
 function makeFixtures(){
@@ -599,6 +600,137 @@ function analysis(){
   let rec='inline';
   if(n>=6) rec='island'; else if(n>=3 && ratio<2.4) rec='corner-l';
   return {W:bounds.w, D:bounds.d, wall, adaOk, adaStall, rec, runs:live};
+}
+
+/* ═══════════════ Precio real (tabulador del panel) ═══════════════
+   El único origen del dinero es /api/cotizar: el mismo motor de despiece y la
+   misma lista de precios que usa el panel de Mauricios. Aquí solo se dibuja lo
+   que responda; mientras no hay respuesta se muestra “…”, jamás un número
+   inventado en el navegador. */
+const DRAFT_KEY='mp_cotizador_v1', PEND_KEY='mp_solicitud_pendiente';
+let serverQuote=null, priceTimer=null, priceLast='';
+
+function proyectoPayload(){
+  const live=computeRuns().runs.filter(r=>!r.empty && r.stalls.length);
+  return {
+    materialId: state.materialId,
+    heightIn: state.room.height,
+    floorGapIn: state.room.floorGap,
+    backPanel: state.room.back==='panel',
+    headrail: state.room.headrail,
+    runs: live.map(r=>({
+      lengthIn: r.length,
+      units: r.stalls.map(st=>({
+        kind: isUrinalUnit(st.cfg)?'urinal':'stall',
+        widthIn: st.aEnd-st.aStart,
+        depthIn: st.depth,
+        doorIn: isUrinalUnit(st.cfg)?0:Math.min(st.cfg.doorOpening, st.aEnd-st.aStart),
+        privacy: !!st.cfg.privacy,
+        ada: !!st.cfg.ada
+      })),
+      boundaries: runBoundaries(r).map(b=>({tall:b.tall, depthIn:b.depth}))
+    }))
+  };
+}
+
+function pedirPrecio(){
+  const p=proyectoPayload();
+  if(!p.runs.length){ serverQuote=null; priceLast=''; return; }
+  const body=JSON.stringify({ proyecto:p, comparar: MATERIALS.map(m=>m.id) });
+  if(body===priceLast) return;                 // nada cambió: no se molesta al servidor
+  clearTimeout(priceTimer);
+  priceTimer=setTimeout(async ()=>{
+    priceLast=body;
+    try{
+      const res=await fetch('/api/cotizar',{method:'POST',headers:{'Content-Type':'application/json'},body});
+      serverQuote = res.ok ? await res.json() : null;
+    }catch{ serverQuote=null; }
+    refreshMoney();
+  },300);
+}
+
+/* El resumen agrupa por familia para no marear; el desglose pieza a pieza
+   vive en el portal cuando la solicitud ya quedó guardada. */
+const CATS={panel:'Paneles y divisiones',puerta:'Puertas',pilastra:'Pilastras',
+  mampara:'Mamparas de mingitorio',riel:'Riel superior',bisagra:'Herrajes',
+  cerradura:'Herrajes',jaladera:'Herrajes',gancho:'Herrajes',escuadra:'Fijación',
+  zapata:'Fijación',tornilleria:'Fijación',empaque:'Empaques y sellos',
+  corte:'Cortes y maquinado',mano_obra:'Instalación',flete:'Flete',otro:'Otros'};
+
+/* Todas las cifras de dinero de la página se pintan aquí y solo aquí. */
+function refreshMoney(){
+  const sq=serverQuote, vacio=!state.room.stalls.length;
+  const total = vacio ? '—' : sq ? moneyCents(sq.totalCents) : '…';
+  const mini=document.getElementById('miniTotal'); if(mini) mini.textContent=total;
+  const sum=document.getElementById('sumTotal'); if(sum) sum.textContent=total;
+
+  const box=document.getElementById('sumLines');
+  if(box){
+    if(vacio) box.innerHTML='<p class="ui-meta" style="margin:0">Agrega cabinas o mingitorios para cotizar.</p>';
+    else if(!sq) box.innerHTML='<p class="ui-meta" style="margin:0">Calculando con la lista de precios…</p>';
+    else{
+      const g=new Map();
+      sq.lines.forEach(l=>{ const k=CATS[l.category]||'Otros'; g.set(k,(g.get(k)||0)+l.totalCents); });
+      box.innerHTML=[...g.entries()].map(([k,v])=>
+        `<div class="sum-line"><span>${k}</span><span class="mono">${moneyCents(v)}</span></div>`).join('')
+        + `<div class="sum-line sum-total"><span><b>Total estimado</b></span><span class="mono"><b>${total}</b></span></div>`
+        + (sq.faltanPrecios&&sq.faltanPrecios.length
+            ? `<p class="ui-meta" style="margin:6px 0 0">Aún sin precio en el tabulador: ${sq.faltanPrecios.join(', ')}.</p>` : '');
+    }
+  }
+  document.querySelectorAll('[data-matprice]').forEach(el=>{
+    el.textContent = sq && sq.porMaterial && sq.porMaterial[el.dataset.matprice]!=null
+      ? moneyCents(sq.porMaterial[el.dataset.matprice]) : '…';
+  });
+}
+
+/* ── Autoguardado de verdad (la insignia del panel ya no miente) ── */
+let draftTimer=null;
+function guardaBorrador(){
+  clearTimeout(draftTimer);
+  draftTimer=setTimeout(()=>{ try{ localStorage.setItem(DRAFT_KEY, JSON.stringify({
+    room:state.room, materialId:state.materialId, colorHex:state.colorHex, zip:state.zip, step:state.step,
+  })); }catch{} },250);
+}
+function cargaBorrador(){
+  try{
+    const d=JSON.parse(localStorage.getItem(DRAFT_KEY)||'null');
+    if(!d || !d.room || !Array.isArray(d.room.stalls) || !d.room.stalls.length) return;
+    Object.assign(state.room, d.room);
+    if(MATERIALS.some(m=>m.id===d.materialId)) state.materialId=d.materialId;
+    if(d.colorHex) state.colorHex=d.colorHex;
+    state.zip=typeof d.zip==='string'?d.zip:'';
+    state.step=Math.max(0,Math.min(4,d.step|0));
+    state.sel=[0]; state.selected=0;
+  }catch{}
+}
+
+/* ── Enviar la solicitud de verdad ──
+   Sin sesión: se guarda el borrador, se marca la solicitud como pendiente y
+   se va a /entrar con regreso aquí. Al volver, el arranque la reenvía solo. */
+async function solicitar(btn, auto){
+  const prev = btn && btn.textContent;
+  if(btn){ btn.disabled=true; btn.textContent='Enviando…'; }
+  try{
+    const res=await fetch('/api/solicitar',{method:'POST',headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        proyecto: proyectoPayload(),
+        nombre: state.room.name||'Baño',
+        zip: state.zip||undefined,
+        estado: { room:state.room, materialId:state.materialId, colorHex:state.colorHex, zip:state.zip },
+      })});
+    if(res.status===401){
+      localStorage.setItem(PEND_KEY,'1'); guardaBorrador();
+      if(auto) toast('Entra a tu cuenta para enviar la solicitud que dejaste lista.');
+      else location.href='/entrar?next='+encodeURIComponent('/cotizador.html');
+      return;
+    }
+    const data=await res.json().catch(()=>({}));
+    if(!res.ok){ toast(data.error||'No se pudo enviar. Intenta otra vez.','danger'); return; }
+    localStorage.removeItem(PEND_KEY); localStorage.removeItem(DRAFT_KEY);
+    location.href=data.url;                    // su proyecto: folio, desglose y seguimiento
+  }catch{ toast('Sin conexión. Revisa tu internet e intenta otra vez.','danger'); }
+  finally{ if(btn){ btn.disabled=false; btn.textContent=prev; } }
 }
 
 /* ═══════════════ Vista 2D (canvas) ═══════════════ */
@@ -1316,25 +1448,10 @@ function refreshCanvasBadge(){
 
 function refreshSummary(){
   const q=computeQuote(), a=analysis();
-  document.getElementById('miniTotal').textContent=money(q.total);
-  document.getElementById('sumTotal').textContent=money(q.total);
   document.getElementById('sumMat').textContent=q.m.name;
-  const L=[];
-  if(q.nStall){
-    L.push(['Cabinas ('+q.nStall+' × '+money(q.m.perStall)+')',q.stalls]);
-    L.push(['Puertas y herrajes',q.doors+q.hardware]);
-  }
-  if(q.screens){
-    L.push(['Mamparas de mingitorio ('+q.screens+' × '+money(q.perScreen)+')',q.screensCost]);
-    L.push(['Soportes y fijación',q.brackets]);
-  }
-  if(q.ada) L.push(['Kit accesible (ADA)',q.ada]);
-  if(q.privacy) L.push(['Tiras de privacidad ('+q.nPriv+' cabinas)',q.privacy]);
-  if(q.backPanel) L.push(['Panel de fondo ('+q.n+' × '+money(Math.round(q.m.perStall*0.45))+')',q.backPanel]);
-  L.push(['Envío estimado',q.shipping]);
-  document.getElementById('sumLines').innerHTML =
-    L.map(x=>`<div class="sum-line"><span>${x[0]}</span><span class="mono">${money(x[1])}</span></div>`).join('')
-    + `<div class="sum-line sum-total"><span><b>Total estimado</b></span><span class="mono"><b>${money(q.total)}</b></span></div>`;
+  /* El dinero se pide al servidor y se pinta cuando llega; la geometría y el
+     análisis sí son instantáneos porque viven en el navegador. */
+  pedirPrecio(); refreshMoney(); guardaBorrador();
 
   const recName=LAYOUTS.find(l=>l.id===a.rec).name;
   const piezas=[q.nStall?`${q.nStall} cabinas`:'', q.nUrinal?`${q.nUrinal} mingitorios`:'',
@@ -1522,14 +1639,13 @@ function renderStep(){
   else if(state.step===3){
     body.innerHTML=`
       <p class="ui-meta" style="margin-top:0">Elige el material. El diseño y el precio se ajustan; la comparación usa las medidas de tu proyecto.</p>
-      ${MATERIALS.map(x=>{ const q=quoteFor(x.id);
-        return `<div class="mat-card ${x.id===state.materialId?'is-active':''}" data-mat="${x.id}">
+      ${MATERIALS.map(x=>`<div class="mat-card ${x.id===state.materialId?'is-active':''}" data-mat="${x.id}">
           <div style="display:flex;align-items:center;gap:10px">
             <span style="width:26px;height:26px;border-radius:6px;flex:none;background:${x.colors[0]};border:1px solid rgba(0,0,0,.14)"></span>
             <div><b>${x.name}</b><div class="ui-meta">${'$'.repeat(x.lvl)} · ${x.warranty} · ${x.tag}</div></div>
           </div>
-          <div class="mono" style="text-align:right"><b>${money(q)}</b></div>
-        </div>`;}).join('')}
+          <div class="mono" style="text-align:right"><b data-matprice="${x.id}">…</b></div>
+        </div>`).join('')}
       <div class="ui-alert ui-alert-info" style="margin-top:var(--space-3)">
         <b>${MATERIALS.find(x=>x.id===state.materialId).name}:</b>
         ${MATERIALS.find(x=>x.id===state.materialId).desc} Garantía ${MATERIALS.find(x=>x.id===state.materialId).warranty}.
@@ -1539,26 +1655,25 @@ function renderStep(){
       state.colorHex=MATERIALS.find(x=>x.id===state.materialId).colors[0];
       renderStep(); render();
     }));
+    refreshMoney();                         // pinta los precios ya conocidos sin esperar otro viaje
   }
 
   else if(state.step===4){
     const q=computeQuote();
     body.innerHTML=`
-      <p class="ui-meta" style="margin-top:0">Revisa el desglose. El precio está garantizado 30 días.</p>
+      <p class="ui-meta" style="margin-top:0">Revisa el resumen de la derecha. Al solicitar, tu proyecto
+        queda guardado con folio y seguimiento en tu portal, y el equipo de Mauricios lo revisa.</p>
       <div class="ui-field"><label>Código postal (afina el envío)</label>
         <input id="zip" type="text" inputmode="numeric" maxlength="5" placeholder="00000" value="${state.zip}"></div>
       <div class="ui-alert ui-alert-ok"><b>Proyecto listo.</b>
         ${[q.nStall?q.nStall+' cabinas':'', q.nUrinal?q.nUrinal+' mingitorios':''].filter(Boolean).join(' y ')}
         en ${q.m.name}, distribución ${LAYOUTS.find(l=>l.id===state.room.layout).name.toLowerCase()}.</div>
       <button class="ui-btn ui-btn-primary ui-btn-block" id="orderBtn">Solicitar cotización formal</button>
-      <div class="ui-form" style="gap:var(--space-2);margin-top:var(--space-2)">
-        <button class="ui-btn" id="pdfBtn">Descargar PDF</button>
-        <button class="ui-btn" id="shareBtn">Compartir enlace</button>
-      </div>`;
-    const zip=document.getElementById('zip'); zip.addEventListener('input',e=>{ state.zip=e.target.value.replace(/\D/g,''); });
-    document.getElementById('orderBtn').addEventListener('click',()=>UI&&UI.toast?UI.toast('Cotización enviada a un experto','ok'):toast('Cotización enviada'));
-    document.getElementById('pdfBtn').addEventListener('click',()=>toast('PDF generado (demo)'));
-    document.getElementById('shareBtn').addEventListener('click',()=>toast('Enlace copiado: /p/MAU-'+Math.random().toString(36).slice(2,7).toUpperCase()));
+      <p class="ui-meta" style="margin:var(--space-2) 0 0">Te llega confirmación por correo con tu folio.
+        Sin compromiso: el precio en firme te lo confirma una persona.</p>`;
+    const zip=document.getElementById('zip'); zip.addEventListener('input',e=>{ state.zip=e.target.value.replace(/\D/g,''); guardaBorrador(); });
+    document.getElementById('orderBtn').addEventListener('click',e=>solicitar(e.currentTarget));
+    refreshMoney();
   }
 }
 
@@ -1688,8 +1803,6 @@ function setMount(m){
   else if(m==='fullheight'){ state.room.height=96; state.room.floorGap=0; state.room.back='panel'; }
   framed=false; renderStep(); render();
 }
-function quoteFor(matId){ const save=state.materialId; state.materialId=matId; const t=computeQuote().total; state.materialId=save; return t; }
-
 /* Miniatura SVG por layout (usa los runs reales) */
 function miniPreview(layoutId){
   const {runs,bounds}=computeRuns(layoutId);
@@ -1715,12 +1828,12 @@ function gotoStep(i){
   state.step=Math.max(0,Math.min(4,i));
   renderStepper(); renderStep(); render();
   document.getElementById('backBtn').style.visibility = state.step===0?'hidden':'visible';
-  document.getElementById('nextBtn').textContent = state.step===4?'Finalizar':'Continuar';
+  document.getElementById('nextBtn').textContent = state.step===4?'Solicitar cotización':'Continuar';
   document.getElementById('footHint').textContent = STEPS[state.step].m;
 }
-document.getElementById('nextBtn').addEventListener('click',()=>{ if(state.step<4) gotoStep(state.step+1); else toast('¡Listo! Proyecto guardado.'); });
+document.getElementById('nextBtn').addEventListener('click',e=>{ if(state.step<4) gotoStep(state.step+1); else solicitar(e.currentTarget); });
 document.getElementById('backBtn').addEventListener('click',()=>gotoStep(state.step-1));
-document.getElementById('roomName').addEventListener('input',e=>{ state.room.name=e.target.value; });
+document.getElementById('roomName').addEventListener('input',e=>{ state.room.name=e.target.value; guardaBorrador(); });
 
 function toast(msg,type){ const box=document.querySelector('[data-ui-toasts]'); if(!box) return alert(msg);
   const t=document.createElement('div'); t.className='ui-toast'+(type?' ui-toast-'+type:''); t.textContent=msg;
@@ -1730,10 +1843,15 @@ function toast(msg,type){ const box=document.querySelector('[data-ui-toasts]'); 
 new ResizeObserver(()=>{ if(state.view==='2d') draw2D(); else resize3D(); }).observe(document.getElementById('canvasWrap'));
 
 /* ═══════════════ Arranque ═══════════════ */
+cargaBorrador();                               // lo que dejaste, tal cual lo dejaste
+document.getElementById('roomName').value = state.room.name || 'Baño 1';
 refreshStallSelect();
 renderStepper();
-gotoStep(0);
+gotoStep(state.step);
 setView('2d');
+/* Si quedó una solicitud lista antes de entrar a la cuenta, se reintenta sola:
+   con sesión se envía y te lleva a tu proyecto; sin sesión solo avisa. */
+if(localStorage.getItem(PEND_KEY)) solicitar(document.getElementById('orderBtn'), true);
 </script>
 </body>
 </html>

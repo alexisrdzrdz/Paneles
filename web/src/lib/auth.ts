@@ -2,9 +2,9 @@ import 'server-only';
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 import { hash as argonHash, verify as argonVerify } from '@node-rs/argon2';
 import { cookies } from 'next/headers';
-import { eq, and, lt } from 'drizzle-orm';
+import { eq, and, lt, sql } from 'drizzle-orm';
 import { db } from '@/db';
-import { users, sessions, authTokens, type User } from '@/db/schema';
+import { users, sessions, authTokens, rateLimits, type User } from '@/db/schema';
 
 export const SESSION_COOKIE = 'mp_session';
 const SESSION_DAYS = 30;
@@ -113,9 +113,35 @@ export async function consumeToken(
   return row.userId;
 }
 
-/* Higiene: borra sesiones y tokens vencidos. Se llama de forma oportunista. */
+/* ── Freno de intentos ─────────────────────────────────────────────────
+   Ventana fija: cuenta intentos por llave y devuelve si aún hay cupo. El
+   upsert con CASE decide dentro de la base si la ventana ya venció, así
+   dos peticiones simultáneas no leen el mismo conteo y se saltan el tope. */
+export async function rateLimit(key: string, max: number, windowMinutes: number) {
+  const resetAt = new Date(Date.now() + windowMinutes * 60_000);
+  const [row] = await db.insert(rateLimits)
+    .values({ key, count: 1, resetAt })
+    .onConflictDoUpdate({
+      target: rateLimits.key,
+      set: {
+        count: sql`case when ${rateLimits.resetAt} < now() then 1 else ${rateLimits.count} + 1 end`,
+        resetAt: sql`case when ${rateLimits.resetAt} < now() then excluded.reset_at else ${rateLimits.resetAt} end`,
+      },
+    })
+    .returning();
+  return row.count <= max;
+}
+
+/* Al entrar bien se perdona el contador de esa cuenta: quien recuerda su
+   contraseña al tercer intento no debe cargar con los intentos fallidos. */
+export const clearRateLimit = (key: string) =>
+  db.delete(rateLimits).where(eq(rateLimits.key, key));
+
+/* Higiene: borra sesiones, tokens y contadores vencidos. Se llama de forma
+   oportunista. */
 export async function purgeExpired() {
   const now = new Date();
   await db.delete(sessions).where(lt(sessions.expiresAt, now));
   await db.delete(authTokens).where(lt(authTokens.expiresAt, now));
+  await db.delete(rateLimits).where(lt(rateLimits.resetAt, now));
 }

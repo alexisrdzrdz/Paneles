@@ -4,6 +4,7 @@ import { useActionState, useState } from 'react';
 import type { CatalogItem } from '@/db/schema';
 import { saveItem, deleteItem, type CatalogState } from '@/lib/actions/catalog';
 import { formatLength } from '@/lib/units';
+import { MATERIALES, MATERIAL_NOMBRE } from '@/lib/materiales';
 import { Notice, Submit } from '@/components/Field';
 
 const CATEGORIES = ['panel','puerta','pilastra','mampara','bisagra','cerradura','jaladera',
@@ -79,7 +80,10 @@ export function CatalogTable({ items }: { items: CatalogItem[] }) {
                 </td>
                 <td>
                   <b>{i.name}</b>
-                  <div className="sub">{CAT_LABEL[i.category]} · <span className="mono">{i.sku}</span></div>
+                  <div className="sub">
+                    {CAT_LABEL[i.category]} · <span className="mono">{i.sku}</span>
+                    {i.materialId ? <> · {MATERIAL_NOMBRE[i.materialId] ?? i.materialId}</> : null}
+                  </div>
                 </td>
                 <td>{MODE_LABEL[i.pricingMode]}</td>
                 <td className="mono">
@@ -143,9 +147,16 @@ function ItemFields({ item }: { item?: CatalogItem }) {
             {Object.entries(WASTE_LABEL).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
           </select></div>
       </div>
-      <div className="ui-field"><label>Nota</label>
-        <input name="notes" defaultValue={item?.notes ?? ''}
-               placeholder="Tramo de 6 m: pedir 6.25 factura 12." /></div>
+      <div className="ui-form two">
+        <div className="ui-field"><label>Material</label>
+          <select name="materialId" defaultValue={item?.materialId ?? ''}>
+            <option value="">Cualquiera (herrajes, flete…)</option>
+            {MATERIALES.map((m) => <option key={m.id} value={m.id}>{m.nombre}</option>)}
+          </select></div>
+        <div className="ui-field"><label>Nota</label>
+          <input name="notes" defaultValue={item?.notes ?? ''}
+                 placeholder="Tramo de 6 m: pedir 6.25 factura 12." /></div>
+      </div>
     </>
   );
 }

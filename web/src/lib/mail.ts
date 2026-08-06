@@ -9,17 +9,23 @@ const APP_URL = process.env.APP_URL ?? 'http://localhost:3000';
 
 /* Sin API key el correo no se pierde: se escribe en web/.mail/ y el enlace se
    imprime en la consola. Así se prueba registro y verificación en local sin
-   dar de alta un proveedor. */
+   dar de alta un proveedor. En hosts sin disco escribible (Vercel y similares)
+   el archivo falla pero el enlace SIEMPRE queda en el log: registrarse nunca
+   truena por un correo. */
 async function deliverToDisk(mail: Mail) {
-  const dir = join(process.cwd(), '.mail');
-  await mkdir(dir, { recursive: true });
-  const stamp = new Date().toISOString().replace(/[:.]/g, '-');
-  const file = join(dir, `${stamp}-${mail.to.replace(/[^a-z0-9]/gi, '_')}.html`);
-  await writeFile(file, mail.html, 'utf8');
   const link = /href="([^"]+)"/.exec(mail.html)?.[1];
   console.log(`\n📧  ${mail.subject}  →  ${mail.to}`);
-  console.log(`    ${file}`);
   if (link) console.log(`    Enlace: ${link}\n`);
+  try {
+    const dir = join(process.cwd(), '.mail');
+    await mkdir(dir, { recursive: true });
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const file = join(dir, `${stamp}-${mail.to.replace(/[^a-z0-9]/gi, '_')}.html`);
+    await writeFile(file, mail.html, 'utf8');
+    console.log(`    ${file}`);
+  } catch {
+    /* disco de solo lectura: el log de arriba ya lleva lo importante */
+  }
 }
 
 async function deliverViaResend(mail: Mail) {

@@ -65,7 +65,7 @@ export const rateLimits = pgTable('rate_limits', {
 export const quoteStatus = pgEnum('quote_status', [
   'draft',          // el cliente aún lo está armando
   'submitted',      // pidió cotización formal
-  'reviewing',      // Mauricios lo está revisando
+  'reviewing',      // el taller lo está revisando
   'quoted',         // hay precio en firme
   'approved',       // el cliente aceptó
   'in_production',
@@ -74,14 +74,14 @@ export const quoteStatus = pgEnum('quote_status', [
   'cancelled',
 ]);
 
-/* Consecutivo del folio MAU-000123. Secuencia de Postgres y no un count():
+/* Consecutivo del folio BETA-000123. Secuencia de Postgres y no un count():
    dos solicitudes simultáneas jamás sacan el mismo número. */
 export const quoteRefSeq = pgSequence('quote_ref_seq', { startWith: 101 });
 
 export const quotes = pgTable('quotes', {
   id: uuid('id').primaryKey().defaultRandom(),
   userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  /* Folio legible para el cliente y para el teléfono: "MAU-000128". */
+  /* Folio legible para el cliente y para el teléfono: "BETA-000128". */
   reference: text('reference').notNull().unique(),
   name: text('name').notNull(),
   status: quoteStatus('status').notNull().default('draft'),

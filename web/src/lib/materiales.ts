@@ -1,4 +1,4 @@
-/* Los cinco materiales que fabrica Mauricios. Fuente única para el panel y
+/* Los cinco materiales que fabrica el taller. Fuente única para el panel y
    las validaciones del servidor; el cotizador estático lleva su propia copia
    (con colores y textos de venta) porque no puede importar de aquí. */
 export const MATERIALES = [

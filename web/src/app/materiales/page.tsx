@@ -1,6 +1,6 @@
-import { Contenido } from '@/components/Contenido';
+﻿import { Contenido } from '@/components/Contenido';
 
-export const metadata = { title: 'Materiales · mauricios Particiones' };
+export const metadata = { title: 'Materiales · Beta Particiones' };
 
 export default function Pagina() {
   return <Contenido pagina="materiales" />;

@@ -52,7 +52,7 @@ export async function POST(req: Request) {
   const quote = await db.transaction(async (tx) => {
     const [q] = await tx.insert(quotes).values({
       userId: user.id,
-      reference: sql`'MAU-' || lpad(nextval('quote_ref_seq')::text, 6, '0')`,
+      reference: sql`'BETA-' || lpad(nextval('quote_ref_seq')::text, 6, '0')`,
       name: nombre,
       status: 'submitted',
       payload: { v: 1, proyecto, estado: estado ?? null, zip: zip ?? null },

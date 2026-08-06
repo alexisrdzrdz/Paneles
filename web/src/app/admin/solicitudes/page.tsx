@@ -7,7 +7,7 @@ import { currentUser, isAdmin } from '@/lib/auth';
 import { statusIsOpen } from '@/lib/bom';
 import { STATUS, money, when } from '@/lib/quotes';
 
-/* La cola de trabajo de Mauricio: todo lo que los clientes han enviado, lo
+/* La cola de trabajo del taller: todo lo que los clientes han enviado, lo
    vivo primero. Cada tarjeta abre el detalle, que es la misma página del
    portal del cliente con el bloque de gestión encima. */
 export default async function SolicitudesPage() {

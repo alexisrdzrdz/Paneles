@@ -3,7 +3,7 @@
    instalación que viaja en el paquete de producción (iniciar.js).
    LOS PRECIOS VAN EN CERO A PROPÓSITO: los captura el administrador. */
 
-/* Los cinco materiales que fabrica Mauricios (mismos ids que el cotizador).
+/* Los cinco materiales que fabrica el taller (mismos ids que el cotizador).
    Las piezas HECHAS del material (hoja, fondo, puerta, pilastra, mampara) se
    siembran una vez por material, con su material_id: así el motor cobra la
    puerta de inoxidable distinta de la de laminado. Los herrajes, consumibles,

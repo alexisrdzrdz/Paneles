@@ -27,5 +27,5 @@ export const money = (cents: number, currency = 'USD') =>
 export const when = (d: Date) =>
   new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium', timeStyle: 'short' }).format(d);
 
-/* Folio legible y estable: MAU-000128. El consecutivo lo da la base. */
-export const reference = (n: number) => `MAU-${String(n).padStart(6, '0')}`;
+/* Folio legible y estable: BETA-000128. El consecutivo lo da la base. */
+export const reference = (n: number) => `BETA-${String(n).padStart(6, '0')}`;

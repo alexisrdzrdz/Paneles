@@ -1,4 +1,4 @@
-/* Precios DE EJEMPLO para probar la calculadora. NO son los de Mauricios.
+/* Precios DE EJEMPLO para probar la calculadora. NO son reales.
    Uso:  npm run seed:precios-demo */
 import postgres from 'postgres';
 import { readFileSync } from 'node:fs';

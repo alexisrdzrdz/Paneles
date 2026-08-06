@@ -88,7 +88,7 @@ rmSync(join(destino, '.mail'), { recursive: true, force: true });
 rmSync(join(destino, 'config.json'), { force: true });
 
 writeFileSync(join(destino, 'LEEME.txt'), [
-  'Paquete de producción de Mauricios Particiones — con asistente de instalación.',
+  'Paquete de producción de Beta Particiones — con asistente de instalación.',
   '',
   '1. Sube este contenido a la carpeta de la app en cPanel.',
   '2. Setup Node.js App → startup file: iniciar.js → Node 20.9+ → Restart.',

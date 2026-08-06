@@ -1,4 +1,4 @@
-# Desplegar Mauricios Particiones en cPanel
+# Desplegar Beta Particiones en cPanel
 
 El paquete trae un **asistente de instalación**: subes el zip, apuntas el
 arranque a `iniciar.js` y el propio sitio te guía para conectar la base,
@@ -36,10 +36,10 @@ postgres://USUARIO:CLAVE@localhost:5432/NOMBRE_BASE
 ## 3. Subir y arrancar
 
 1. Sube el zip con el administrador de archivos a la carpeta de la app
-   (p. ej. `~/app-mauricios`) y descomprímelo ahí.
+   (p. ej. `~/app-particiones`) y descomprímelo ahí.
 2. cPanel → **Setup Node.js App** → Create Application:
    - Node version: **20.x o superior**
-   - Application root: `app-mauricios`
+   - Application root: `app-particiones`
    - Application startup file: **`iniciar.js`**
    - Modo: Production
 3. Restart, y abre tu dominio.

@@ -18,7 +18,7 @@ const cambioSchema = z.object({
     'in_production', 'shipped', 'delivered', 'cancelled',
   ]),
   mensaje: z.string().trim().max(1000).optional(),
-  /* Total en firme en pesos, opcional: al pasar a "Cotizado" Mauricio puede
+  /* Total en firme en pesos, opcional: al pasar a "Cotizado" el staff puede
      ajustar el número del tabulador con su criterio. */
   total: z.string().trim().max(20).optional(),
 });

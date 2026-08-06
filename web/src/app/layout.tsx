@@ -7,7 +7,7 @@ import { MenuMovil } from '@/components/MenuMovil';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'mauricios · Particiones de baño con cotización en línea',
+  title: 'Beta · Particiones de baño con cotización en línea',
   description: 'Particiones de baño a medida, con diseño y cotización en línea.',
 };
 
@@ -46,7 +46,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body className="ui" data-layout="topbar" data-panel="card" style={{ margin: 0 }}>
         <header className="ui-topbar site-topbar">
-          <Link className="brand" href="/"><Marca /> mauricios <span className="ui-sigla">PARTICIONES</span></Link>
+          <Link className="brand" href="/"><Marca /> Beta <span className="ui-sigla">PARTICIONES</span></Link>
           <div className="ui-topbar-right">
             <nav className="site-nav" aria-label="Navegación">
               {NAV.map((i) => (i.href.endsWith('.html')
@@ -77,7 +77,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <footer className="site-footer">
           <div className="footer-grid section">
             <div>
-              <div className="brand" style={{ marginBottom: 'var(--space-2)' }}><Marca size={22} /> mauricios</div>
+              <div className="brand" style={{ marginBottom: 'var(--space-2)' }}><Marca size={22} /> Beta</div>
               <p className="ui-meta">Particiones de baño a medida, con diseño y cotización en línea.</p>
             </div>
             <div><b>Producto</b>
@@ -93,10 +93,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <div><b>Contacto</b>
               <a href="tel:+525555555555">+52 55 5555 5555</a>
               <a href="https://wa.me/525555555555">WhatsApp</a>
-              <a href="mailto:hola@mauricios.mx">hola@mauricios.mx</a>
+              <a href="mailto:hola@betaparticiones.com">hola@betaparticiones.com</a>
             </div>
           </div>
-          <div className="footer-bottom">© 2026 mauricios · Particiones. Diseñado con el sistema Nord.</div>
+          <div className="footer-bottom">© 2026 Beta · Particiones. Diseñado con el sistema Nord.</div>
         </footer>
       </body>
     </html>

@@ -16,7 +16,7 @@ const ARGON = { memoryCost: 19456, timeCost: 2, parallelism: 1 };
 const pw = await hash('Prueba1234', ARGON);
 
 const CLIENTE = 'cliente@ejemplo.com';
-const ADMIN = 'admin@mauriciosparticiones.com';
+const ADMIN = 'admin@betaparticiones.com';
 
 await sql`delete from users where email in (${CLIENTE}, ${ADMIN})`;
 
@@ -27,11 +27,11 @@ const [cliente] = await sql`
 
 await sql`
   insert into users (email, password_hash, name, role, email_verified_at)
-  values (${ADMIN}, ${pw}, 'Mauricio Díaz', 'admin', now())`;
+  values (${ADMIN}, ${pw}, 'Admin Beta', 'admin', now())`;
 
 const [q] = await sql`
   insert into quotes (user_id, reference, name, status, payload, total_cents, material_id, unit_count)
-  values (${cliente.id}, 'MAU-000101', 'Baño planta baja · Torre Sur', 'in_production',
+  values (${cliente.id}, 'BETA-000101', 'Baño planta baja · Torre Sur', 'in_production',
           ${sql.json({ demo: true })}, 505500, 'hdpe', 7)
   returning id`;
 
@@ -51,7 +51,7 @@ for (const [type, to, msg, dias] of bitacora) {
 
 await sql`
   insert into quotes (user_id, reference, name, status, payload, total_cents, material_id, unit_count)
-  values (${cliente.id}, 'MAU-000102', 'Baño de visitas · Oficinas', 'draft',
+  values (${cliente.id}, 'BETA-000102', 'Baño de visitas · Oficinas', 'draft',
           ${sql.json({ demo: true })}, 244000, 'laminado', 3)`;
 
 console.log('Sembrado listo.');

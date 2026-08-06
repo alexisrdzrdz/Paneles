@@ -4,7 +4,7 @@ import { join } from 'node:path';
 
 type Mail = { to: string; subject: string; html: string; text: string };
 
-const FROM = process.env.MAIL_FROM ?? 'Mauricios Particiones <no-reply@localhost>';
+const FROM = process.env.MAIL_FROM ?? 'Beta Particiones <no-reply@localhost>';
 const APP_URL = process.env.APP_URL ?? 'http://localhost:3000';
 
 /* Sin API key el correo no se pierde: se escribe en web/.mail/ y el enlace se
@@ -41,7 +41,7 @@ export async function sendMail(mail: Mail) {
 
 const shell = (title: string, body: string) => `
 <div style="font-family:system-ui,Segoe UI,sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;color:#191c22">
-  <h1 style="font-size:20px;margin:0 0 4px">Mauricios <span style="color:#4a7c7b">Particiones</span></h1>
+  <h1 style="font-size:20px;margin:0 0 4px">Beta <span style="color:#4a7c7b">Particiones</span></h1>
   <p style="color:#6e7888;font-size:13px;margin:0 0 24px">${title}</p>
   ${body}
   <p style="color:#9aa2ad;font-size:12px;margin-top:32px;border-top:1px solid #e6e8ec;padding-top:16px">
@@ -59,7 +59,7 @@ export function verificationMail(to: string, name: string, token: string) {
   const href = `${APP_URL}/verificar?token=${encodeURIComponent(token)}`;
   return sendMail({
     to,
-    subject: 'Confirma tu correo · Mauricios Particiones',
+    subject: 'Confirma tu correo · Beta Particiones',
     html: shell('Confirmación de correo', `
       <p>Hola ${name}, ya casi está. Confirma tu correo para activar tu cuenta
          y poder guardar y dar seguimiento a tus proyectos.</p>
@@ -75,7 +75,7 @@ export function solicitudClienteMail(to: string, name: string, ref: string, quot
   const href = `${APP_URL}${quoteUrl}`;
   return sendMail({
     to,
-    subject: `Recibimos tu solicitud ${ref} · Mauricios Particiones`,
+    subject: `Recibimos tu solicitud ${ref} · Beta Particiones`,
     html: shell('Solicitud recibida', `
       <p>Hola ${name}, tu solicitud <b>${ref}</b> ya está con nosotros y entra a
          revisión. Te avisamos por aquí en cada avance, y siempre puedes ver el
@@ -109,7 +109,7 @@ export function estadoMail(
   const href = `${APP_URL}${quoteUrl}`;
   return sendMail({
     to,
-    subject: `${ref}: ${statusLabel} · Mauricios Particiones`,
+    subject: `${ref}: ${statusLabel} · Beta Particiones`,
     html: shell('Avance de tu proyecto', `
       <p>Hola ${name}, tu proyecto <b>${ref}</b> cambió a
          <b>${statusLabel}</b>. ${statusHint}</p>
@@ -145,7 +145,7 @@ export function pagoClienteMail(
   const href = `${APP_URL}${quoteUrl}`;
   return sendMail({
     to,
-    subject: `Pago recibido en ${ref} · Mauricios Particiones`,
+    subject: `Pago recibido en ${ref} · Beta Particiones`,
     html: shell('Pago registrado', `
       <p>Hola ${name}, registramos un pago de <b>${montoTxt}</b> en tu proyecto
          <b>${ref}</b>. Saldo pendiente: <b>${saldoTxt}</b>.</p>
@@ -158,7 +158,7 @@ export function passwordResetMail(to: string, name: string, token: string) {
   const href = `${APP_URL}/restablecer?token=${encodeURIComponent(token)}`;
   return sendMail({
     to,
-    subject: 'Restablece tu contraseña · Mauricios Particiones',
+    subject: 'Restablece tu contraseña · Beta Particiones',
     html: shell('Recuperación de contraseña', `
       <p>Hola ${name}, recibimos una solicitud para cambiar tu contraseña.</p>
       ${button(href, 'Elegir contraseña nueva')}

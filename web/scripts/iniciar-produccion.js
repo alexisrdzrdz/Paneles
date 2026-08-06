@@ -76,7 +76,7 @@ function instalador() {
     const appUrl = String(d.appUrl || '').trim().replace(/\/+$/, '');
     if (!/^https?:\/\//.test(appUrl)) throw new Error('La dirección del sitio debe empezar con https:// (o http:// en pruebas).');
     const mailFrom = String(d.mailFrom || '').trim();
-    if (!mailFrom.includes('@')) throw new Error('El remitente de correo no parece válido. Ejemplo: Mauricios <no-reply@tudominio.com>');
+    if (!mailFrom.includes('@')) throw new Error('El remitente de correo no parece válido. Ejemplo: Beta Particiones <no-reply@tudominio.com>');
     const adminNombre = String(d.adminNombre || '').trim();
     const adminCorreo = String(d.adminCorreo || '').trim().toLowerCase();
     const adminPass = String(d.adminPass || '');
@@ -152,7 +152,7 @@ const PAGINA = `<!doctype html>
 <html lang="es"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex">
-<title>Instalación · Mauricios Particiones</title>
+<title>Instalación · Beta Particiones</title>
 <style>
   :root{--tinta:#191c22;--tenue:#6e7888;--linea:#dde1e6;--marca:#4a7c7b;--fondo:#f2f4f7;--tarjeta:#fff;--mal:#a33}
   @media (prefers-color-scheme:dark){:root{--tinta:#e8eaee;--tenue:#9aa2ad;--linea:#333a44;--marca:#6fa3a2;--fondo:#14171c;--tarjeta:#1c2027;--mal:#e08585}}
@@ -172,7 +172,7 @@ const PAGINA = `<!doctype html>
   .aviso.mal{display:block;background:color-mix(in srgb,var(--mal) 12%,transparent);color:var(--mal)}
   .aviso.bien{display:block;background:color-mix(in srgb,var(--marca) 14%,transparent)}
 </style></head><body><div class="caja"><div class="tarjeta">
-  <h1>mauricios <span>PARTICIONES</span></h1>
+  <h1>Beta <span>PARTICIONES</span></h1>
   <p class="sub">Asistente de instalación — se ejecuta una sola vez.</p>
   <form id="f">
     <h2>Seguridad</h2>
@@ -182,14 +182,14 @@ const PAGINA = `<!doctype html>
 
     <h2>Base de datos (PostgreSQL)</h2>
     <label>Cadena de conexión</label>
-    <input name="dbUrl" required placeholder="postgres://usuario:clave@localhost:5432/mauricios">
+    <input name="dbUrl" required placeholder="postgres://usuario:clave@localhost:5432/particiones">
     <small>La armas con los datos de cPanel → PostgreSQL, o la copias de Neon.</small>
 
     <h2>Tu sitio</h2>
     <label>Dirección pública</label>
     <input name="appUrl" required placeholder="https://tudominio.com">
     <label>Remitente de los correos</label>
-    <input name="mailFrom" required placeholder="Mauricios Particiones &lt;no-reply@tudominio.com&gt;">
+    <input name="mailFrom" required placeholder="Beta Particiones &lt;no-reply@tudominio.com&gt;">
     <label>Clave de Resend (opcional, para que salgan los correos)</label>
     <input name="resendKey" placeholder="re_...">
     <small>Sin ella el sitio funciona, pero nadie recibirá correos de confirmación.</small>

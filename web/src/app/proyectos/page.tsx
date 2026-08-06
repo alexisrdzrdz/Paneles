@@ -1,6 +1,6 @@
-import { Contenido } from '@/components/Contenido';
+﻿import { Contenido } from '@/components/Contenido';
 
-export const metadata = { title: 'Proyectos · mauricios Particiones' };
+export const metadata = { title: 'Proyectos · Beta Particiones' };
 
 export default function Pagina() {
   return <Contenido pagina="proyectos" />;

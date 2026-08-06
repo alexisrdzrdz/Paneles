@@ -44,6 +44,14 @@ postgres://USUARIO:CLAVE@localhost:5432/NOMBRE_BASE
    - Modo: Production
 3. Restart, y abre tu dominio.
 
+> **⚠ Si al abrir el dominio ves "Index of /" con la lista de archivos:**
+> descomprimiste en `public_html` y todavía no existe la aplicación Node.
+> Mueve todo a una carpeta en tu home (p. ej. `~/app-particiones`, FUERA de
+> `public_html`), borra los restos de `public_html`, cambia el contenido de
+> `clave-instalacion.txt` por una clave nueva (estuvo expuesta al público) y
+> crea la aplicación en "Setup Node.js App" con el Application URL en la raíz
+> del dominio. Ese paso es el que quita el listado de Apache.
+
 ## 4. El asistente hace el resto
 
 Al abrir el dominio verás el asistente. Te pide:

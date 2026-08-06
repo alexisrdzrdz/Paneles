@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { proyectoSchema, cotizar } from '@/lib/cotizacion';
+import { proyectoSchema, cotizar, sinEnvioCents } from '@/lib/cotizacion';
 
 /* Precio en vivo para el cotizador. Público a propósito: cotizar no exige
    cuenta. No escribe nada; solo lee el tabulador y calcula. */
@@ -21,11 +21,13 @@ export async function POST(req: Request) {
   }
 
   const { bom, faltanPrecios, porMaterial } = await cotizar(parsed.data.proyecto, parsed.data.comparar);
+  /* Al navegador viaja UN número, sin envío y sin el despiece: cómo se arma
+     el precio es del taller. El desglose completo vive en la solicitud
+     guardada, que solo ve el staff. */
   return NextResponse.json({
     currency: 'MXN',
-    totalCents: bom.subtotalCents,
-    lines: bom.lines,
-    faltanPrecios,
+    totalCents: sinEnvioCents(bom),
+    faltanPrecios: faltanPrecios.length,
     porMaterial,
   });
 }

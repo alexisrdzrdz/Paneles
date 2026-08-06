@@ -647,15 +647,9 @@ function pedirPrecio(){
   },300);
 }
 
-/* El resumen agrupa por familia para no marear; el desglose pieza a pieza
-   vive en el portal cuando la solicitud ya quedó guardada. */
-const CATS={panel:'Paneles y divisiones',puerta:'Puertas',pilastra:'Pilastras',
-  mampara:'Mamparas de mingitorio',riel:'Riel superior',bisagra:'Herrajes',
-  cerradura:'Herrajes',jaladera:'Herrajes',gancho:'Herrajes',escuadra:'Fijación',
-  zapata:'Fijación',tornilleria:'Fijación',empaque:'Empaques y sellos',
-  corte:'Cortes y maquinado',mano_obra:'Instalación',flete:'Flete',otro:'Otros'};
-
-/* Todas las cifras de dinero de la página se pintan aquí y solo aquí. */
+/* Todas las cifras de dinero de la página se pintan aquí y solo aquí.
+   El cliente ve UN número: el total sin envío. Cómo se arma por dentro es
+   asunto del taller y ni siquiera viaja al navegador. */
 function refreshMoney(){
   const sq=serverQuote, vacio=!state.room.stalls.length;
   const total = vacio ? '—' : sq ? moneyCents(sq.totalCents) : '…';
@@ -666,15 +660,12 @@ function refreshMoney(){
   if(box){
     if(vacio) box.innerHTML='<p class="ui-meta" style="margin:0">Agrega cabinas o mingitorios para cotizar.</p>';
     else if(!sq) box.innerHTML='<p class="ui-meta" style="margin:0">Calculando con la lista de precios…</p>';
-    else{
-      const g=new Map();
-      sq.lines.forEach(l=>{ const k=CATS[l.category]||'Otros'; g.set(k,(g.get(k)||0)+l.totalCents); });
-      box.innerHTML=[...g.entries()].map(([k,v])=>
-        `<div class="sum-line"><span>${k}</span><span class="mono">${moneyCents(v)}</span></div>`).join('')
-        + `<div class="sum-line sum-total"><span><b>Total estimado</b></span><span class="mono"><b>${total}</b></span></div>`
-        + (sq.faltanPrecios&&sq.faltanPrecios.length
-            ? `<p class="ui-meta" style="margin:6px 0 0">Aún sin precio en el tabulador: ${sq.faltanPrecios.join(', ')}.</p>` : '');
-    }
+    else box.innerHTML =
+      '<p class="ui-meta" style="margin:0">Incluye materiales, herrajes e instalación. '
+      + 'El envío se cotiza según tu ubicación al solicitar.</p>'
+      + (sq.faltanPrecios
+          ? '<p class="ui-meta" style="margin:6px 0 0">Estamos completando la lista de precios; el total puede ajustarse en tu cotización formal.</p>'
+          : '');
   }
   document.querySelectorAll('[data-matprice]').forEach(el=>{
     el.textContent = sq && sq.porMaterial && sq.porMaterial[el.dataset.matprice]!=null

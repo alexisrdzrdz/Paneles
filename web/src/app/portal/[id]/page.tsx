@@ -94,9 +94,11 @@ export default async function QuoteDetail({ params }: { params: Promise<{ id: st
 
       <div className="two-col">
         <section>
-          {lines.length > 0 && (
+          {/* El despiece con precios unitarios es información del taller:
+              el cliente ve su total y su seguimiento, no la ingeniería. */}
+          {admin && lines.length > 0 && (
             <>
-              <h2 style={{ fontSize: 16, marginTop: 0 }}>Desglose</h2>
+              <h2 style={{ fontSize: 16, marginTop: 0 }}>Desglose <span style={{ color: 'var(--ink-faint)', fontWeight: 400, fontSize: 12 }}>solo staff</span></h2>
               <div className="desglose-wrap">
                 <table className="desglose">
                   <thead>
@@ -130,7 +132,7 @@ export default async function QuoteDetail({ params }: { params: Promise<{ id: st
 
           {(pagos.length > 0 || admin) && (
             <>
-              <h2 style={{ fontSize: 16, marginTop: lines.length ? 'var(--space-5)' : 0 }}>Pagos</h2>
+              <h2 style={{ fontSize: 16, marginTop: admin && lines.length ? 'var(--space-5)' : 0 }}>Pagos</h2>
               {pagos.length === 0 ? (
                 <p style={{ color: 'var(--ink-dim)' }}>Sin pagos registrados.</p>
               ) : (
@@ -162,7 +164,7 @@ export default async function QuoteDetail({ params }: { params: Promise<{ id: st
             </>
           )}
 
-          <h2 style={{ fontSize: 16, marginTop: 'var(--space-5)' }}>Seguimiento</h2>
+          <h2 style={{ fontSize: 16, marginTop: admin || pagos.length ? 'var(--space-5)' : 0 }}>Seguimiento</h2>
           {events.length === 0 ? (
             <p style={{ color: 'var(--ink-dim)' }}>Aún no hay movimientos registrados.</p>
           ) : (

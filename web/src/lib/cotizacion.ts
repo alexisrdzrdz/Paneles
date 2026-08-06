@@ -94,9 +94,17 @@ async function catalogo(): Promise<Catalogo> {
 export type Cotizacion = {
   bom: BomResult;
   faltanPrecios: string[];
-  /* Total con cada material alternativo, para la comparación del paso 4. */
+  /* Total con cada material alternativo, para la comparación del paso 4.
+     SIN envío: es lo que el cliente compara y el flete no cambia con el
+     material. */
   porMaterial: Record<string, number>;
 };
+
+/* Lo que ve el cliente: todo menos el flete. El envío se cotiza aparte según
+   la obra, y el desglose interno del taller no viaja al navegador. */
+export const sinEnvioCents = (b: BomResult) =>
+  b.subtotalCents - b.lines.filter((l) => l.category === 'flete')
+    .reduce((s, l) => s + l.totalCents, 0);
 
 export async function cotizar(p: Proyecto, comparar: string[] = []): Promise<Cotizacion> {
   const { items, rules } = await catalogo();
@@ -111,10 +119,10 @@ export async function cotizar(p: Proyecto, comparar: string[] = []): Promise<Cot
   const bom = buildBom(toRoomSpec(p), items, efectivas);
   const faltanPrecios = bom.lines.filter((l) => l.unitPriceCents === 0).map((l) => l.name);
 
-  const porMaterial: Record<string, number> = { [p.materialId]: bom.subtotalCents };
+  const porMaterial: Record<string, number> = { [p.materialId]: sinEnvioCents(bom) };
   for (const id of comparar.slice(0, 8)) {
     if (porMaterial[id] !== undefined) continue;
-    porMaterial[id] = buildBom(toRoomSpec({ ...p, materialId: id }), items, efectivas).subtotalCents;
+    porMaterial[id] = sinEnvioCents(buildBom(toRoomSpec({ ...p, materialId: id }), items, efectivas));
   }
 
   return { bom, faltanPrecios, porMaterial };

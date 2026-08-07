@@ -13,6 +13,7 @@
     "test:bom": "node scripts/bom-test.mjs",
     "seed:catalog": "node scripts/seed-catalog.mjs",
     "seed:precios-demo": "node scripts/seed-precios-demo.mjs",
+    "seed:precios-referencia": "node scripts/seed-precios-referencia.mjs",
     "admin": "node scripts/admin.mjs"
   },
   "dependencies": {

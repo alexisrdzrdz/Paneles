@@ -6,7 +6,7 @@ const env = Object.fromEntries(
   readFileSync(new URL('../.env.local', import.meta.url), 'utf8')
     .split('\n').filter((l) => l.includes('=') && !l.trim().startsWith('#'))
     .map((l) => { const i = l.indexOf('='); return [l.slice(0, i).trim(), l.slice(i + 1).trim().replace(/^"|"$/g, '')]; }));
-const sql = postgres(env.DATABASE_URL);
+const sql = postgres(process.env.DATABASE_URL || env.DATABASE_URL);
 
 /* Piezas comunes (centavos). */
 const P = { 'BISAGRA':8550, 'CERRADURA':14000, 'JALADERA':6500, 'GANCHO':4500,

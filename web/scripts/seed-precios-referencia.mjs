@@ -45,6 +45,8 @@ Object.assign(P, {
   'EMPAQUE-U': 35, SELLO: 95, CORTE: 80,
   INSTALACION: 350,     // por hora de cuadrilla
   FLETE: 1800,          // entrega local; foráneo se ajusta en firme
+  'TIRA-PRIV': 180,     // agregado por cabina con privacidad
+  'KIT-ADA': 950,       // agregado por cabina accesible
 });
 
 /* Un update que no encuentra su SKU es un error silencioso: se avisa. */

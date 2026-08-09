@@ -126,6 +126,18 @@ body { margin: 0; }
 .pago-form summary { display: inline-block; cursor: pointer; list-style: none; }
 .pago-form summary::-webkit-details-marker { display: none; }
 
+/* Conversación en el sistema: caja de escribir + hilo. */
+.conv-form textarea {
+  width: 100%; resize: vertical; padding: 10px 12px;
+  border: var(--border-width) solid var(--line-strong); border-radius: var(--radius-md);
+  background: var(--surface); color: var(--ink); font: inherit;
+}
+.conv-form textarea:focus { outline: 2px solid var(--accent); border-color: transparent; }
+/* Los mensajes del cliente y del equipo se separan con un matiz de color en
+   el punto del hilo, para leerse como ida y vuelta. */
+.track .conv-line.de-cliente .dot { border-color: var(--accent-strong); }
+.track .conv-line .who { text-transform: none; letter-spacing: 0; }
+
 /* Calculadora: el formulario va angosto y el despiece se queda con el ancho,
    al revés que .two-col (donde la bitácora manda). */
 .calc-cols { display: grid; grid-template-columns: 340px 1fr; gap: var(--space-5); align-items: start; }

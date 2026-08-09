@@ -39,7 +39,7 @@ const CATEGORIES = ['panel','puerta','pilastra','mampara','bisagra','cerradura',
 const MODES = ['pieza','longitud','area','hora'] as const;
 const WASTE = ['exacto','pieza_completa','redondeo_arriba'] as const;
 const TARGETS = ['cabina','mingitorio','puerta','division_alta','division_corta',
-  'hilera','panel_fondo','proyecto'] as const;
+  'hilera','panel_fondo','proyecto','privacidad','ada'] as const;
 const BASES = ['fija','por_mm','por_mm2'] as const;
 
 /* El precio se captura en pesos y se guarda en centavos enteros: nunca float

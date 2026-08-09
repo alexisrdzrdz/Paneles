@@ -15,6 +15,13 @@
       "when": 1786241001431,
       "tag": "0001_overrated_sphinx",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1786247324959,
+      "tag": "0002_goofy_millenium_guard",
+      "breakpoints": true
     }
   ]
 }

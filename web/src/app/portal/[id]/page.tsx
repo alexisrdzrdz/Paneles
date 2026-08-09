@@ -15,6 +15,7 @@ import { Direccion } from './Direccion';
 import { PagoForm } from './PagoForm';
 import { ReportarPago } from './ReportarPago';
 import { PagoValidar } from './PagoValidar';
+import { Conversacion } from './Conversacion';
 
 const METODO: Record<string, string> = {
   transferencia: 'Transferencia', deposito: 'Depósito',
@@ -84,7 +85,7 @@ export default async function QuoteDetail({ params }: { params: Promise<{ id: st
     .select({
       id: quoteEvents.id, type: quoteEvents.type, message: quoteEvents.message,
       toStatus: quoteEvents.toStatus, createdAt: quoteEvents.createdAt,
-      actorName: users.name,
+      actorName: users.name, actorId: quoteEvents.actorId, actorRole: users.role,
     })
     .from(quoteEvents)
     .leftJoin(users, eq(quoteEvents.actorId, users.id))
@@ -232,23 +233,41 @@ export default async function QuoteDetail({ params }: { params: Promise<{ id: st
             </>
           )}
 
-          <h2 style={{ fontSize: 16, marginTop: admin || pagos.length || puedePagar ? 'var(--space-5)' : 0 }}>Seguimiento</h2>
+          <h2 style={{ fontSize: 16, marginTop: admin || pagos.length || puedePagar ? 'var(--space-5)' : 0 }}>
+            Conversación y seguimiento
+          </h2>
+          <p className="ui-meta" style={{ marginTop: 0 }}>
+            {admin
+              ? 'Escríbele al cliente aquí; le llega en su portal, sin salir del sistema.'
+              : 'Escríbenos aquí cualquier duda o cambio; te respondemos en este mismo espacio.'}
+          </p>
+
+          {(esDueno || admin) && <Conversacion quoteId={quote.id} esStaff={admin} />}
+
           {events.length === 0 ? (
-            <p style={{ color: 'var(--ink-dim)' }}>Aún no hay movimientos registrados.</p>
+            <p style={{ color: 'var(--ink-dim)', marginTop: 'var(--space-3)' }}>Aún no hay mensajes ni movimientos.</p>
           ) : (
-            <ul className="track">
-              {events.map((e, i) => (
-                <li key={e.id} className={i === events.length - 1 ? 'is-current' : ''}>
-                  <span className="dot" />
-                  <span className="when">{when(e.createdAt)}</span>
-                  <span className="what">
-                    {e.toStatus ? <b>{STATUS[e.toStatus].label}</b> : null}
-                    {e.toStatus && e.message ? ' — ' : null}
-                    {e.message}
-                  </span>
-                  {e.actorName && <span className="who">por {e.actorName}</span>}
-                </li>
-              ))}
+            <ul className="track" style={{ marginTop: 'var(--space-4)' }}>
+              {events.map((e, i) => {
+                /* Un mensaje del staff (o del sistema) se alinea distinto que
+                   el del cliente, para que se lea como conversación. */
+                const delStaff = e.actorRole === 'admin' || e.actorRole === 'staff' || !e.actorId;
+                const esMio = e.actorId === user.id;
+                return (
+                  <li key={e.id} className={`conv-line ${delStaff ? 'de-staff' : 'de-cliente'} ${i === events.length - 1 ? 'is-current' : ''}`}>
+                    <span className="dot" />
+                    <span className="when">{when(e.createdAt)}</span>
+                    <span className="what">
+                      {e.toStatus ? <b>{STATUS[e.toStatus].label}</b> : null}
+                      {e.toStatus && e.message ? ' — ' : null}
+                      {e.message}
+                    </span>
+                    <span className="who">
+                      {esMio ? 'tú' : e.actorName ? (delStaff ? `${e.actorName} · equipo` : e.actorName) : 'sistema'}
+                    </span>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </section>

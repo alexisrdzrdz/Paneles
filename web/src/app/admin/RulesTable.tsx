@@ -14,6 +14,8 @@ const TARGETS = [
   ['hilera', 'por cada hilera'],
   ['panel_fondo', 'por el panel de fondo'],
   ['proyecto', 'una vez por proyecto'],
+  ['privacidad', 'por cada cabina con privacidad'],
+  ['ada', 'por cada cabina accesible (ADA)'],
 ] as const;
 
 const BASES = [

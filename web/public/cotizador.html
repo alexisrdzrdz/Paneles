@@ -1658,8 +1658,8 @@ function renderStep(){
         ${[q.nStall?q.nStall+' cabinas':'', q.nUrinal?q.nUrinal+' mingitorios':''].filter(Boolean).join(' y ')}
         en ${q.m.name}, distribución ${LAYOUTS.find(l=>l.id===state.room.layout).name.toLowerCase()}.</div>
       <button class="ui-btn ui-btn-primary ui-btn-block" id="orderBtn">Solicitar cotización formal</button>
-      <p class="ui-meta" style="margin:var(--space-2) 0 0">Te llega confirmación por correo con tu folio.
-        Sin compromiso: el precio en firme te lo confirma una persona.</p>`;
+      <p class="ui-meta" style="margin:var(--space-2) 0 0">Necesitas una cuenta para dar seguimiento: si no tienes,
+        te pedimos crearla al enviar. Tu proyecto y la conversación con el equipo quedan en tu portal.</p>`;
     const zip=document.getElementById('zip'); zip.addEventListener('input',e=>{ state.zip=e.target.value.replace(/\D/g,''); guardaBorrador(); });
     document.getElementById('orderBtn').addEventListener('click',e=>solicitar(e.currentTarget));
     refreshMoney();

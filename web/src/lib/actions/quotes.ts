@@ -81,7 +81,7 @@ export async function cambiarEstado(_prev: GestionState, form: FormData): Promis
   revalidatePath(`/portal/${quoteId}`);
   revalidatePath('/portal');
   revalidatePath('/admin/solicitudes');
-  return { ok: cambia ? `Ahora está en “${STATUS[estado].label}”. Se le avisó al cliente por correo.` : 'Guardado.' };
+  return { ok: cambia ? `Ahora está en “${STATUS[estado].label}”. El cliente lo verá en su portal.` : 'Guardado.' };
 }
 
 /* ── La decisión del cliente ───────────────────────────────────────────
@@ -181,6 +181,37 @@ export async function guardarDireccion(_prev: GestionState, form: FormData): Pro
 
   revalidatePath(`/portal/${quoteId}`);
   return { ok: 'Dirección guardada.' };
+}
+
+/* ── Conversación dentro del sistema ───────────────────────────────────
+   El cliente y el vendedor hablan aquí, no por correo: cada mensaje es un
+   evento de la bitácora, visible para ambos en el detalle del proyecto.
+   Escribe el dueño del proyecto o el staff; nadie más. */
+const mensajeSchema = z.object({
+  quoteId: z.string().uuid(),
+  texto: z.string().trim().min(1, 'Escribe un mensaje').max(2000),
+});
+
+export async function enviarMensaje(_prev: GestionState, form: FormData): Promise<GestionState> {
+  const user = await currentUser();
+  if (!user) return { error: 'Tu sesión caducó. Vuelve a entrar.' };
+
+  const parsed = mensajeSchema.safeParse(Object.fromEntries(form));
+  if (!parsed.success) return { error: parsed.error.issues[0].message };
+  const { quoteId, texto } = parsed.data;
+
+  const quote = await db.query.quotes.findFirst({ where: eq(quotes.id, quoteId) });
+  if (!quote || (quote.userId !== user.id && !isAdmin(user))) {
+    return { error: 'Ese proyecto no existe.' };
+  }
+
+  await db.insert(quoteEvents).values({
+    quoteId, type: 'note', message: texto, actorId: user.id, visibleToCustomer: true,
+  });
+
+  revalidatePath(`/portal/${quoteId}`);
+  revalidatePath('/admin/solicitudes');
+  return { ok: 'enviado' };
 }
 
 /* ── Pagos ─────────────────────────────────────────────────────────────

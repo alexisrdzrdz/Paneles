@@ -44,6 +44,9 @@ export const ITEMS = [
   ['CORTE',      'Corte y canteado',             'corte',       'pieza',    null, null, 'exacto',         'Por pieza maquinada.'],
   ['INSTALACION','Instalación',                  'mano_obra',   'hora',     null, null, 'exacto',         'Horas por cabina.'],
   ['FLETE',      'Flete',                        'flete',       'pieza',    null, null, 'exacto',         ''],
+  /* Agregados que el cliente activa en el cotizador y el admin cobra aquí. */
+  ['TIRA-PRIV',  'Tira de privacidad',           'otro',        'pieza',    null, null, 'exacto',         'Cierra la rendija junto a la bisagra. Por cabina que la lleve.'],
+  ['KIT-ADA',    'Kit accesible (ADA)',          'otro',        'pieza',    null, null, 'exacto',         'Barras de apoyo y herraje. Por cabina accesible.'],
 ];
 for (const [matId, matNombre] of MATERIALES) {
   for (const [base, nombre, cat, modo, largo, ancho, sobrante, nota] of POR_MATERIAL) {
@@ -84,6 +87,8 @@ export const RULES = [
   ['INSTALACION','cabina',         'fija',    1500],   // 1.5 h por cabina
   ['INSTALACION','mingitorio',     'fija',     750],
   ['FLETE',      'proyecto',       'fija',    1000],
+  ['TIRA-PRIV',  'privacidad',     'fija',    1000],   // 1 por cabina con privacidad
+  ['KIT-ADA',    'ada',            'fija',    1000],   // 1 por cabina accesible
 ];
 for (const [matId] of MATERIALES) {
   for (const [base, reglas] of REGLAS_MATERIAL) {

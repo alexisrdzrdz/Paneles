@@ -244,6 +244,8 @@ export const ruleTarget = pgEnum('rule_target', [
   'hilera',           // por cada hilera
   'panel_fondo',      // por el fondo, cuando se cotiza
   'proyecto',         // una vez por cotización
+  'privacidad',       // por cada cabina con tira de privacidad
+  'ada',              // por cada cabina accesible
 ]);
 
 /* Cómo se calcula la cantidad a partir de la geometría. */

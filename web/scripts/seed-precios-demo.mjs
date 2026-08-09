@@ -7,7 +7,7 @@ const sql = conectar();
 const P = { 'BISAGRA':8550, 'CERRADURA':14000, 'JALADERA':6500, 'GANCHO':4500,
   'ESCUADRA':3800, 'ZAPATA':9500, 'TAQUETE':350, 'TORNILLO':180, 'PIJA':220,
   'EMPAQUE-P':12000, 'EMPAQUE-U':2800, 'SELLO':9500, 'CORTE':5500, 'INSTALACION':32000,
-  'FLETE':180000, 'RIEL':41000 };
+  'FLETE':180000, 'RIEL':41000, 'TIRA-PRIV':15000, 'KIT-ADA':65000 };
 
 /* Piezas por material: precio base × factor del material, para que la
    comparación del cotizador tenga sentido desde el primer día.

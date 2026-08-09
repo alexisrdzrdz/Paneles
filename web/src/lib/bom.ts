@@ -93,6 +93,8 @@ type Targets = {
   cabina: number; mingitorio: number; puerta: number;
   division_alta: number; division_corta: number; hilera: number;
   panel_fondo: number; proyecto: number;
+  /* Agregados que dependen de una opción de la unidad, no de su geometría. */
+  privacidad: number; ada: number;
 };
 
 /* Longitud (mm) y área (mm²) asociadas a cada objetivo, para las reglas que
@@ -103,11 +105,13 @@ export function measure(room: RoomSpec): { count: Targets; ext: Extents } {
   const count: Targets = {
     cabina: 0, mingitorio: 0, puerta: 0, division_alta: 0,
     division_corta: 0, hilera: 0, panel_fondo: 0, proyecto: 1,
+    privacidad: 0, ada: 0,
   };
   const ext: Extents = {
     cabina: { mm: 0, mm2: 0 }, mingitorio: { mm: 0, mm2: 0 }, puerta: { mm: 0, mm2: 0 },
     division_alta: { mm: 0, mm2: 0 }, division_corta: { mm: 0, mm2: 0 },
     hilera: { mm: 0, mm2: 0 }, panel_fondo: { mm: 0, mm2: 0 }, proyecto: { mm: 0, mm2: 0 },
+    privacidad: { mm: 0, mm2: 0 }, ada: { mm: 0, mm2: 0 },
   };
 
   const H = room.heightMm;
@@ -132,7 +136,10 @@ export function measure(room: RoomSpec): { count: Targets; ext: Extents } {
           ext.puerta.mm += u.doorOpeningMm;
           ext.puerta.mm2 += u.doorOpeningMm * H;
         }
+        /* Agregados por cabina: solo cuando el cliente los pidió. */
+        if (u.privacy) count.privacidad++;
       }
+      if (u.ada) count.ada++;
     }
 
     /* Cada división se mide con SU profundidad: una mampara de mingitorio no

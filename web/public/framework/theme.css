@@ -242,3 +242,73 @@
   --map-ctrl-bg: var(--surface);
   --map-ctrl-ink: var(--ink);
 }
+
+/* ═══════════════════════════════════════════════════════
+   Tema OSCURO. El botón de tema pone data-theme="dark" en <html>; aquí se
+   redefinen solo los tokens con color crudo. Los que derivan por var() o
+   color-mix() (accent-soft, surface-inset, menu-*, map-*…) se recalculan
+   solos. Doble selector porque el framework declara los tokens en :root y
+   en .ui (el <body>). Gana por especificidad, no por orden.
+   ═══════════════════════════════════════════════════════ */
+:root[data-theme="dark"],
+[data-theme="dark"] .ui {
+  color-scheme: dark;
+  /* Superficies */
+  --bg: #14171c;
+  --surface: #1c2027;
+  --surface-2: #242a33;
+  --surface-3: #2e3540;
+  --line: #2b323c;
+  --line-strong: #3a424e;
+  /* Tinta */
+  --ink: #e8eaee;
+  --ink-dim: #aab3c0;
+  --ink-faint: #7f8996;
+  /* Acento */
+  --accent: #7d9296;
+  --accent-strong: #6fa3a2;
+  --accent-ink: #ffffff;
+  /* Semáforo, aclarado para legibilidad sobre fondo oscuro */
+  --ok: #7fb069;
+  --warn: #d6a44e;
+  --danger: #e08585;
+  --info: #6f9bc4;
+  --ok-bg: rgba(127, 176, 105, 0.15);
+  --warn-bg: rgba(214, 164, 78, 0.15);
+  --danger-bg: rgba(224, 133, 133, 0.15);
+  --info-bg: rgba(111, 155, 196, 0.15);
+  /* Componentes */
+  --link: #7fb3c4;
+  --link-hover: #9fcdcb;
+  --focus-ring: #6fa3a2;
+  --topbar-bg: #1a1e24;
+  --topbar-accent: #6fa3a2;
+  --panel-bg: #1c2027;
+  --panel-border: #2b323c;
+  --btn-primary-bg: #4a7c7b;
+  --btn-primary-ink: #ffffff;
+  --btn-primary-border: #4a7c7b;
+  --btn-bg: #2a313b;
+  --btn-ink: #e8eaee;
+  --btn-border: #3a424e;
+  --input-bg: #12151a;
+  --input-border: #3a424e;
+  --stat-accent: #6fa3a2;
+  --nav-bg: #14171c;
+  --nav-ink: #aab3c0;
+  --nav-active-bg: #242a33;
+  --nav-active-ink: #9fcdcb;
+  --tab-active-ink: #e8eaee;
+  --tab-indicator: #6fa3a2;
+  --tooltip-bg: #2e3540;
+  --tooltip-ink: #e8eaee;
+  --dialog-bg: #1c2027;
+  --dialog-border: #3a424e;
+  --progress-track: #2b323c;
+  --progress-fill: #6fa3a2;
+  --chip-bg: #242a33;
+  --chip-ink: #aab3c0;
+  --avatar-bg: #4a7c7b;
+  --scroll-track: #14171c;
+  --scroll-thumb: #3a424e;
+}

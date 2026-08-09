@@ -12,6 +12,24 @@ const nextConfig: NextConfig = {
     '/': ['content/**/*'],
     '/*': ['content/**/*'],
   },
+  /* Cabeceras de seguridad para todo el sitio. Ponen el mínimo que espera
+     cualquier auditoría moderna: nada de enmarcar el sitio en otro dominio
+     (clickjacking), forzar HTTPS por un año, no adivinar tipos de contenido,
+     no filtrar la URL completa al navegar afuera, y apagar APIs del navegador
+     que este sitio no usa. */
+  async headers() {
+    return [{
+      source: '/:path*',
+      headers: [
+        { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
+        { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+        { key: 'X-Content-Type-Options', value: 'nosniff' },
+        { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+        { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), payment=()' },
+        { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
+      ],
+    }];
+  },
 };
 
 export default nextConfig;

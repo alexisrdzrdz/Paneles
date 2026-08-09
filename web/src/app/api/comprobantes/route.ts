@@ -3,6 +3,7 @@ import { and, eq, ne, sum } from 'drizzle-orm';
 import { db } from '@/db';
 import { quotes, payments, paymentReceipts, quoteEvents, users } from '@/db/schema';
 import { currentUser, rateLimit } from '@/lib/auth';
+import { sameOrigin } from '@/lib/http';
 import { money, parsePesosToCents, isUuid } from '@/lib/quotes';
 import { pagoReportadoAdminMail } from '@/lib/mail';
 
@@ -17,6 +18,8 @@ const MIMES = new Set(['image/jpeg', 'image/png', 'image/webp', 'application/pdf
 const PAGABLES = new Set(['approved', 'in_production', 'shipped', 'delivered']);
 
 export async function POST(req: Request) {
+  if (!sameOrigin(req)) return NextResponse.json({ error: 'Origen no permitido' }, { status: 403 });
+
   const user = await currentUser();
   if (!user) return NextResponse.json({ error: 'Necesitas entrar a tu cuenta' }, { status: 401 });
 

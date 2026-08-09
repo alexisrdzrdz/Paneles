@@ -4,6 +4,7 @@ import { ne, sql } from 'drizzle-orm';
 import { db } from '@/db';
 import { quotes, quoteLines, quoteEvents, users } from '@/db/schema';
 import { currentUser, rateLimit } from '@/lib/auth';
+import { sameOrigin } from '@/lib/http';
 import { proyectoSchema, cotizar, cuentaUnidades, sinEnvioCents } from '@/lib/cotizacion';
 import { money } from '@/lib/quotes';
 import { solicitudClienteMail, solicitudAdminMail } from '@/lib/mail';
@@ -22,6 +23,8 @@ const bodySchema = z.object({
 });
 
 export async function POST(req: Request) {
+  if (!sameOrigin(req)) return NextResponse.json({ error: 'Origen no permitido' }, { status: 403 });
+
   const user = await currentUser();
   if (!user) {
     return NextResponse.json({ error: 'Necesitas entrar a tu cuenta' }, { status: 401 });

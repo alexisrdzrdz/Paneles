@@ -4,7 +4,7 @@ import { ne, sql } from 'drizzle-orm';
 import { db } from '@/db';
 import { quotes, quoteLines, quoteEvents, users } from '@/db/schema';
 import { currentUser, rateLimit } from '@/lib/auth';
-import { proyectoSchema, cotizar, cuentaUnidades } from '@/lib/cotizacion';
+import { proyectoSchema, cotizar, cuentaUnidades, sinEnvioCents } from '@/lib/cotizacion';
 import { money } from '@/lib/quotes';
 import { solicitudClienteMail, solicitudAdminMail } from '@/lib/mail';
 
@@ -56,7 +56,10 @@ export async function POST(req: Request) {
       name: nombre,
       status: 'submitted',
       payload: { v: 1, proyecto, estado: estado ?? null, zip: zip ?? null },
-      totalCents: bom.subtotalCents,
+      /* El MISMO número que el cliente vio al pulsar el botón: sin flete.
+         El despiece guardado sí trae la línea de flete; el staff la suma al
+         poner el precio en firme según la obra. */
+      totalCents: sinEnvioCents(bom),
       currency: 'MXN',
       materialId: proyecto.materialId,
       unitCount: cuentaUnidades(proyecto),

@@ -1,17 +1,10 @@
 /* Datos de prueba: un cliente verificado, un administrador y un proyecto con
    su bitácora, para poder ver el portal con contenido real.
    Uso:  npm run seed   (borra y recrea SOLO estas cuentas de ejemplo) */
-import postgres from 'postgres';
 import { hash } from '@node-rs/argon2';
-import { readFileSync } from 'node:fs';
+import { conectar } from './db.mjs';
 
-const env = Object.fromEntries(
-  readFileSync(new URL('../.env.local', import.meta.url), 'utf8')
-    .split('\n').filter((l) => l.includes('=') && !l.trim().startsWith('#'))
-    .map((l) => { const i = l.indexOf('='); return [l.slice(0, i).trim(), l.slice(i + 1).trim().replace(/^"|"$/g, '')]; }),
-);
-
-const sql = postgres(env.DATABASE_URL);
+const sql = conectar();
 const ARGON = { memoryCost: 19456, timeCost: 2, parallelism: 1 };
 const pw = await hash('Prueba1234', ARGON);
 

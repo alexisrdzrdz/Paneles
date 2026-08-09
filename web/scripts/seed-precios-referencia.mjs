@@ -18,21 +18,19 @@
      Libre; se desglosan en piezas coherentes con eso.
 
    Uso:  npm run seed:precios-referencia   (DATABASE_URL del entorno manda) */
-import postgres from 'postgres';
-import { readFileSync } from 'node:fs';
-const env = Object.fromEntries(
-  readFileSync(new URL('../.env.local', import.meta.url), 'utf8')
-    .split('\n').filter((l) => l.includes('=') && !l.trim().startsWith('#'))
-    .map((l) => { const i = l.indexOf('='); return [l.slice(0, i).trim(), l.slice(i + 1).trim().replace(/^"|"$/g, '')]; }));
-const sql = postgres(process.env.DATABASE_URL || env.DATABASE_URL);
+import { conectar } from './db.mjs';
+const sql = conectar();
 
-/* $/m² por material (la hoja del catálogo es de 3×1.5 = 4.5 m²). */
+/* $/m² por material. OJO: HOJA se vende por ÁREA, así que su precio va POR
+   M² tal cual — el motor ya multiplica por los m² facturados (en hojas
+   completas de 4.5 m²). Ponerle el precio de la hoja entera lo cobraría
+   4.5 veces. */
 const M2 = { LAM: 600, MET: 850, HDPE: 1500, COMP: 2200, INOX: 2600 };
 
 const P = {};
 for (const [suf, m2] of Object.entries(M2)) {
-  P[`HOJA-${suf}`]        = m2 * 4.5;          // hoja completa 4.5 m²
-  P[`PUERTA-${suf}`]      = m2 * 1.05 * 1.35;  // ~1.05 m² + canteado/maquila
+  P[`HOJA-${suf}`]        = m2;                // por m² (la unidad de venta)
+  P[`PUERTA-${suf}`]      = m2 * 1.05 * 1.35;  // pieza: ~1.05 m² + canteado/maquila
   P[`PILASTRA-${suf}`]    = m2 * 0.35 * 1.35;
   P[`MAMPARA-${suf}`]     = m2 * 0.75 * 1.35;
   P[`PANEL-FONDO-${suf}`] = m2 * 1.5 * 1.15;   // por metro lineal, 1.5 m de alto
@@ -49,10 +47,14 @@ Object.assign(P, {
   FLETE: 1800,          // entrega local; foráneo se ajusta en firme
 });
 
+/* Un update que no encuentra su SKU es un error silencioso: se avisa. */
+let ok = 0;
 for (const [sku, pesos] of Object.entries(P)) {
-  await sql`update catalog_items set unit_price_cents = ${Math.round(pesos * 100)}, updated_at = now()
+  const r = await sql`update catalog_items set unit_price_cents = ${Math.round(pesos * 100)}, updated_at = now()
             where sku = ${sku}`;
+  if (r.count === 0) console.warn(`⚠  SKU sin renglón en el catálogo: ${sku} (¿corriste seed:catalog?)`);
+  else ok++;
 }
-console.log(`Precios de REFERENCIA cargados en ${Object.keys(P).length} piezas.`);
+console.log(`Precios de REFERENCIA cargados en ${ok} de ${Object.keys(P).length} piezas.`);
 console.log('Anclados a mercado ago-2026; los definitivos los captura el admin.');
 await sql.end();

@@ -116,13 +116,22 @@ export async function cotizar(p: Proyecto, comparar: string[] = []): Promise<Cot
     ? rules.filter((r) => !rielIds.has(r.itemId))
     : rules;
 
-  const bom = buildBom(toRoomSpec(p), items, efectivas);
-  const faltanPrecios = bom.lines.filter((l) => l.unitPriceCents === 0).map((l) => l.name);
+  /* La geometría no cambia entre materiales: se convierte UNA vez y solo se
+     intercambia el materialId para cada comparación. */
+  const spec = toRoomSpec(p);
+  const bom = buildBom(spec, items, efectivas);
+
+  /* Sin flete: el aviso de "faltan precios" debe hablar del mismo conjunto
+     de líneas que suma el total que el cliente ve. Un flete en $0 no es un
+     hueco — el envío se cotiza aparte. */
+  const faltanPrecios = bom.lines
+    .filter((l) => l.category !== 'flete' && l.unitPriceCents === 0)
+    .map((l) => l.name);
 
   const porMaterial: Record<string, number> = { [p.materialId]: sinEnvioCents(bom) };
   for (const id of comparar.slice(0, 8)) {
     if (porMaterial[id] !== undefined) continue;
-    porMaterial[id] = sinEnvioCents(buildBom(toRoomSpec({ ...p, materialId: id }), items, efectivas));
+    porMaterial[id] = sinEnvioCents(buildBom({ ...spec, materialId: id }, items, efectivas));
   }
 
   return { bom, faltanPrecios, porMaterial };

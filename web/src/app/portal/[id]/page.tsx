@@ -37,9 +37,13 @@ export default async function QuoteDetail({ params }: { params: Promise<{ id: st
     ? await db.query.users.findFirst({ where: eq(users.id, quote.userId) })
     : null;
 
-  const lines = await db.query.quoteLines.findMany({
-    where: eq(quoteLines.quoteId, id), orderBy: [asc(quoteLines.sortOrder)],
-  });
+  /* El despiece solo se enseña al staff: al cliente ni se le consulta. */
+  const lines = admin
+    ? await db.query.quoteLines.findMany({
+        where: eq(quoteLines.quoteId, id), orderBy: [asc(quoteLines.sortOrder)],
+      })
+    : [];
+  const sumaDespiece = lines.reduce((s, l) => s + l.totalCents, 0);
 
   const pagos = await db.query.payments.findMany({
     where: eq(payments.quoteId, id), orderBy: [asc(payments.paidAt)],
@@ -121,9 +125,17 @@ export default async function QuoteDetail({ params }: { params: Promise<{ id: st
                   </tbody>
                   <tfoot>
                     <tr>
-                      <td colSpan={3}>Total{quote.status === 'submitted' || quote.status === 'reviewing' ? ' estimado' : ''}</td>
-                      <td className="num">{money(quote.totalCents, quote.currency)}</td>
+                      <td colSpan={3}>Suma del despiece (con flete)</td>
+                      <td className="num">{money(sumaDespiece, quote.currency)}</td>
                     </tr>
+                    {sumaDespiece !== quote.totalCents && (
+                      <tr>
+                        <td colSpan={3} style={{ fontWeight: 400, color: 'var(--ink-dim)' }}>
+                          Lo que el cliente vio (sin flete)
+                        </td>
+                        <td className="num" style={{ fontWeight: 400 }}>{money(quote.totalCents, quote.currency)}</td>
+                      </tr>
+                    )}
                   </tfoot>
                 </table>
               </div>

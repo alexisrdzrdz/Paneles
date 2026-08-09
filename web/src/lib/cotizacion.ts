@@ -19,9 +19,10 @@ const unitSchema = z.object({
   widthIn: inches(120),
   depthIn: inches(120),
   doorIn: z.number().finite().min(0).max(60),
-  /* Hacia dónde abre la puerta. No afecta el precio, pero viaja con el
-     proyecto porque el taller lo necesita para fabricar. */
+  /* Giro y posición de la puerta. No afectan el precio, pero viajan con el
+     proyecto porque el taller los necesita para fabricar. */
   doorSwing: z.enum(['left-in', 'left-out', 'right-in', 'right-out']).nullish(),
+  doorPosition: z.enum(['center', 'left', 'right']).nullish(),
   privacy: z.boolean().default(false),
   ada: z.boolean().default(false),
 });

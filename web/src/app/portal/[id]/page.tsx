@@ -35,22 +35,30 @@ const PAGABLES = new Set(['approved', 'in_production', 'shipped', 'delivered']);
 const qty = (milli: number) =>
   (milli / 1000).toFixed(2).replace(/\.?0+$/, '');
 
-/* Hacia dónde abre la puerta, en palabras que el taller usa. */
+/* Giro y posición de la puerta, en palabras que el taller usa. */
 const SWING: Record<string, string> = {
   'left-in': 'bisagra izq. · abre adentro',
   'left-out': 'bisagra izq. · abre afuera',
   'right-in': 'bisagra der. · abre adentro',
   'right-out': 'bisagra der. · abre afuera',
 };
+const POS: Record<string, string> = {
+  center: 'centrada', left: 'a la izquierda', right: 'a la derecha',
+};
 
-type ProyectoGuardado = { runs?: { units?: { kind: string; doorSwing?: string | null }[] }[] };
+type ProyectoGuardado = {
+  runs?: { units?: { kind: string; doorSwing?: string | null; doorPosition?: string | null }[] }[];
+};
 
-/* Lee del proyecto guardado el giro de cada puerta de cabina. */
+/* Lee del proyecto guardado el giro y la posición de cada puerta de cabina. */
 function puertasDe(payload: unknown): string[] {
   const proyecto = (payload as { proyecto?: ProyectoGuardado } | null)?.proyecto;
   const out: string[] = [];
   proyecto?.runs?.forEach((r) => r.units?.forEach((u) => {
-    if (u.kind === 'stall') out.push(SWING[u.doorSwing ?? ''] ?? 'sin especificar');
+    if (u.kind !== 'stall') return;
+    const giro = SWING[u.doorSwing ?? ''] ?? 'sin especificar';
+    const pos = POS[u.doorPosition ?? ''];
+    out.push(pos ? `${giro} · ${pos}` : giro);
   }));
   return out;
 }

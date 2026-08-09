@@ -623,9 +623,10 @@ function proyectoPayload(){
         widthIn: st.aEnd-st.aStart,
         depthIn: st.depth,
         doorIn: isUrinalUnit(st.cfg)?0:Math.min(st.cfg.doorOpening, st.aEnd-st.aStart),
-        /* Hacia dónde abre la puerta: no cambia el precio, pero el taller lo
-           necesita para fabricar. Los mingitorios no llevan puerta. */
+        /* Giro y posición de la puerta: no cambian el precio, pero el taller
+           los necesita para fabricar. Los mingitorios no llevan puerta. */
         doorSwing: isUrinalUnit(st.cfg)?null:st.cfg.doorSwing,
+        doorPosition: isUrinalUnit(st.cfg)?null:st.cfg.doorPosition,
         privacy: !!st.cfg.privacy,
         ada: !!st.cfg.ada
       })),

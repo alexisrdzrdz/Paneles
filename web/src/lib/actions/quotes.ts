@@ -1,13 +1,13 @@
 'use server';
 
 import { z } from 'zod';
-import { eq, ne, sum } from 'drizzle-orm';
+import { and, eq, ne, sum } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { db } from '@/db';
 import { quotes, quoteEvents, users, payments } from '@/db/schema';
 import { currentUser, isAdmin } from '@/lib/auth';
 import { STATUS, money } from '@/lib/quotes';
-import { estadoMail, decisionAdminMail, pagoClienteMail } from '@/lib/mail';
+import { estadoMail, decisionAdminMail, pagoClienteMail, pagoValidadoMail } from '@/lib/mail';
 
 export type GestionState = { error?: string; ok?: string };
 
@@ -223,9 +223,10 @@ export async function registrarPago(_prev: GestionState, form: FormData): Promis
     });
   });
 
-  /* Saldo después de este pago, para el recibo. */
+  /* Saldo después de este pago, para el recibo. Solo lo confirmado abona. */
   const [{ pagado }] = await db.select({ pagado: sum(payments.amountCents) })
-    .from(payments).where(eq(payments.quoteId, quoteId));
+    .from(payments)
+    .where(and(eq(payments.quoteId, quoteId), eq(payments.status, 'confirmado')));
   const saldo = quote.totalCents - Number(pagado ?? 0);
 
   try {
@@ -240,4 +241,64 @@ export async function registrarPago(_prev: GestionState, form: FormData): Promis
 
   revalidatePath(`/portal/${quoteId}`);
   return { ok: `Pago de ${money(amountCents, quote.currency)} registrado. Saldo: ${money(Math.max(0, saldo), quote.currency)}.` };
+}
+
+/* ── Validar un pago reportado ─────────────────────────────────────────
+   El cliente subió su comprobante; el staff lo coteja contra el banco y lo
+   confirma o lo regresa con motivo. Solo pagos pendientes se validan. */
+const validarSchema = z.object({
+  paymentId: z.string().uuid(),
+  decision: z.enum(['confirmado', 'rechazado']),
+  nota: z.string().trim().max(300).optional(),
+});
+
+export async function validarPago(_prev: GestionState, form: FormData): Promise<GestionState> {
+  const user = await currentUser();
+  if (!isAdmin(user)) return { error: 'No autorizado' };
+
+  const parsed = validarSchema.safeParse(Object.fromEntries(form));
+  if (!parsed.success) return { error: 'Revisa los datos de la validación.' };
+  const { paymentId, decision, nota } = parsed.data;
+
+  const pago = await db.query.payments.findFirst({ where: eq(payments.id, paymentId) });
+  if (!pago) return { error: 'Ese pago no existe.' };
+  if (pago.status !== 'pendiente') return { error: 'Ese pago ya fue validado.' };
+
+  const quote = await db.query.quotes.findFirst({ where: eq(quotes.id, pago.quoteId) });
+  if (!quote) return { error: 'El proyecto de ese pago ya no existe.' };
+
+  const montoTxt = money(pago.amountCents, quote.currency);
+  await db.transaction(async (tx) => {
+    await tx.update(payments)
+      .set({ status: decision, note: nota ? `${pago.note ? pago.note + ' · ' : ''}${nota}` : pago.note })
+      .where(eq(payments.id, paymentId));
+    await tx.insert(quoteEvents).values({
+      quoteId: pago.quoteId, type: 'note',
+      message: decision === 'confirmado'
+        ? `Pago de ${montoTxt} confirmado.`
+        : `Pago de ${montoTxt} no validado.${nota ? ` Motivo: ${nota}` : ''}`,
+      actorId: user!.id, visibleToCustomer: true,
+    });
+  });
+
+  const [{ pagado }] = await db.select({ pagado: sum(payments.amountCents) })
+    .from(payments)
+    .where(and(eq(payments.quoteId, pago.quoteId), eq(payments.status, 'confirmado')));
+  const saldo = Math.max(0, quote.totalCents - Number(pagado ?? 0));
+
+  try {
+    const owner = await db.query.users.findFirst({ where: eq(users.id, quote.userId) });
+    if (owner) {
+      await pagoValidadoMail(owner.email, owner.name, quote.reference, montoTxt,
+        decision === 'confirmado', nota || null, money(saldo, quote.currency), `/portal/${quote.id}`);
+    }
+  } catch (err) {
+    console.error('Correo de validación no enviado:', err);
+  }
+
+  revalidatePath(`/portal/${quote.id}`);
+  revalidatePath('/admin/solicitudes');
+  return { ok: decision === 'confirmado'
+    ? `Pago confirmado. Saldo: ${money(saldo, quote.currency)}.`
+    : 'Pago marcado como no validado; se le avisó al cliente.' };
 }

@@ -68,6 +68,18 @@ export async function register(_prev: FormState, form: FormData): Promise<FormSt
     passwordHash: await hashPassword(pw),
   }).returning();
 
+  /* Sin proveedor de correo configurado, el enlace de confirmación moriría
+     en los logs del servidor y registrarse sería un callejón sin salida.
+     En ese caso la cuenta se activa al momento y el cliente entra de una
+     vez; cuando haya RESEND_API_KEY, vuelve el flujo de confirmación. */
+  if (!process.env.RESEND_API_KEY) {
+    await db.update(users)
+      .set({ emailVerifiedAt: new Date(), updatedAt: new Date() })
+      .where(eq(users.id, user.id));
+    await createSession(user.id, await meta());
+    redirect('/portal');
+  }
+
   const token = await issueToken(user.id, 'email_verification', 60 * 24);
   await verificationMail(mail, name, token);
   return { ok: 'Cuenta creada. Revisa tu correo para confirmarla.' };

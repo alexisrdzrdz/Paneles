@@ -2,7 +2,8 @@ import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { and, asc, eq } from 'drizzle-orm';
 import { db } from '@/db';
-import { quotes, quoteEvents, quoteLines, users, payments } from '@/db/schema';
+import { quotes, quoteEvents, quoteLines, users, payments, paymentReceipts } from '@/db/schema';
+import { inArray } from 'drizzle-orm';
 import { currentUser, isAdmin } from '@/lib/auth';
 import { STATUS, FLOW, money, when } from '@/lib/quotes';
 import { MATERIAL_NOMBRE } from '@/lib/materiales';
@@ -12,11 +13,22 @@ import { Decision } from './Decision';
 import { AbrirEnCotizador } from './AbrirEnCotizador';
 import { Direccion } from './Direccion';
 import { PagoForm } from './PagoForm';
+import { ReportarPago } from './ReportarPago';
+import { PagoValidar } from './PagoValidar';
 
 const METODO: Record<string, string> = {
   transferencia: 'Transferencia', deposito: 'Depósito',
   efectivo: 'Efectivo', tarjeta: 'Tarjeta', otro: 'Otro',
 };
+
+const PAGO_BADGE: Record<string, { label: string; tone: string }> = {
+  pendiente:  { label: 'Por validar', tone: 'ui-badge-info' },
+  confirmado: { label: 'Confirmado',  tone: 'ui-badge-ok' },
+  rechazado:  { label: 'No validado', tone: 'ui-badge-danger' },
+};
+
+/* Estados en los que el cliente ya puede transferir y reportar su pago. */
+const PAGABLES = new Set(['approved', 'in_production', 'shipped', 'delivered']);
 
 /* Cantidades en milésimas → texto: 2000 = "2", 6250 = "6.25". */
 const qty = (milli: number) =>
@@ -48,8 +60,25 @@ export default async function QuoteDetail({ params }: { params: Promise<{ id: st
   const pagos = await db.query.payments.findMany({
     where: eq(payments.quoteId, id), orderBy: [asc(payments.paidAt)],
   });
-  const pagado = pagos.reduce((s, p) => s + p.amountCents, 0);
+  /* Solo lo confirmado abona; lo pendiente se enseña aparte, sin sumar. */
+  const pagado = pagos.filter((p) => p.status === 'confirmado').reduce((s, p) => s + p.amountCents, 0);
+  const porValidar = pagos.filter((p) => p.status === 'pendiente').reduce((s, p) => s + p.amountCents, 0);
   const saldo = Math.max(0, quote.totalCents - pagado);
+
+  /* Qué pagos traen comprobante (solo los ids: el archivo pesa y se sirve
+     por su propia ruta con permisos). */
+  const conRecibo = new Set(
+    pagos.length
+      ? (await db.select({ paymentId: paymentReceipts.paymentId }).from(paymentReceipts)
+          .where(inArray(paymentReceipts.paymentId, pagos.map((p) => p.id))))
+          .map((r) => r.paymentId)
+      : [],
+  );
+
+  const esDueno = quote.userId === user.id;
+  const puedePagar = esDueno && PAGABLES.has(quote.status);
+  const instruccionesPago = process.env.PAGO_INSTRUCCIONES
+    ?? 'Transferencia o depósito directo a nuestra cuenta. Si aún no tienes los datos, pídelos por WhatsApp o correo y con gusto te los compartimos.';
 
   const events = await db
     .select({
@@ -142,41 +171,68 @@ export default async function QuoteDetail({ params }: { params: Promise<{ id: st
             </>
           )}
 
-          {(pagos.length > 0 || admin) && (
+          {(pagos.length > 0 || admin || puedePagar) && (
             <>
               <h2 style={{ fontSize: 16, marginTop: admin && lines.length ? 'var(--space-5)' : 0 }}>Pagos</h2>
               {pagos.length === 0 ? (
-                <p style={{ color: 'var(--ink-dim)' }}>Sin pagos registrados.</p>
+                <p style={{ color: 'var(--ink-dim)' }}>
+                  {puedePagar
+                    ? 'Aún no registras ningún pago. Cuando transfieras, sube aquí tu comprobante.'
+                    : 'Sin pagos registrados.'}
+                </p>
               ) : (
                 <div className="desglose-wrap">
                   <table className="desglose">
                     <thead>
-                      <tr><th>Fecha</th><th>Método</th><th>Referencia</th><th>Monto</th></tr>
+                      <tr><th>Fecha</th><th>Método</th><th>Estado</th><th>Monto</th></tr>
                     </thead>
                     <tbody>
-                      {pagos.map((p) => (
-                        <tr key={p.id}>
-                          <td>{when(p.paidAt)}{p.note && <small>{p.note}</small>}</td>
-                          <td>{METODO[p.method]}</td>
-                          <td className="num">{p.reference ?? '—'}</td>
-                          <td className="num">{money(p.amountCents, quote.currency)}</td>
-                        </tr>
-                      ))}
+                      {pagos.map((p) => {
+                        const b = PAGO_BADGE[p.status];
+                        return (
+                          <tr key={p.id}>
+                            <td>
+                              {when(p.paidAt)}
+                              {(p.reference || p.note) && <small>{[p.reference, p.note].filter(Boolean).join(' · ')}</small>}
+                            </td>
+                            <td>
+                              {METODO[p.method]}
+                              {conRecibo.has(p.id) && (
+                                <small><a href={`/api/comprobantes/${p.id}`} target="_blank" style={{ color: 'var(--link)' }}>
+                                  ver comprobante
+                                </a></small>
+                              )}
+                            </td>
+                            <td>
+                              <span className={`ui-badge ${b.tone}`}>{b.label}</span>
+                              {admin && p.status === 'pendiente' && (
+                                <div style={{ marginTop: 4 }}><PagoValidar paymentId={p.id} /></div>
+                              )}
+                            </td>
+                            <td className="num">{money(p.amountCents, quote.currency)}</td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                     <tfoot>
                       <tr>
-                        <td colSpan={3}>Pagado {money(pagado, quote.currency)} · Saldo</td>
+                        <td colSpan={3}>
+                          Pagado {money(pagado, quote.currency)}
+                          {porValidar > 0 && <> · por validar {money(porValidar, quote.currency)}</>}
+                          {' '}· Saldo
+                        </td>
                         <td className="num">{money(saldo, quote.currency)}</td>
                       </tr>
                     </tfoot>
                   </table>
                 </div>
               )}
+              {puedePagar && <ReportarPago quoteId={quote.id} instrucciones={instruccionesPago} />}
               {admin && <PagoForm quoteId={quote.id} />}
             </>
           )}
 
-          <h2 style={{ fontSize: 16, marginTop: admin || pagos.length ? 'var(--space-5)' : 0 }}>Seguimiento</h2>
+          <h2 style={{ fontSize: 16, marginTop: admin || pagos.length || puedePagar ? 'var(--space-5)' : 0 }}>Seguimiento</h2>
           {events.length === 0 ? (
             <p style={{ color: 'var(--ink-dim)' }}>Aún no hay movimientos registrados.</p>
           ) : (

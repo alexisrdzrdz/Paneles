@@ -1,36 +1,38 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Beta Particiones — plataforma de cotización
 
-## Getting Started
+Sitio, cotizador 2D/3D, portal de clientes y panel de administración para un
+taller de particiones de baño. Next.js + PostgreSQL.
 
-First, run the development server:
+## Desarrollo
 
 ```bash
+docker compose up -d        # Postgres local (puerto 5433, desde la raíz del repo)
+cd web
+cp .env.example .env.local
+npm install
+npm run db:push             # crea el esquema
+npm run seed:catalog        # piezas y reglas del tabulador (precios en $0)
+npm run seed                # cuentas y proyecto de ejemplo
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Scripts útiles: `npm run admin correo@x.com` da acceso de administrador;
+`seed:precios-referencia` carga precios ancla de mercado;
+`seed:precios-demo` carga precios sintéticos de prueba.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Producción
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Vercel**: conectar el repositorio (root directory `web`, framework
+  Next.js) con `DATABASE_URL`, `APP_URL`, `MAIL_FROM` y `RESEND_API_KEY`.
+- **cPanel / VPS**: `npm run build && npm run empaquetar` produce
+  `dist-cpanel/` con un asistente de instalación web. Guía completa en
+  [DESPLIEGUE.md](DESPLIEGUE.md).
 
-## Learn More
+## Estructura
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `src/app` — páginas (sitio público, portal, admin) y APIs
+- `src/lib/bom.ts` — motor de despiece: geometría → piezas y costo
+- `src/lib/cotizacion.ts` — validación y puente cotizador → motor
+- `public/cotizador.html` — configurador 2D/3D independiente
+- `content/` — HTML de las páginas públicas
+- `scripts/` — seeds, empaquetador y utilidades de base

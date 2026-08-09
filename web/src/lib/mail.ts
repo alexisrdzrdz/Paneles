@@ -144,6 +144,46 @@ export function decisionAdminMail(
   });
 }
 
+export function pagoReportadoAdminMail(
+  to: string, adminName: string,
+  ref: string, clientName: string, montoTxt: string, saldoTxt: string, quoteUrl: string,
+) {
+  const href = `${APP_URL}${quoteUrl}`;
+  return sendMail({
+    to,
+    subject: `Pago por validar en ${ref}: ${montoTxt} de ${clientName}`,
+    html: shell('Pago reportado', `
+      <p>Hola ${adminName}: <b>${clientName}</b> reporta una transferencia de
+         <b>${montoTxt}</b> en <b>${ref}</b> y subió su comprobante.
+         Saldo confirmado pendiente: <b>${saldoTxt}</b>.</p>
+      ${button(href, 'Revisar y validar')}`),
+    text: `${clientName} reporta ${montoTxt} en ${ref} (comprobante adjunto en el sistema). Valida en ${href}`,
+  });
+}
+
+export function pagoValidadoMail(
+  to: string, name: string,
+  ref: string, montoTxt: string, confirmado: boolean, nota: string | null,
+  saldoTxt: string, quoteUrl: string,
+) {
+  const href = `${APP_URL}${quoteUrl}`;
+  return sendMail({
+    to,
+    subject: confirmado
+      ? `Pago confirmado en ${ref} · Beta Particiones`
+      : `Sobre tu pago en ${ref} · Beta Particiones`,
+    html: shell(confirmado ? 'Pago confirmado' : 'Pago por aclarar', `
+      <p>Hola ${name}, ${confirmado
+        ? `confirmamos tu pago de <b>${montoTxt}</b> en <b>${ref}</b>. Saldo pendiente: <b>${saldoTxt}</b>.`
+        : `no pudimos validar tu pago de <b>${montoTxt}</b> en <b>${ref}</b>.`}</p>
+      ${!confirmado && nota ? `<p style="border-left:3px solid #a33;padding-left:12px;color:#3a4149">${nota}</p>` : ''}
+      ${button(href, 'Ver mi proyecto')}`),
+    text: confirmado
+      ? `Confirmamos tu pago de ${montoTxt} en ${ref}. Saldo: ${saldoTxt}. ${href}`
+      : `No pudimos validar tu pago de ${montoTxt} en ${ref}. ${nota ?? ''} ${href}`,
+  });
+}
+
 export function pagoClienteMail(
   to: string, name: string,
   ref: string, montoTxt: string, saldoTxt: string, quoteUrl: string,

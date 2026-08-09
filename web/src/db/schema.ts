@@ -1,7 +1,12 @@
 import {
   pgTable, uuid, text, timestamp, integer, jsonb, index, pgEnum, boolean,
-  pgSequence,
+  pgSequence, customType,
 } from 'drizzle-orm/pg-core';
+
+/* Drizzle no trae bytea de fábrica; los comprobantes se guardan en la base
+   (los hosts serverless no tienen disco) y se sirven por una ruta con
+   permisos. */
+const bytea = customType<{ data: Buffer }>({ dataType: () => 'bytea' });
 
 /* ── Cuentas ────────────────────────────────────────────────────────────
    El rol vive en el usuario. Un solo enum evita el clásico `isAdmin` que
@@ -112,18 +117,41 @@ export const paymentMethod = pgEnum('payment_method', [
   'transferencia', 'deposito', 'efectivo', 'tarjeta', 'otro',
 ]);
 
+/* El ciclo del pago por transferencia: el cliente lo reporta con su
+   comprobante (pendiente), el staff lo valida contra el banco (confirmado)
+   o lo regresa (rechazado). Solo lo confirmado abona al saldo. */
+export const paymentStatus = pgEnum('payment_status', [
+  'pendiente', 'confirmado', 'rechazado',
+]);
+
 export const payments = pgTable('payments', {
   id: uuid('id').primaryKey().defaultRandom(),
   quoteId: uuid('quote_id').notNull().references(() => quotes.id, { onDelete: 'cascade' }),
   amountCents: integer('amount_cents').notNull(),
   method: paymentMethod('method').notNull().default('transferencia'),
+  /* Lo que captura el staff a mano nace confirmado; lo que reporta el
+     cliente nace pendiente. */
+  status: paymentStatus('status').notNull().default('confirmado'),
   reference: text('reference'),          // folio del banco, últimos dígitos…
   note: text('note'),
-  /* Quién lo capturó. Nulo si esa cuenta de staff se elimina después. */
+  /* Quién lo registró: staff (captura manual) o el propio cliente (reporte
+     con comprobante). Nulo si esa cuenta se elimina después. */
   createdBy: uuid('created_by').references(() => users.id, { onDelete: 'set null' }),
   paidAt: timestamp('paid_at', { withTimezone: true }).notNull().defaultNow(),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 }, (t) => [index('payments_quote_idx').on(t.quoteId, t.paidAt)]);
+
+/* El archivo va en tabla aparte: las consultas de pagos no deben arrastrar
+   megabytes de imagen; el blob solo se lee en la ruta que lo sirve. */
+export const paymentReceipts = pgTable('payment_receipts', {
+  paymentId: uuid('payment_id').primaryKey()
+    .references(() => payments.id, { onDelete: 'cascade' }),
+  data: bytea('data').notNull(),
+  mime: text('mime').notNull(),
+  filename: text('filename').notNull(),
+  size: integer('size').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
 
 export type Payment = typeof payments.$inferSelect;
 

@@ -55,12 +55,19 @@ export async function register(_prev: FormState, form: FormData): Promise<FormSt
     return { error: TOO_MANY };
   }
 
+  /* Sin proveedor de correo el enlace de confirmación moriría en los logs, así
+     que el flujo cambia: la cuenta se activa al momento. Con proveedor, se
+     confirma por enlace y se protege la privacidad de quién ya tiene cuenta. */
+  const sinCorreo = !process.env.RESEND_API_KEY;
+
   const existing = await db.query.users.findFirst({ where: eq(users.email, mail) });
   if (existing) {
-    /* No se revela si el correo ya tiene cuenta: eso permitiría enumerar
-       clientes. Se responde igual que en el alta buena y, si la cuenta
-       existe, se le manda un aviso a su dueño. */
-    return { ok: 'Revisa tu correo: te enviamos el enlace de confirmación.' };
+    /* Con correo se responde neutro para no delatar quién está registrado.
+       Sin correo se prioriza que el cliente no se atore: se le dice claro
+       que ya tiene cuenta y por dónde entrar (el tope por IP frena el abuso). */
+    return sinCorreo
+      ? { error: 'Ya existe una cuenta con ese correo. Entra con tu contraseña o usa “olvidé mi contraseña”.' }
+      : { ok: 'Revisa tu correo: te enviamos el enlace de confirmación.' };
   }
 
   const [user] = await db.insert(users).values({
@@ -68,15 +75,11 @@ export async function register(_prev: FormState, form: FormData): Promise<FormSt
     passwordHash: await hashPassword(pw),
   }).returning();
 
-  /* Sin proveedor de correo configurado, el enlace de confirmación moriría
-     en los logs del servidor y registrarse sería un callejón sin salida.
-     En ese caso la cuenta se activa al momento y el cliente entra de una
-     vez; cuando haya RESEND_API_KEY, vuelve el flujo de confirmación. */
-  if (!process.env.RESEND_API_KEY) {
+  if (sinCorreo) {
     await db.update(users)
       .set({ emailVerifiedAt: new Date(), updatedAt: new Date() })
       .where(eq(users.id, user.id));
-    await createSession(user.id, await meta());
+    await createSession(user.id, m);
     redirect('/portal');
   }
 

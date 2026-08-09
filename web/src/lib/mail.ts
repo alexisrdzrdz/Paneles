@@ -61,13 +61,21 @@ const button = (href: string, label: string) => `
   <p style="color:#6e7888;font-size:12px;margin-top:18px;word-break:break-all">
     O copia este enlace: ${href}</p>`;
 
+/* Nombre, empresa, mensaje… los teclea gente de fuera: escapar antes de
+   meterlos en el HTML del correo, o un nombre con etiquetas inyecta markup en
+   la bandeja del staff. En el asunto, además, se aplastan los saltos de línea
+   para que nadie inyecte cabeceras. */
+const ESC: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+const esc = (s: string | null | undefined) => String(s ?? '').replace(/[&<>"']/g, (c) => ESC[c]);
+const escSubj = (s: string | null | undefined) => String(s ?? '').replace(/[\r\n]+/g, ' ').trim();
+
 export function verificationMail(to: string, name: string, token: string) {
   const href = `${APP_URL}/verificar?token=${encodeURIComponent(token)}`;
   return sendMail({
     to,
     subject: 'Confirma tu correo · Beta Particiones',
     html: shell('Confirmación de correo', `
-      <p>Hola ${name}, ya casi está. Confirma tu correo para activar tu cuenta
+      <p>Hola ${esc(name)}, ya casi está. Confirma tu correo para activar tu cuenta
          y poder guardar y dar seguimiento a tus proyectos.</p>
       ${button(href, 'Confirmar mi correo')}
       <p style="color:#6e7888;font-size:12px">El enlace caduca en 24 horas.</p>`),
@@ -83,7 +91,7 @@ export function solicitudClienteMail(to: string, name: string, ref: string, quot
     to,
     subject: `Recibimos tu solicitud ${ref} · Beta Particiones`,
     html: shell('Solicitud recibida', `
-      <p>Hola ${name}, tu solicitud <b>${ref}</b> ya está con nosotros y entra a
+      <p>Hola ${esc(name)}, tu solicitud <b>${esc(ref)}</b> ya está con nosotros y entra a
          revisión. Te avisamos por aquí en cada avance, y siempre puedes ver el
          estado en tu portal.</p>
       ${button(href, 'Ver mi proyecto')}`),
@@ -99,10 +107,10 @@ export function solicitudAdminMail(
   const quien = company ? `${clientName} (${company})` : clientName;
   return sendMail({
     to,
-    subject: `Nueva solicitud ${ref} de ${quien}`,
+    subject: escSubj(`Nueva solicitud ${ref} de ${quien}`),
     html: shell('Nueva solicitud de cotización', `
-      <p>Hola ${adminName}: entró la solicitud <b>${ref}</b> de <b>${quien}</b>
-         con un estimado del tabulador de <b>${totalTxt}</b>.</p>
+      <p>Hola ${esc(adminName)}: entró la solicitud <b>${esc(ref)}</b> de <b>${esc(quien)}</b>
+         con un estimado del tabulador de <b>${esc(totalTxt)}</b>.</p>
       ${button(href, 'Revisar la solicitud')}`),
     text: `Nueva solicitud ${ref} de ${quien} — estimado ${totalTxt}. Revísala en ${href}`,
   });
@@ -117,9 +125,9 @@ export function estadoMail(
     to,
     subject: `${ref}: ${statusLabel} · Beta Particiones`,
     html: shell('Avance de tu proyecto', `
-      <p>Hola ${name}, tu proyecto <b>${ref}</b> cambió a
-         <b>${statusLabel}</b>. ${statusHint}</p>
-      ${message ? `<p style="border-left:3px solid #4a7c7b;padding-left:12px;color:#3a4149">${message}</p>` : ''}
+      <p>Hola ${esc(name)}, tu proyecto <b>${esc(ref)}</b> cambió a
+         <b>${esc(statusLabel)}</b>. ${esc(statusHint)}</p>
+      ${message ? `<p style="border-left:3px solid #4a7c7b;padding-left:12px;color:#3a4149">${esc(message)}</p>` : ''}
       ${button(href, 'Ver el detalle')}`),
     text: `Tu proyecto ${ref} cambió a ${statusLabel}. ${message ?? ''} Detalle: ${href}`,
   });
@@ -132,13 +140,13 @@ export function decisionAdminMail(
   const href = `${APP_URL}${quoteUrl}`;
   return sendMail({
     to,
-    subject: aprobado
+    subject: escSubj(aprobado
       ? `✔ ${clientName} aprobó la cotización ${ref}`
-      : `${clientName} no continuará con ${ref}`,
+      : `${clientName} no continuará con ${ref}`),
     html: shell(aprobado ? 'Cotización aprobada' : 'Proyecto descartado', `
-      <p>Hola ${adminName}: <b>${clientName}</b> ${aprobado
-        ? `aprobó la cotización <b>${ref}</b>. Sigue pasarla a fabricación.`
-        : `decidió no continuar con <b>${ref}</b>.`}</p>
+      <p>Hola ${esc(adminName)}: <b>${esc(clientName)}</b> ${aprobado
+        ? `aprobó la cotización <b>${esc(ref)}</b>. Sigue pasarla a fabricación.`
+        : `decidió no continuar con <b>${esc(ref)}</b>.`}</p>
       ${button(href, 'Ver el proyecto')}`),
     text: `${clientName} ${aprobado ? 'aprobó' : 'no continuará con'} ${ref}. Detalle: ${href}`,
   });
@@ -151,11 +159,11 @@ export function pagoReportadoAdminMail(
   const href = `${APP_URL}${quoteUrl}`;
   return sendMail({
     to,
-    subject: `Pago por validar en ${ref}: ${montoTxt} de ${clientName}`,
+    subject: escSubj(`Pago por validar en ${ref}: ${montoTxt} de ${clientName}`),
     html: shell('Pago reportado', `
-      <p>Hola ${adminName}: <b>${clientName}</b> reporta una transferencia de
-         <b>${montoTxt}</b> en <b>${ref}</b> y subió su comprobante.
-         Saldo confirmado pendiente: <b>${saldoTxt}</b>.</p>
+      <p>Hola ${esc(adminName)}: <b>${esc(clientName)}</b> reporta una transferencia de
+         <b>${esc(montoTxt)}</b> en <b>${esc(ref)}</b> y subió su comprobante.
+         Saldo confirmado pendiente: <b>${esc(saldoTxt)}</b>.</p>
       ${button(href, 'Revisar y validar')}`),
     text: `${clientName} reporta ${montoTxt} en ${ref} (comprobante adjunto en el sistema). Valida en ${href}`,
   });
@@ -173,10 +181,10 @@ export function pagoValidadoMail(
       ? `Pago confirmado en ${ref} · Beta Particiones`
       : `Sobre tu pago en ${ref} · Beta Particiones`,
     html: shell(confirmado ? 'Pago confirmado' : 'Pago por aclarar', `
-      <p>Hola ${name}, ${confirmado
-        ? `confirmamos tu pago de <b>${montoTxt}</b> en <b>${ref}</b>. Saldo pendiente: <b>${saldoTxt}</b>.`
-        : `no pudimos validar tu pago de <b>${montoTxt}</b> en <b>${ref}</b>.`}</p>
-      ${!confirmado && nota ? `<p style="border-left:3px solid #a33;padding-left:12px;color:#3a4149">${nota}</p>` : ''}
+      <p>Hola ${esc(name)}, ${confirmado
+        ? `confirmamos tu pago de <b>${esc(montoTxt)}</b> en <b>${esc(ref)}</b>. Saldo pendiente: <b>${esc(saldoTxt)}</b>.`
+        : `no pudimos validar tu pago de <b>${esc(montoTxt)}</b> en <b>${esc(ref)}</b>.`}</p>
+      ${!confirmado && nota ? `<p style="border-left:3px solid #a33;padding-left:12px;color:#3a4149">${esc(nota)}</p>` : ''}
       ${button(href, 'Ver mi proyecto')}`),
     text: confirmado
       ? `Confirmamos tu pago de ${montoTxt} en ${ref}. Saldo: ${saldoTxt}. ${href}`
@@ -193,8 +201,8 @@ export function pagoClienteMail(
     to,
     subject: `Pago recibido en ${ref} · Beta Particiones`,
     html: shell('Pago registrado', `
-      <p>Hola ${name}, registramos un pago de <b>${montoTxt}</b> en tu proyecto
-         <b>${ref}</b>. Saldo pendiente: <b>${saldoTxt}</b>.</p>
+      <p>Hola ${esc(name)}, registramos un pago de <b>${esc(montoTxt)}</b> en tu proyecto
+         <b>${esc(ref)}</b>. Saldo pendiente: <b>${esc(saldoTxt)}</b>.</p>
       ${button(href, 'Ver mis pagos')}`),
     text: `Hola ${name}, registramos un pago de ${montoTxt} en ${ref}. Saldo: ${saldoTxt}. Detalle: ${href}`,
   });
@@ -206,7 +214,7 @@ export function passwordResetMail(to: string, name: string, token: string) {
     to,
     subject: 'Restablece tu contraseña · Beta Particiones',
     html: shell('Recuperación de contraseña', `
-      <p>Hola ${name}, recibimos una solicitud para cambiar tu contraseña.</p>
+      <p>Hola ${esc(name)}, recibimos una solicitud para cambiar tu contraseña.</p>
       ${button(href, 'Elegir contraseña nueva')}
       <p style="color:#6e7888;font-size:12px">El enlace caduca en 1 hora.
          Si no fuiste tú, tu contraseña actual sigue funcionando.</p>`),

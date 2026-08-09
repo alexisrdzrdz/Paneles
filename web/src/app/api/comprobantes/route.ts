@@ -3,7 +3,7 @@ import { and, eq, ne, sum } from 'drizzle-orm';
 import { db } from '@/db';
 import { quotes, payments, paymentReceipts, quoteEvents, users } from '@/db/schema';
 import { currentUser, rateLimit } from '@/lib/auth';
-import { money } from '@/lib/quotes';
+import { money, parsePesosToCents, isUuid } from '@/lib/quotes';
 import { pagoReportadoAdminMail } from '@/lib/mail';
 
 /* El cliente reporta su transferencia: monto + comprobante (imagen o PDF).
@@ -24,6 +24,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Demasiados intentos seguidos. Espera unos minutos.' }, { status: 429 });
   }
 
+  /* Se rechaza por tamaño ANTES de leer el cuerpo: formData() lo cargaría
+     entero en memoria y un cuerpo enorme tumbaría el proceso. */
+  const declarado = Number(req.headers.get('content-length') ?? '');
+  if (Number.isFinite(declarado) && declarado > MAX_BYTES + 512 * 1024) {
+    return NextResponse.json({ error: 'El archivo pasa de 4 MB. Sube una foto más ligera.' }, { status: 413 });
+  }
+
   let form: FormData;
   try { form = await req.formData(); } catch {
     return NextResponse.json({ error: 'Formulario inválido' }, { status: 400 });
@@ -32,12 +39,12 @@ export async function POST(req: Request) {
   const quoteId = String(form.get('quoteId') ?? '');
   const referencia = String(form.get('referencia') ?? '').trim().slice(0, 80);
   const nota = String(form.get('nota') ?? '').trim().slice(0, 300);
-  const monto = Number(String(form.get('monto') ?? '').replace(/[$,\s]/g, ''));
+  const amountCents = parsePesosToCents(String(form.get('monto') ?? ''));
   const archivo = form.get('archivo');
 
-  if (!/^[0-9a-f-]{36}$/.test(quoteId)) return NextResponse.json({ error: 'Proyecto inválido' }, { status: 400 });
-  if (!Number.isFinite(monto) || monto <= 0) {
-    return NextResponse.json({ error: 'Escribe el monto transferido (solo el número).' }, { status: 400 });
+  if (!isUuid(quoteId)) return NextResponse.json({ error: 'Proyecto inválido' }, { status: 400 });
+  if (amountCents === null) {
+    return NextResponse.json({ error: 'Escribe el monto transferido (solo el número, p. ej. 20000).' }, { status: 400 });
   }
   if (!(archivo instanceof File) || archivo.size === 0) {
     return NextResponse.json({ error: 'Adjunta tu comprobante (foto o PDF).' }, { status: 400 });
@@ -55,7 +62,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Este proyecto aún no está en etapa de pago.' }, { status: 400 });
   }
 
-  const amountCents = Math.round(monto * 100);
   const data = Buffer.from(await archivo.arrayBuffer());
 
   const pago = await db.transaction(async (tx) => {

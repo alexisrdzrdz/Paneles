@@ -27,5 +27,43 @@ export const money = (cents: number, currency = 'USD') =>
 export const when = (d: Date) =>
   new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium', timeStyle: 'short' }).format(d);
 
+/* Techo de dinero: cabe en el integer de Postgres con margen. Un monto por
+   encima es dedazo, no un pedido de $21 millones. */
+export const MAX_CENTS = 2_000_000_000;
+
+/* Convierte lo que teclea una persona ("$1,500.50", "20,000", "1.500,50") a
+   centavos enteros, o null si no se entiende. Regla: el último separador
+   seguido de 1–2 dígitos es el decimal; cualquier otro punto o coma es de
+   millares y se descarta. Así "20,000" son veinte mil y "1500,50" son mil
+   quinientos con cincuenta, sin que la coma multiplique por cien. */
+export function parsePesosToCents(raw: string): number | null {
+  const s = String(raw).trim().replace(/[$\s]/g, '');
+  if (!s || !/^[0-9.,]+$/.test(s)) return null;
+
+  const lastSep = Math.max(s.lastIndexOf(','), s.lastIndexOf('.'));
+  let intPart: string, decPart: string;
+  if (lastSep === -1) {
+    intPart = s; decPart = '';
+  } else {
+    const after = s.slice(lastSep + 1);
+    if (after.length >= 1 && after.length <= 2) {   // separador decimal
+      intPart = s.slice(0, lastSep).replace(/[.,]/g, '');
+      decPart = after;
+    } else {                                          // separador de millares
+      intPart = s.replace(/[.,]/g, '');
+      decPart = '';
+    }
+  }
+  if (!/^\d+$/.test(intPart)) return null;
+  const cents = parseInt(intPart, 10) * 100 + (decPart ? parseInt(decPart.padEnd(2, '0'), 10) : 0);
+  if (!Number.isSafeInteger(cents) || cents <= 0 || cents > MAX_CENTS) return null;
+  return cents;
+}
+
+/* UUID canónico 8-4-4-4-12. La regex laxa dejaba pasar cadenas que Postgres
+   rechaza con un 500 en vez del 404 que se pretende. */
+export const isUuid = (v: string) =>
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v);
+
 /* Folio legible y estable: BETA-000128. El consecutivo lo da la base. */
 export const reference = (n: number) => `BETA-${String(n).padStart(6, '0')}`;

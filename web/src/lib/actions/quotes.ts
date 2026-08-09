@@ -6,7 +6,7 @@ import { revalidatePath } from 'next/cache';
 import { db } from '@/db';
 import { quotes, quoteEvents, users, payments } from '@/db/schema';
 import { currentUser, isAdmin } from '@/lib/auth';
-import { STATUS, money } from '@/lib/quotes';
+import { STATUS, money, parsePesosToCents } from '@/lib/quotes';
 import { estadoMail, decisionAdminMail, pagoClienteMail, pagoValidadoMail } from '@/lib/mail';
 
 export type GestionState = { error?: string; ok?: string };
@@ -203,9 +203,8 @@ export async function registrarPago(_prev: GestionState, form: FormData): Promis
   if (!parsed.success) return { error: parsed.error.issues[0].message };
   const { quoteId, monto, metodo, referencia, nota } = parsed.data;
 
-  const n = Number(monto.replace(/[$,\s]/g, ''));
-  if (!Number.isFinite(n) || n === 0) return { error: 'El monto no se entiende. Escribe solo el número.' };
-  const amountCents = Math.round(n * 100);
+  const amountCents = parsePesosToCents(monto);
+  if (amountCents === null) return { error: 'El monto no se entiende. Escribe solo el número (p. ej. 20000).' };
 
   const quote = await db.query.quotes.findFirst({ where: eq(quotes.id, quoteId) });
   if (!quote) return { error: 'Esa cotización no existe.' };
@@ -249,7 +248,9 @@ export async function registrarPago(_prev: GestionState, form: FormData): Promis
 const validarSchema = z.object({
   paymentId: z.string().uuid(),
   decision: z.enum(['confirmado', 'rechazado']),
-  nota: z.string().trim().max(300).optional(),
+  /* Se recorta en vez de rechazar: un motivo largo no debe tumbar la
+     validación con un error genérico. */
+  nota: z.string().trim().transform((s) => s.slice(0, 300) || undefined).optional(),
 });
 
 export async function validarPago(_prev: GestionState, form: FormData): Promise<GestionState> {
@@ -268,10 +269,15 @@ export async function validarPago(_prev: GestionState, form: FormData): Promise<
   if (!quote) return { error: 'El proyecto de ese pago ya no existe.' };
 
   const montoTxt = money(pago.amountCents, quote.currency);
-  await db.transaction(async (tx) => {
-    await tx.update(payments)
+  /* El UPDATE exige que SIGA pendiente: si otro miembro del staff lo validó
+     entre la lectura y aquí, afecta cero filas y se aborta — nada de dos
+     correos contradictorios ni doble evento en la bitácora. */
+  const validado = await db.transaction(async (tx) => {
+    const filas = await tx.update(payments)
       .set({ status: decision, note: nota ? `${pago.note ? pago.note + ' · ' : ''}${nota}` : pago.note })
-      .where(eq(payments.id, paymentId));
+      .where(and(eq(payments.id, paymentId), eq(payments.status, 'pendiente')))
+      .returning({ id: payments.id });
+    if (!filas.length) return false;
     await tx.insert(quoteEvents).values({
       quoteId: pago.quoteId, type: 'note',
       message: decision === 'confirmado'
@@ -279,7 +285,9 @@ export async function validarPago(_prev: GestionState, form: FormData): Promise<
         : `Pago de ${montoTxt} no validado.${nota ? ` Motivo: ${nota}` : ''}`,
       actorId: user!.id, visibleToCustomer: true,
     });
+    return true;
   });
+  if (!validado) return { error: 'Ese pago acaba de ser validado por alguien más.' };
 
   const [{ pagado }] = await db.select({ pagado: sum(payments.amountCents) })
     .from(payments)

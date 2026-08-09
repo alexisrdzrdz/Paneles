@@ -377,6 +377,7 @@ const state = {
   materialId:'hdpe', colorHex:'#5a7d94',
   zip:'',
   repeticiones:1,   // baños idénticos (p. ej. un edificio con el mismo baño por piso)
+  banos:[],         // baños DISTINTOS ya agregados al proyecto; el actual se edita aparte
   room:{ name:'Baño 1', back:'concrete', showWall:true, height:58, floorGap:12, mount:'standard',
          stalls:Array.from({length:5},()=>defaultStall('stall')),
          splitAuto:true, ada:false, layout:'inline',
@@ -657,20 +658,23 @@ function pedirPrecio(){
    asunto del taller y ni siquiera viaja al navegador. */
 function refreshMoney(){
   const sq=serverQuote, vacio=!state.room.stalls.length;
-  const N=Math.max(1,state.repeticiones|0);   // el precio del proyecto = un baño × N
-  const total = vacio ? '—' : sq ? moneyCents(sq.totalCents*N) : '…';
+  const N=Math.max(1,state.repeticiones|0);   // el baño actual × sus repeticiones
+  const hayG=state.banos.length>0;            // ¿hay otros baños guardados?
+  const totalP=totalProyectoCents();          // proyecto completo (guardados + actual)
+  const total = (vacio && !hayG) ? '—' : (sq||hayG) ? moneyCents(totalP) : '…';
   const mini=document.getElementById('miniTotal'); if(mini) mini.textContent=total;
   const sum=document.getElementById('sumTotal'); if(sum) sum.textContent=total;
 
   const box=document.getElementById('sumLines');
   if(box){
-    if(vacio) box.innerHTML='<p class="ui-meta" style="margin:0">Agrega cabinas o mingitorios para cotizar.</p>';
-    else if(!sq) box.innerHTML='<p class="ui-meta" style="margin:0">Calculando con la lista de precios…</p>';
+    if(vacio && !hayG) box.innerHTML='<p class="ui-meta" style="margin:0">Agrega cabinas o mingitorios para cotizar.</p>';
+    else if(!sq && !hayG) box.innerHTML='<p class="ui-meta" style="margin:0">Calculando con la lista de precios…</p>';
     else box.innerHTML =
-      (N>1 ? `<p class="ui-meta" style="margin:0 0 6px">${N} baños idénticos · ${moneyCents(sq.totalCents)} cada uno.</p>` : '')
+      (hayG ? `<p class="ui-meta" style="margin:0 0 6px"><b>${state.banos.length+(vacio?0:1)} baños</b> en el proyecto${sq&&!vacio?` · este: ${moneyCents(sq.totalCents*N)}`:''}.</p>`
+            : (N>1 ? `<p class="ui-meta" style="margin:0 0 6px">${N} baños idénticos · ${moneyCents(sq.totalCents)} cada uno.</p>` : ''))
       + '<p class="ui-meta" style="margin:0">Incluye materiales, herrajes e instalación. '
       + 'El envío se cotiza según tu ubicación al solicitar.</p>'
-      + (sq.faltanPrecios
+      + (sq&&sq.faltanPrecios
           ? '<p class="ui-meta" style="margin:6px 0 0">Estamos completando la lista de precios; el total puede ajustarse en tu cotización formal.</p>'
           : '');
   }
@@ -685,7 +689,7 @@ let draftTimer=null;
 function guardaBorrador(){
   clearTimeout(draftTimer);
   draftTimer=setTimeout(()=>{ try{ localStorage.setItem(DRAFT_KEY, JSON.stringify({
-    room:state.room, materialId:state.materialId, colorHex:state.colorHex, zip:state.zip, repeticiones:state.repeticiones, step:state.step,
+    room:state.room, materialId:state.materialId, colorHex:state.colorHex, zip:state.zip, repeticiones:state.repeticiones, banos:state.banos, step:state.step,
   })); }catch{} },250);
 }
 function cargaBorrador(){
@@ -697,9 +701,89 @@ function cargaBorrador(){
     if(d.colorHex) state.colorHex=d.colorHex;
     state.zip=typeof d.zip==='string'?d.zip:'';
     state.repeticiones=Math.max(1,Math.min(500,d.repeticiones|0))||1;
+    state.banos=Array.isArray(d.banos)?d.banos:[];
     state.step=Math.max(0,Math.min(4,d.step|0));
     state.sel=[0]; state.selected=0;
   }catch{}
+}
+
+/* ── Varios baños distintos en un proyecto ──
+   El editor maneja UN baño a la vez; los ya terminados se guardan en
+   state.banos como copias independientes. Un proyecto de edificio con plantas
+   distintas se arma agregando un baño tipo tras otro. */
+function banoNuevo(){
+  return { name:'Baño '+(state.banos.length+1), back:'concrete', showWall:true, height:58, floorGap:12,
+    mount:'standard', stalls:Array.from({length:5},()=>defaultStall('stall')),
+    splitAuto:true, ada:false, layout:'inline', headrail:'none' };
+}
+function snapshotActual(){
+  return {
+    room: JSON.parse(JSON.stringify(state.room)),
+    materialId: state.materialId, colorHex: state.colorHex,
+    repeticiones: Math.max(1,state.repeticiones|0),
+    totalUnit: serverQuote ? serverQuote.totalCents : 0,   // precio de un baño, para la lista
+  };
+}
+function cargaBano(b){
+  state.room = JSON.parse(JSON.stringify(b.room));
+  state.materialId = b.materialId; state.colorHex = b.colorHex;
+  state.repeticiones = b.repeticiones||1;
+  state.sel=[0]; state.selected=0; framed=false; serverQuote=null; priceLast='';
+}
+/* Construye el proyecto de un baño GUARDADO reutilizando la geometría, que
+   vive atada a state.room: se intercambia un instante y se restaura. */
+function proyectoDe(b){
+  const saveRoom=state.room, saveMat=state.materialId;
+  state.room=b.room; state.materialId=b.materialId;
+  const p=proyectoPayload();
+  state.room=saveRoom; state.materialId=saveMat;
+  return p;
+}
+function agregarOtroBano(){
+  const p=proyectoPayload();
+  if(!p.runs.length){ toast('Agrega al menos una cabina o mingitorio antes de sumar otro baño.','danger'); return; }
+  state.banos.push(snapshotActual());
+  cargaBano({ room:banoNuevo(), materialId:state.materialId, colorHex:state.colorHex, repeticiones:1 });
+  refreshStallSelect(); gotoStep(0);
+  toast('Baño agregado al proyecto. Diseña el siguiente.','ok');
+}
+function quitarBano(i){
+  state.banos.splice(i,1); renderStep(); render(); guardaBorrador();
+}
+function editarBano(i){
+  /* Se intercambia: el que está en el editor se guarda y se carga el elegido,
+     para no perder lo que se venía diseñando. */
+  const elegido=state.banos[i];
+  const p=proyectoPayload();
+  if(p.runs.length) state.banos[i]=snapshotActual(); else state.banos.splice(i,1);
+  cargaBano(elegido);
+  refreshStallSelect(); gotoStep(0);
+}
+/* El precio del proyecto completo: cada baño guardado por sus repeticiones,
+   más el que se edita ahora. */
+function totalProyectoCents(){
+  let t = state.banos.reduce((s,b)=> s + b.totalUnit*Math.max(1,b.repeticiones), 0);
+  if(serverQuote) t += serverQuote.totalCents*Math.max(1,state.repeticiones|0);
+  return t;
+}
+/* Lista de baños ya agregados, en el paso de cierre. */
+function banoListaHTML(){
+  if(!state.banos.length) return '';
+  const fila=(inner,dim)=>`<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)${dim?';opacity:.7':''}">${inner}</div>`;
+  const guardados=state.banos.map((b,i)=>{
+    const nS=b.room.stalls.filter(u=>u.kind!=='urinal').length, nU=b.room.stalls.length-nS;
+    const mat=((MATERIALS.find(m=>m.id===b.materialId)||{}).name)||b.materialId;
+    const resumen=[nS?nS+' cabinas':'', nU?nU+' mingitorios':''].filter(Boolean).join(' y ')||'sin unidades';
+    const precio=b.totalUnit?moneyCents(b.totalUnit*Math.max(1,b.repeticiones)):'…';
+    return fila(`<div><b>${b.room.name||('Baño '+(i+1))}</b>${b.repeticiones>1?` ×${b.repeticiones}`:''}
+        <small style="display:block;color:var(--ink-faint)">${resumen} · ${mat}</small></div>
+      <div style="display:flex;align-items:center;gap:8px;white-space:nowrap">
+        <span class="mono">${precio}</span>
+        <button class="lnk" type="button" data-editbano="${i}">Editar</button>
+        <button class="lnk danger" type="button" data-delbano="${i}">Quitar</button></div>`);
+  }).join('');
+  return '<div class="ui-label">Baños del proyecto</div>'+guardados
+    + fila(`<div><b>${state.room.name||'Baño actual'}</b> <small style="color:var(--ink-faint)">— el que estás diseñando ahora</small></div>`, true);
 }
 
 /* ── Enviar la solicitud de verdad ──
@@ -709,13 +793,18 @@ async function solicitar(btn, auto){
   const prev = btn && btn.textContent;
   if(btn){ btn.disabled=true; btn.textContent='Enviando…'; }
   try{
+    /* El baño en edición cuenta como uno más del proyecto. */
+    const actual=proyectoPayload();
+    const banos=[
+      ...state.banos.map((b,i)=>({ proyecto: proyectoDe(b), repeticiones: b.repeticiones, nombre: (b.room.name||('Baño '+(i+1))) })),
+      ...(actual.runs.length ? [{ proyecto: actual, repeticiones: Math.max(1,state.repeticiones|0), nombre: state.room.name||'Baño' }] : []),
+    ];
     const res=await fetch('/api/solicitar',{method:'POST',headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
-        proyecto: proyectoPayload(),
-        nombre: state.room.name||'Baño',
+        banos,
+        nombre: (state.banos.length? (state.room.name?state.room.name.replace(/\s*\d+$/,'').trim()||'Proyecto':'Proyecto') : (state.room.name||'Baño')),
         zip: state.zip||undefined,
-        repeticiones: Math.max(1,state.repeticiones|0),
-        estado: { room:state.room, materialId:state.materialId, colorHex:state.colorHex, zip:state.zip, repeticiones:state.repeticiones },
+        estado: { room:state.room, materialId:state.materialId, colorHex:state.colorHex, zip:state.zip, repeticiones:state.repeticiones, banos:state.banos },
       })});
     if(res.status===401){
       localStorage.setItem(PEND_KEY,'1'); guardaBorrador();
@@ -1665,21 +1754,27 @@ function renderStep(){
     body.innerHTML=`
       <p class="ui-meta" style="margin-top:0">Revisa el resumen de la derecha. Al solicitar, tu proyecto
         queda guardado con folio y seguimiento en tu portal, y nuestro equipo lo revisa.</p>
-      <div class="ui-field"><label>¿Cuántos baños iguales? (pisos / repeticiones)</label>
+      <div class="ui-field"><label>¿Cuántos de ESTE baño? (pisos iguales)</label>
         <input id="reps" type="number" inputmode="numeric" min="1" max="500" value="${state.repeticiones}"></div>
-      <p class="ui-meta" style="margin:-6px 0 var(--space-3)">Si el mismo baño se repite en varios pisos, ponlo aquí:
-        se cotiza uno y se multiplica. Diseña un baño tipo, no 200 cabinas juntas.</p>
+      <p class="ui-meta" style="margin:-6px 0 var(--space-3)">Si este mismo baño se repite en varios pisos, ponlo aquí.
+        Si un piso es distinto, agrégalo como otro baño abajo.</p>
+      ${banoListaHTML()}
+      <button class="ui-btn ui-btn-block" id="addBanoBtn" style="margin-bottom:var(--space-3)">＋ Agregar otro baño distinto</button>
       <div class="ui-field"><label>Código postal (afina el envío)</label>
         <input id="zip" type="text" inputmode="numeric" maxlength="5" placeholder="00000" value="${state.zip}"></div>
       <div class="ui-alert ui-alert-ok"><b>Proyecto listo.</b>
-        ${state.repeticiones>1?`<b>${state.repeticiones} baños</b> de `:''}${[q.nStall?q.nStall+' cabinas':'', q.nUrinal?q.nUrinal+' mingitorios':''].filter(Boolean).join(' y ')}
-        en ${q.m.name}, distribución ${LAYOUTS.find(l=>l.id===state.room.layout).name.toLowerCase()}.</div>
+        ${state.banos.length?`<b>${state.banos.length+1} baños distintos</b> en el proyecto.`
+          :`${state.repeticiones>1?`<b>${state.repeticiones} baños</b> de `:''}${[q.nStall?q.nStall+' cabinas':'', q.nUrinal?q.nUrinal+' mingitorios':''].filter(Boolean).join(' y ')}
+        en ${q.m.name}, distribución ${LAYOUTS.find(l=>l.id===state.room.layout).name.toLowerCase()}.`}</div>
       <button class="ui-btn ui-btn-primary ui-btn-block" id="orderBtn">Solicitar cotización formal</button>
       <p class="ui-meta" style="margin:var(--space-2) 0 0">Necesitas una cuenta para dar seguimiento: si no tienes,
         te pedimos crearla al enviar. Tu proyecto y la conversación con el equipo quedan en tu portal.</p>`;
     const reps=document.getElementById('reps'); reps.addEventListener('input',e=>{
       state.repeticiones=Math.max(1,Math.min(500,parseInt(e.target.value,10)||1)); refreshMoney(); guardaBorrador();
     });
+    document.getElementById('addBanoBtn').addEventListener('click',()=>agregarOtroBano());
+    body.querySelectorAll('[data-editbano]').forEach(b=> b.addEventListener('click',()=>editarBano(+b.dataset.editbano)));
+    body.querySelectorAll('[data-delbano]').forEach(b=> b.addEventListener('click',()=>{ quitarBano(+b.dataset.delbano); }));
     const zip=document.getElementById('zip'); zip.addEventListener('input',e=>{ state.zip=e.target.value.replace(/\D/g,''); guardaBorrador(); });
     document.getElementById('orderBtn').addEventListener('click',e=>solicitar(e.currentTarget));
     refreshMoney();

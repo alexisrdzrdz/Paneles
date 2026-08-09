@@ -47,14 +47,27 @@ const POS: Record<string, string> = {
 };
 
 type ProyectoGuardado = {
+  materialId?: string;
   runs?: { units?: { kind: string; doorSwing?: string | null; doorPosition?: string | null }[] }[];
 };
+type BanoGuardado = { proyecto: ProyectoGuardado; repeticiones: number; nombre: string | null };
 
-/* Lee del proyecto guardado el giro y la posición de cada puerta de cabina. */
-function puertasDe(payload: unknown): string[] {
-  const proyecto = (payload as { proyecto?: ProyectoGuardado } | null)?.proyecto;
+/* Normaliza el payload a una lista de baños. Formato v2 (varios baños) y v1
+   (un solo proyecto) conviven: los pedidos viejos se siguen leyendo. */
+function banosDe(payload: unknown): BanoGuardado[] {
+  const p = payload as { banos?: { proyecto?: ProyectoGuardado; repeticiones?: number; nombre?: string | null }[];
+    proyecto?: ProyectoGuardado; repeticiones?: number } | null;
+  if (p?.banos?.length) {
+    return p.banos.map((b) => ({ proyecto: b.proyecto ?? {}, repeticiones: b.repeticiones ?? 1, nombre: b.nombre ?? null }));
+  }
+  if (p?.proyecto) return [{ proyecto: p.proyecto, repeticiones: p.repeticiones ?? 1, nombre: null }];
+  return [];
+}
+
+/* El giro y la posición de cada puerta de cabina de un proyecto. */
+function puertasDe(proyecto: ProyectoGuardado): string[] {
   const out: string[] = [];
-  proyecto?.runs?.forEach((r) => r.units?.forEach((u) => {
+  proyecto.runs?.forEach((r) => r.units?.forEach((u) => {
     if (u.kind !== 'stall') return;
     const giro = SWING[u.doorSwing ?? ''] ?? 'sin especificar';
     const pos = POS[u.doorPosition ?? ''];
@@ -322,13 +335,17 @@ export default async function QuoteDetail({ params }: { params: Promise<{ id: st
             <hr style={{ border: 0, borderTop: 'var(--border-width) solid var(--line)', margin: 'var(--space-3) 0' }} />
             <div style={{ fontSize: 'var(--fs-label)', color: 'var(--ink-dim)', lineHeight: 1.8 }}>
               {(() => {
-                const reps = (quote.payload as { repeticiones?: number } | null)?.repeticiones ?? 1;
+                const banos = banosDe(quote.payload);
+                if (banos.length > 1) {
+                  return <div>Composición: <b>{banos.length} baños distintos</b> <span style={{ color: 'var(--ink-faint)' }}>({banos.reduce((s, b) => s + b.repeticiones, 0)} en total)</span></div>;
+                }
+                const reps = banos[0]?.repeticiones ?? 1;
                 return reps > 1
                   ? <div>Baños idénticos: <b>{reps}</b> <span style={{ color: 'var(--ink-faint)' }}>({quote.unitCount / reps} unidades c/u)</span></div>
                   : null;
               })()}
               <div>Unidades totales: <b>{quote.unitCount}</b></div>
-              <div>Material: <b>{quote.materialId ? (MATERIAL_NOMBRE[quote.materialId] ?? quote.materialId) : '—'}</b></div>
+              <div>Material: <b>{quote.materialId ? (MATERIAL_NOMBRE[quote.materialId] ?? quote.materialId) : 'varios'}</b></div>
               <div>Creado: {when(quote.createdAt)}</div>
             </div>
             {(() => {
@@ -338,31 +355,36 @@ export default async function QuoteDetail({ params }: { params: Promise<{ id: st
           </div>
 
           {(() => {
-            const puertas = puertasDe(quote.payload);
-            if (!puertas.length) return null;
-            const todasIgual = puertas.every((p) => p === puertas[0]);
+            const banos = banosDe(quote.payload);
+            const grupos = banos
+              .map((b, i) => ({ nombre: b.nombre || (banos.length > 1 ? `Baño ${i + 1}` : ''), reps: b.repeticiones, puertas: puertasDe(b.proyecto) }))
+              .filter((g) => g.puertas.length);
+            if (!grupos.length) return null;
             return (
               <div style={{
                 border: 'var(--border-width) solid var(--line)', borderRadius: 'var(--radius-md)',
                 background: 'var(--surface)', padding: 'var(--space-4)', marginTop: 'var(--space-3)',
               }}>
-                <h2 style={{ fontSize: 14, marginTop: 0, color: 'var(--ink-dim)' }}>
-                  Apertura de puertas
-                  {((quote.payload as { repeticiones?: number } | null)?.repeticiones ?? 1) > 1 && (
-                    <span style={{ color: 'var(--ink-faint)', fontWeight: 400 }}> · por baño</span>
-                  )}
-                </h2>
-                {todasIgual ? (
-                  <div style={{ fontSize: 'var(--fs-label)' }}>
-                    Las {puertas.length} puertas: <b>{puertas[0]}</b>
-                  </div>
-                ) : (
-                  <ol style={{ listStyle: 'none', margin: 0, padding: 0, fontSize: 'var(--fs-label)', lineHeight: 1.9 }}>
-                    {puertas.map((p, i) => (
-                      <li key={i}>Cabina {i + 1}: <b>{p}</b></li>
-                    ))}
-                  </ol>
-                )}
+                <h2 style={{ fontSize: 14, marginTop: 0, color: 'var(--ink-dim)' }}>Apertura de puertas</h2>
+                {grupos.map((g, gi) => {
+                  const todasIgual = g.puertas.every((p) => p === g.puertas[0]);
+                  return (
+                    <div key={gi} style={{ marginTop: gi ? 'var(--space-3)' : 0 }}>
+                      {g.nombre && (
+                        <div style={{ fontWeight: 600, fontSize: 'var(--fs-label)' }}>
+                          {g.nombre}{g.reps > 1 ? ` · ×${g.reps}` : ''}
+                        </div>
+                      )}
+                      {todasIgual ? (
+                        <div style={{ fontSize: 'var(--fs-label)' }}>Las {g.puertas.length} puertas: <b>{g.puertas[0]}</b></div>
+                      ) : (
+                        <ol style={{ listStyle: 'none', margin: 0, padding: 0, fontSize: 'var(--fs-label)', lineHeight: 1.9 }}>
+                          {g.puertas.map((p, i) => <li key={i}>Cabina {i + 1}: <b>{p}</b></li>)}
+                        </ol>
+                      )}
+                    </div>
+                  );
+                })}
                 <p className="ui-meta" style={{ margin: 'var(--space-2) 0 0' }}>Visto de frente a la cabina.</p>
               </div>
             );

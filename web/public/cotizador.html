@@ -998,23 +998,20 @@ function drawElevation(box){
     ctx.font='600 8px Inter,sans-serif'; ctx.fillStyle=css('--ink-faint'); ctx.fillText(cap, tx, my+6);
   }
 }
+/* Profundidad FIJA del número dentro de la hilera: así el badge de una cabina
+   y el de un mingitorio quedan en la MISMA línea, aunque sus artefactos estén
+   a distinta profundidad. Sin esto, los mingitorios (poco profundos) llevaban
+   el número pegado al muro y las cabinas sobre el inodoro: dos niveles. */
+const BADGE_T=12;
 function drawToilet(r,st,M){
   const back=P(r,st.aCenter,4), bowl=P(r,st.aCenter,16);
-  const b=M(bowl.x,bowl.y), k=M(back.x,back.y), sc=map.s;
+  const b=M(bowl.x,bowl.y), k=M(back.x,back.y);
   ctx.save();
   ctx.strokeStyle='#9fb3c4'; ctx.fillStyle='#fbfdff'; ctx.lineWidth=1.3;
   ctx.beginPath(); ctx.rect(k.X-9, k.Y-9, 18,18); ctx.fill(); ctx.stroke();
   ctx.beginPath(); ctx.ellipse(b.X,b.Y, 11,11,0,0,Math.PI*2); ctx.fill(); ctx.stroke();
   ctx.restore();
-  /* El badge se encoge con la cabina: fijo en 11px se encimaba con el vecino
-     cuando hay muchas unidades angostas. */
-  const rd=badgeR(st);
-  ctx.beginPath(); ctx.arc(b.X,b.Y,rd,0,Math.PI*2);
-  ctx.fillStyle = selHas(st.gi) ? css('--danger') : css('--ink');
-  ctx.fill();
-  if(st.cfg.ada){ ctx.strokeStyle=css('--info'); ctx.lineWidth=2.4; ctx.stroke(); }
-  ctx.fillStyle='#fff'; ctx.font='bold '+(rd*1.05).toFixed(1)+'px Inter,sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
-  ctx.fillText(String(st.gi+1), b.X, b.Y+0.5);
+  drawBadge(r,st,M);
 }
 function drawUrinal(r,st,M){
   const back=P(r,st.aCenter,3), b=M(back.x,back.y);
@@ -1022,17 +1019,19 @@ function drawUrinal(r,st,M){
   ctx.strokeStyle='#9fb3c4'; ctx.fillStyle='#fbfdff'; ctx.lineWidth=1.3;
   ctx.beginPath(); ctx.ellipse(b.X,b.Y+9,8.5,12,0,0,Math.PI*2); ctx.fill(); ctx.stroke();
   ctx.restore();
-  const rd=badgeR(st);
-  ctx.beginPath(); ctx.arc(b.X,b.Y+9,rd,0,Math.PI*2);
-  ctx.fillStyle = selHas(st.gi) ? css('--danger') : css('--ink'); ctx.fill();
-  ctx.fillStyle='#fff'; ctx.font='bold '+(rd*1.0).toFixed(1)+'px Inter,sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
-  ctx.fillText(String(st.gi+1), b.X, b.Y+9);
+  drawBadge(r,st,M);
 }
-/* Radio del número según el ancho de la unidad en pantalla: nunca mayor que
-   11, ni tan grande que dos badges vecinos se toquen. */
-function badgeR(st){
+/* El número de cada unidad, en su línea común (BADGE_T) y con radio que encoge
+   cuando la unidad es angosta, para no encimarse con el vecino. */
+function drawBadge(r,st,M){
+  const p=P(r,st.aCenter,BADGE_T), b=M(p.x,p.y);
   const anchoPx=(st.aEnd-st.aStart)*(map?map.s:1);
-  return Math.max(6, Math.min(11, anchoPx*0.38));
+  const rd=Math.max(6, Math.min(11, anchoPx*0.38));
+  ctx.beginPath(); ctx.arc(b.X,b.Y,rd,0,Math.PI*2);
+  ctx.fillStyle = selHas(st.gi) ? css('--danger') : css('--ink'); ctx.fill();
+  if(st.cfg.ada && !isUrinalUnit(st.cfg)){ ctx.strokeStyle=css('--info'); ctx.lineWidth=2.4; ctx.stroke(); }
+  ctx.fillStyle='#fff'; ctx.font='bold '+(rd*1.05).toFixed(1)+'px Inter,sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(String(st.gi+1), b.X, b.Y+0.5);
 }
 function drawDoor(r,st,M,s){
   const L=doorLayout(st);

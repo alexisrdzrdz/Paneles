@@ -1818,10 +1818,18 @@ function bindCounter(el){
 }
 /* Alta/baja de unidades de un tipo sin tocar las del otro. Las nuevas heredan la
    hilera de la última, que es donde el usuario venía trabajando. */
+/* Topes del cotizador: un baño de una sala rara vez pasa de esto, y más
+   unidades empequeñecen el dibujo. Para proyectos grandes, dividir en varios
+   baños (cada uno una sección) rinde mejor que amontonar todo en una sala. */
+const MAX_POR_TIPO=20, MAX_TOTAL=30;
 function setUnitCount(kind,n){
   const list=state.room.stalls, cur=countKind(kind), other=list.length-cur;
-  n=Math.max(0,Math.min(10,n));
-  if(n===cur || n+other<1 || n+other>16) return;
+  n=Math.max(0,Math.min(MAX_POR_TIPO,n));
+  if(n+other>MAX_TOTAL){
+    toast(`Máximo ${MAX_TOTAL} unidades por baño. Para más, agrega otro baño en el paso de cierre: cada baño es una sección.`);
+    return;
+  }
+  if(n===cur || n+other<1) return;
   if(n>cur){
     const run = list.length? (list[list.length-1].run|0) : 0;
     for(let i=cur;i<n;i++) list.push(defaultStall(kind,run));

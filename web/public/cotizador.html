@@ -1021,16 +1021,18 @@ function drawUrinal(r,st,M){
   ctx.restore();
   drawBadge(r,st,M);
 }
-/* El número de cada unidad, en su línea común (BADGE_T) y con radio que encoge
-   cuando la unidad es angosta, para no encimarse con el vecino. */
+/* El número de cada unidad, en su línea común (BADGE_T). El radio se calcula
+   para dejar SIEMPRE un hueco entre badges vecinos: el ancho de la unidad en
+   pantalla menos un margen, partido a la mitad. Así seis mingitorios angostos
+   pegados nunca enciman sus números; solo se hacen más chicos. */
 function drawBadge(r,st,M){
   const p=P(r,st.aCenter,BADGE_T), b=M(p.x,p.y);
   const anchoPx=(st.aEnd-st.aStart)*(map?map.s:1);
-  const rd=Math.max(6, Math.min(11, anchoPx*0.38));
+  const rd=Math.max(5, Math.min(11, (anchoPx-6)/2));
   ctx.beginPath(); ctx.arc(b.X,b.Y,rd,0,Math.PI*2);
   ctx.fillStyle = selHas(st.gi) ? css('--danger') : css('--ink'); ctx.fill();
-  if(st.cfg.ada && !isUrinalUnit(st.cfg)){ ctx.strokeStyle=css('--info'); ctx.lineWidth=2.4; ctx.stroke(); }
-  ctx.fillStyle='#fff'; ctx.font='bold '+(rd*1.05).toFixed(1)+'px Inter,sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  if(st.cfg.ada && !isUrinalUnit(st.cfg)){ ctx.strokeStyle=css('--info'); ctx.lineWidth=2.2; ctx.stroke(); }
+  ctx.fillStyle='#fff'; ctx.font='bold '+(rd*1.1).toFixed(1)+'px Inter,sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
   ctx.fillText(String(st.gi+1), b.X, b.Y+0.5);
 }
 function drawDoor(r,st,M,s){

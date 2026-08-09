@@ -321,7 +321,13 @@ export default async function QuoteDetail({ params }: { params: Promise<{ id: st
             </ol>
             <hr style={{ border: 0, borderTop: 'var(--border-width) solid var(--line)', margin: 'var(--space-3) 0' }} />
             <div style={{ fontSize: 'var(--fs-label)', color: 'var(--ink-dim)', lineHeight: 1.8 }}>
-              <div>Unidades: <b>{quote.unitCount}</b></div>
+              {(() => {
+                const reps = (quote.payload as { repeticiones?: number } | null)?.repeticiones ?? 1;
+                return reps > 1
+                  ? <div>Baños idénticos: <b>{reps}</b> <span style={{ color: 'var(--ink-faint)' }}>({quote.unitCount / reps} unidades c/u)</span></div>
+                  : null;
+              })()}
+              <div>Unidades totales: <b>{quote.unitCount}</b></div>
               <div>Material: <b>{quote.materialId ? (MATERIAL_NOMBRE[quote.materialId] ?? quote.materialId) : '—'}</b></div>
               <div>Creado: {when(quote.createdAt)}</div>
             </div>
@@ -340,7 +346,12 @@ export default async function QuoteDetail({ params }: { params: Promise<{ id: st
                 border: 'var(--border-width) solid var(--line)', borderRadius: 'var(--radius-md)',
                 background: 'var(--surface)', padding: 'var(--space-4)', marginTop: 'var(--space-3)',
               }}>
-                <h2 style={{ fontSize: 14, marginTop: 0, color: 'var(--ink-dim)' }}>Apertura de puertas</h2>
+                <h2 style={{ fontSize: 14, marginTop: 0, color: 'var(--ink-dim)' }}>
+                  Apertura de puertas
+                  {((quote.payload as { repeticiones?: number } | null)?.repeticiones ?? 1) > 1 && (
+                    <span style={{ color: 'var(--ink-faint)', fontWeight: 400 }}> · por baño</span>
+                  )}
+                </h2>
                 {todasIgual ? (
                   <div style={{ fontSize: 'var(--fs-label)' }}>
                     Las {puertas.length} puertas: <b>{puertas[0]}</b>

@@ -376,6 +376,7 @@ const state = {
   step:0, view:'2d', selected:0, sel:[0],   // `selected` es el ancla; `sel` la selección múltiple
   materialId:'hdpe', colorHex:'#5a7d94',
   zip:'',
+  repeticiones:1,   // baños idénticos (p. ej. un edificio con el mismo baño por piso)
   room:{ name:'Baño 1', back:'concrete', showWall:true, height:58, floorGap:12, mount:'standard',
          stalls:Array.from({length:5},()=>defaultStall('stall')),
          splitAuto:true, ada:false, layout:'inline',
@@ -656,7 +657,8 @@ function pedirPrecio(){
    asunto del taller y ni siquiera viaja al navegador. */
 function refreshMoney(){
   const sq=serverQuote, vacio=!state.room.stalls.length;
-  const total = vacio ? '—' : sq ? moneyCents(sq.totalCents) : '…';
+  const N=Math.max(1,state.repeticiones|0);   // el precio del proyecto = un baño × N
+  const total = vacio ? '—' : sq ? moneyCents(sq.totalCents*N) : '…';
   const mini=document.getElementById('miniTotal'); if(mini) mini.textContent=total;
   const sum=document.getElementById('sumTotal'); if(sum) sum.textContent=total;
 
@@ -665,7 +667,8 @@ function refreshMoney(){
     if(vacio) box.innerHTML='<p class="ui-meta" style="margin:0">Agrega cabinas o mingitorios para cotizar.</p>';
     else if(!sq) box.innerHTML='<p class="ui-meta" style="margin:0">Calculando con la lista de precios…</p>';
     else box.innerHTML =
-      '<p class="ui-meta" style="margin:0">Incluye materiales, herrajes e instalación. '
+      (N>1 ? `<p class="ui-meta" style="margin:0 0 6px">${N} baños idénticos · ${moneyCents(sq.totalCents)} cada uno.</p>` : '')
+      + '<p class="ui-meta" style="margin:0">Incluye materiales, herrajes e instalación. '
       + 'El envío se cotiza según tu ubicación al solicitar.</p>'
       + (sq.faltanPrecios
           ? '<p class="ui-meta" style="margin:6px 0 0">Estamos completando la lista de precios; el total puede ajustarse en tu cotización formal.</p>'
@@ -673,7 +676,7 @@ function refreshMoney(){
   }
   document.querySelectorAll('[data-matprice]').forEach(el=>{
     el.textContent = sq && sq.porMaterial && sq.porMaterial[el.dataset.matprice]!=null
-      ? moneyCents(sq.porMaterial[el.dataset.matprice]) : '…';
+      ? moneyCents(sq.porMaterial[el.dataset.matprice]*N) : '…';
   });
 }
 
@@ -682,7 +685,7 @@ let draftTimer=null;
 function guardaBorrador(){
   clearTimeout(draftTimer);
   draftTimer=setTimeout(()=>{ try{ localStorage.setItem(DRAFT_KEY, JSON.stringify({
-    room:state.room, materialId:state.materialId, colorHex:state.colorHex, zip:state.zip, step:state.step,
+    room:state.room, materialId:state.materialId, colorHex:state.colorHex, zip:state.zip, repeticiones:state.repeticiones, step:state.step,
   })); }catch{} },250);
 }
 function cargaBorrador(){
@@ -693,6 +696,7 @@ function cargaBorrador(){
     if(MATERIALS.some(m=>m.id===d.materialId)) state.materialId=d.materialId;
     if(d.colorHex) state.colorHex=d.colorHex;
     state.zip=typeof d.zip==='string'?d.zip:'';
+    state.repeticiones=Math.max(1,Math.min(500,d.repeticiones|0))||1;
     state.step=Math.max(0,Math.min(4,d.step|0));
     state.sel=[0]; state.selected=0;
   }catch{}
@@ -710,7 +714,8 @@ async function solicitar(btn, auto){
         proyecto: proyectoPayload(),
         nombre: state.room.name||'Baño',
         zip: state.zip||undefined,
-        estado: { room:state.room, materialId:state.materialId, colorHex:state.colorHex, zip:state.zip },
+        repeticiones: Math.max(1,state.repeticiones|0),
+        estado: { room:state.room, materialId:state.materialId, colorHex:state.colorHex, zip:state.zip, repeticiones:state.repeticiones },
       })});
     if(res.status===401){
       localStorage.setItem(PEND_KEY,'1'); guardaBorrador();
@@ -1660,14 +1665,21 @@ function renderStep(){
     body.innerHTML=`
       <p class="ui-meta" style="margin-top:0">Revisa el resumen de la derecha. Al solicitar, tu proyecto
         queda guardado con folio y seguimiento en tu portal, y nuestro equipo lo revisa.</p>
+      <div class="ui-field"><label>¿Cuántos baños iguales? (pisos / repeticiones)</label>
+        <input id="reps" type="number" inputmode="numeric" min="1" max="500" value="${state.repeticiones}"></div>
+      <p class="ui-meta" style="margin:-6px 0 var(--space-3)">Si el mismo baño se repite en varios pisos, ponlo aquí:
+        se cotiza uno y se multiplica. Diseña un baño tipo, no 200 cabinas juntas.</p>
       <div class="ui-field"><label>Código postal (afina el envío)</label>
         <input id="zip" type="text" inputmode="numeric" maxlength="5" placeholder="00000" value="${state.zip}"></div>
       <div class="ui-alert ui-alert-ok"><b>Proyecto listo.</b>
-        ${[q.nStall?q.nStall+' cabinas':'', q.nUrinal?q.nUrinal+' mingitorios':''].filter(Boolean).join(' y ')}
+        ${state.repeticiones>1?`<b>${state.repeticiones} baños</b> de `:''}${[q.nStall?q.nStall+' cabinas':'', q.nUrinal?q.nUrinal+' mingitorios':''].filter(Boolean).join(' y ')}
         en ${q.m.name}, distribución ${LAYOUTS.find(l=>l.id===state.room.layout).name.toLowerCase()}.</div>
       <button class="ui-btn ui-btn-primary ui-btn-block" id="orderBtn">Solicitar cotización formal</button>
       <p class="ui-meta" style="margin:var(--space-2) 0 0">Necesitas una cuenta para dar seguimiento: si no tienes,
         te pedimos crearla al enviar. Tu proyecto y la conversación con el equipo quedan en tu portal.</p>`;
+    const reps=document.getElementById('reps'); reps.addEventListener('input',e=>{
+      state.repeticiones=Math.max(1,Math.min(500,parseInt(e.target.value,10)||1)); refreshMoney(); guardaBorrador();
+    });
     const zip=document.getElementById('zip'); zip.addEventListener('input',e=>{ state.zip=e.target.value.replace(/\D/g,''); guardaBorrador(); });
     document.getElementById('orderBtn').addEventListener('click',e=>solicitar(e.currentTarget));
     refreshMoney();

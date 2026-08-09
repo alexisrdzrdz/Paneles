@@ -29,7 +29,7 @@ const bodySchema = z.object({
   /* Compatibilidad con el envío de un solo baño. */
   proyecto: proyectoSchema.optional(),
   repeticiones: z.number().int().min(1).max(500).catch(1),
-  nombre: z.string().trim().min(1).max(120).catch('Baño'),
+  nombre: z.string().trim().min(1).max(120).catch('Área'),
   zip: z.string().trim().max(10).optional(),
   /* Estado íntegro del configurador, para poder reabrir el proyecto tal cual
      se dejó. Opaco a propósito: el servidor no lo interpreta, solo lo guarda. */
@@ -90,7 +90,7 @@ export async function POST(req: Request) {
     totalCents += sinEnvioCents(bom) * N;
     unitCount += cuentaUnidades(b.proyecto) * N;
     materiales.add(b.proyecto.materialId);
-    const etiqueta = varios ? (b.nombre?.trim() || `Baño ${bi + 1}`) : null;
+    const etiqueta = varios ? (b.nombre?.trim() || `Área ${bi + 1}`) : null;
 
     for (const l of bom.lines) {
       if (l.category === 'flete' && bi > 0) continue;   // un solo flete por obra
@@ -109,8 +109,8 @@ export async function POST(req: Request) {
   const materialId = materiales.size === 1 ? [...materiales][0] : null;
   const totalReps = banos.reduce((s, b) => s + b.repeticiones, 0);
   const nombreFinal = varios
-    ? `${nombre} (${banos.length} baños distintos)`
-    : (banos[0].repeticiones > 1 ? `${nombre} (× ${banos[0].repeticiones} baños)` : nombre);
+    ? `${nombre} (${banos.length} áreas distintas)`
+    : (banos[0].repeticiones > 1 ? `${nombre} (× ${banos[0].repeticiones} áreas)` : nombre);
 
   const quote = await db.transaction(async (tx) => {
     const [q] = await tx.insert(quotes).values({
@@ -138,9 +138,9 @@ export async function POST(req: Request) {
       type: 'submitted',
       toStatus: 'submitted',
       message: varios
-        ? `Solicitud enviada desde el cotizador: ${banos.length} baños distintos (${totalReps} en total).`
+        ? `Solicitud enviada desde el cotizador: ${banos.length} áreas distintas (${totalReps} en total).`
         : (banos[0].repeticiones > 1
-            ? `Solicitud enviada desde el cotizador: ${banos[0].repeticiones} baños idénticos.`
+            ? `Solicitud enviada desde el cotizador: ${banos[0].repeticiones} áreas idénticas.`
             : 'Solicitud enviada desde el cotizador.'),
       actorId: user.id,
       visibleToCustomer: true,

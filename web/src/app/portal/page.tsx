@@ -56,8 +56,8 @@ export default async function PortalPage() {
       {rows.length === 0 ? (
         <div className="empty">
           <p><b>Todavía no tienes proyectos.</b></p>
-          <p>Cuando cotices un baño y lo envíes, aparecerá aquí con su folio y seguimiento.</p>
-          <a className="ui-btn ui-btn-primary" href="/cotizador.html">Cotizar mi primer baño</a>
+          <p>Cuando cotices un proyecto y lo envíes, aparecerá aquí con su folio y seguimiento.</p>
+          <a className="ui-btn ui-btn-primary" href="/cotizador.html">Cotizar mi primer proyecto</a>
         </div>
       ) : (
         GRUPOS.map(({ titulo, hint, estados }) => {

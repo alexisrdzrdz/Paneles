@@ -337,11 +337,11 @@ export default async function QuoteDetail({ params }: { params: Promise<{ id: st
               {(() => {
                 const banos = banosDe(quote.payload);
                 if (banos.length > 1) {
-                  return <div>Composición: <b>{banos.length} baños distintos</b> <span style={{ color: 'var(--ink-faint)' }}>({banos.reduce((s, b) => s + b.repeticiones, 0)} en total)</span></div>;
+                  return <div>Composición: <b>{banos.length} áreas distintas</b> <span style={{ color: 'var(--ink-faint)' }}>({banos.reduce((s, b) => s + b.repeticiones, 0)} en total)</span></div>;
                 }
                 const reps = banos[0]?.repeticiones ?? 1;
                 return reps > 1
-                  ? <div>Baños idénticos: <b>{reps}</b> <span style={{ color: 'var(--ink-faint)' }}>({quote.unitCount / reps} unidades c/u)</span></div>
+                  ? <div>Áreas idénticas: <b>{reps}</b> <span style={{ color: 'var(--ink-faint)' }}>({quote.unitCount / reps} unidades c/u)</span></div>
                   : null;
               })()}
               <div>Unidades totales: <b>{quote.unitCount}</b></div>
@@ -357,7 +357,7 @@ export default async function QuoteDetail({ params }: { params: Promise<{ id: st
           {(() => {
             const banos = banosDe(quote.payload);
             const grupos = banos
-              .map((b, i) => ({ nombre: b.nombre || (banos.length > 1 ? `Baño ${i + 1}` : ''), reps: b.repeticiones, puertas: puertasDe(b.proyecto) }))
+              .map((b, i) => ({ nombre: b.nombre || (banos.length > 1 ? `Área ${i + 1}` : ''), reps: b.repeticiones, puertas: puertasDe(b.proyecto) }))
               .filter((g) => g.puertas.length);
             if (!grupos.length) return null;
             return (

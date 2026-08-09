@@ -243,8 +243,8 @@
       <div class="ui-panel-body">
         <div class="canvas-bar">
           <div class="ui-field grow" style="margin:0;min-width:150px">
-            <label>Nombre del baño</label>
-            <input id="roomName" type="text" maxlength="60" value="Baño 1">
+            <label>Nombre del área</label>
+            <input id="roomName" type="text" maxlength="60" value="Área 1">
           </div>
           <div class="grow"></div>
           <div class="ui-field" style="margin:0;min-width:130px">
@@ -378,7 +378,7 @@ const state = {
   zip:'',
   repeticiones:1,   // baños idénticos (p. ej. un edificio con el mismo baño por piso)
   banos:[],         // baños DISTINTOS ya agregados al proyecto; el actual se edita aparte
-  room:{ name:'Baño 1', back:'concrete', showWall:true, height:58, floorGap:12, mount:'standard',
+  room:{ name:'Área 1', back:'concrete', showWall:true, height:58, floorGap:12, mount:'standard',
          stalls:Array.from({length:5},()=>defaultStall('stall')),
          splitAuto:true, ada:false, layout:'inline',
          /* Riel superior: 'none' | 'flush' (al ras, corona las pilastras)
@@ -670,10 +670,10 @@ function refreshMoney(){
     if(vacio && !hayG) box.innerHTML='<p class="ui-meta" style="margin:0">Agrega cabinas o mingitorios para cotizar.</p>';
     else if(!sq && !hayG) box.innerHTML='<p class="ui-meta" style="margin:0">Calculando con la lista de precios…</p>';
     else box.innerHTML =
-      (hayG ? `<p class="ui-meta" style="margin:0 0 6px"><b>${state.banos.length+(vacio?0:1)} baños</b> en el proyecto${sq&&!vacio?` · este: ${moneyCents(sq.totalCents*N)}`:''}.</p>`
-            : (N>1 ? `<p class="ui-meta" style="margin:0 0 6px">${N} baños idénticos · ${moneyCents(sq.totalCents)} cada uno.</p>` : ''))
-      + '<p class="ui-meta" style="margin:0">Incluye materiales, herrajes e instalación. '
-      + 'El envío se cotiza según tu ubicación al solicitar.</p>'
+      (hayG ? `<p class="ui-meta" style="margin:0 0 6px"><b>${state.banos.length+(vacio?0:1)} áreas</b> en el proyecto${sq&&!vacio?` · esta: ${moneyCents(sq.totalCents*N)}`:''}.</p>`
+            : (N>1 ? `<p class="ui-meta" style="margin:0 0 6px">${N} áreas idénticas · ${moneyCents(sq.totalCents)} cada una.</p>` : ''))
+      + '<p class="ui-meta" style="margin:0">Incluye la partición, puertas, herrajes e instalación. '
+      + '<b>No incluye el mueble sanitario</b> (inodoro/mingitorio). El envío se cotiza según tu ubicación al solicitar.</p>'
       + (sq&&sq.faltanPrecios
           ? '<p class="ui-meta" style="margin:6px 0 0">Estamos completando la lista de precios; el total puede ajustarse en tu cotización formal.</p>'
           : '');
@@ -712,7 +712,7 @@ function cargaBorrador(){
    state.banos como copias independientes. Un proyecto de edificio con plantas
    distintas se arma agregando un baño tipo tras otro. */
 function banoNuevo(){
-  return { name:'Baño '+(state.banos.length+1), back:'concrete', showWall:true, height:58, floorGap:12,
+  return { name:'Área '+(state.banos.length+1), back:'concrete', showWall:true, height:58, floorGap:12,
     mount:'standard', stalls:Array.from({length:5},()=>defaultStall('stall')),
     splitAuto:true, ada:false, layout:'inline', headrail:'none' };
 }
@@ -743,16 +743,16 @@ function proyectoDe(b){
   }
 }
 function agregarOtroBano(){
-  if(state.banos.length>=29){ toast('Máximo 30 baños distintos por proyecto. Para pisos iguales, usa las repeticiones de arriba.','danger'); return; }
+  if(state.banos.length>=29){ toast('Máximo 30 áreas distintas por proyecto. Para pisos iguales, usa las repeticiones de arriba.','danger'); return; }
   const p=proyectoPayload();
-  if(!p.runs.length){ toast('Agrega al menos una cabina o mingitorio antes de sumar otro baño.','danger'); return; }
-  /* Sin precio del servidor no se guarda: si no, el baño entraría al total
+  if(!p.runs.length){ toast('Agrega al menos una cabina o mingitorio antes de sumar otra área.','danger'); return; }
+  /* Sin precio del servidor no se guarda: si no, el área entraría al total
      con $0 y el número que ve el cliente quedaría por debajo del real. */
-  if(!serverQuote){ toast('Espera un momento: se está calculando el precio de este baño.'); return; }
+  if(!serverQuote){ toast('Espera un momento: se está calculando el precio de esta área.'); return; }
   state.banos.push(snapshotActual());
   cargaBano({ room:banoNuevo(), materialId:state.materialId, colorHex:state.colorHex, repeticiones:1 });
   refreshStallSelect(); gotoStep(0);
-  toast('Baño agregado al proyecto. Diseña el siguiente.','ok');
+  toast('Área agregada al proyecto. Diseña la siguiente.','ok');
 }
 function quitarBano(i){
   state.banos.splice(i,1); renderStep(); render(); guardaBorrador();
@@ -782,15 +782,15 @@ function banoListaHTML(){
     const mat=((MATERIALS.find(m=>m.id===b.materialId)||{}).name)||b.materialId;
     const resumen=[nS?nS+' cabinas':'', nU?nU+' mingitorios':''].filter(Boolean).join(' y ')||'sin unidades';
     const precio=b.totalUnit?moneyCents(b.totalUnit*Math.max(1,b.repeticiones)):'…';
-    return fila(`<div><b>${b.room.name||('Baño '+(i+1))}</b>${b.repeticiones>1?` ×${b.repeticiones}`:''}
+    return fila(`<div><b>${b.room.name||('Área '+(i+1))}</b>${b.repeticiones>1?` ×${b.repeticiones}`:''}
         <small style="display:block;color:var(--ink-faint)">${resumen} · ${mat}</small></div>
       <div style="display:flex;align-items:center;gap:8px;white-space:nowrap">
         <span class="mono">${precio}</span>
         <button class="lnk" type="button" data-editbano="${i}">Editar</button>
         <button class="lnk danger" type="button" data-delbano="${i}">Quitar</button></div>`);
   }).join('');
-  return '<div class="ui-label">Baños del proyecto</div>'+guardados
-    + fila(`<div><b>${state.room.name||'Baño actual'}</b> <small style="color:var(--ink-faint)">— el que estás diseñando ahora</small></div>`, true);
+  return '<div class="ui-label">Áreas del proyecto</div>'+guardados
+    + fila(`<div><b>${state.room.name||'Área actual'}</b> <small style="color:var(--ink-faint)">— la que estás diseñando ahora</small></div>`, true);
 }
 
 /* ── Enviar la solicitud de verdad ──
@@ -803,13 +803,13 @@ async function solicitar(btn, auto){
     /* El baño en edición cuenta como uno más del proyecto. */
     const actual=proyectoPayload();
     const banos=[
-      ...state.banos.map((b,i)=>({ proyecto: proyectoDe(b), repeticiones: b.repeticiones, nombre: (b.room.name||('Baño '+(i+1))) })),
-      ...(actual.runs.length ? [{ proyecto: actual, repeticiones: Math.max(1,state.repeticiones|0), nombre: state.room.name||'Baño' }] : []),
+      ...state.banos.map((b,i)=>({ proyecto: proyectoDe(b), repeticiones: b.repeticiones, nombre: (b.room.name||('Área '+(i+1))) })),
+      ...(actual.runs.length ? [{ proyecto: actual, repeticiones: Math.max(1,state.repeticiones|0), nombre: state.room.name||'Área' }] : []),
     ];
     const res=await fetch('/api/solicitar',{method:'POST',headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
         banos,
-        nombre: (state.banos.length? (state.room.name?state.room.name.replace(/\s*\d+$/,'').trim()||'Proyecto':'Proyecto') : (state.room.name||'Baño')),
+        nombre: (state.banos.length? (state.room.name?state.room.name.replace(/\s*\d+$/,'').trim()||'Proyecto':'Proyecto') : (state.room.name||'Área')),
         zip: state.zip||undefined,
         estado: { room:state.room, materialId:state.materialId, colorHex:state.colorHex, zip:state.zip, repeticiones:state.repeticiones, banos:state.banos },
       })});
@@ -1606,7 +1606,7 @@ function renderStep(){
   if(state.step===0){
     const nS=countKind('stall'), nU=countKind('urinal');
     body.innerHTML=`
-      <div class="ui-label">Elementos del baño</div>
+      <div class="ui-label">Elementos del área</div>
       <p class="ui-meta" style="margin-top:0">Combina cabinas y mingitorios en una sola cotización: el precio y el dibujo los toman juntos.</p>
       ${countRow('Cabinas de inodoro','stall',nS,'Panel + puerta por cabina')}
       ${countRow('Mingitorios','urinal',nU,'Una mampara entre cada uno')}
@@ -1778,17 +1778,17 @@ function renderStep(){
     body.innerHTML=`
       <p class="ui-meta" style="margin-top:0">Revisa el resumen de la derecha. Al solicitar, tu proyecto
         queda guardado con folio y seguimiento en tu portal, y nuestro equipo lo revisa.</p>
-      <div class="ui-field"><label>¿Cuántos de ESTE baño? (pisos iguales)</label>
+      <div class="ui-field"><label>¿Cuántas de ESTA área? (pisos iguales)</label>
         <input id="reps" type="number" inputmode="numeric" min="1" max="500" value="${state.repeticiones}"></div>
-      <p class="ui-meta" style="margin:-6px 0 var(--space-3)">Si este mismo baño se repite en varios pisos, ponlo aquí.
-        Si un piso es distinto, agrégalo como otro baño abajo.</p>
+      <p class="ui-meta" style="margin:-6px 0 var(--space-3)">Si esta misma área se repite en varios pisos, ponlo aquí.
+        Si un piso es distinto, agrégalo como otra área abajo.</p>
       ${banoListaHTML()}
-      <button class="ui-btn ui-btn-block" id="addBanoBtn" style="margin-bottom:var(--space-3)" ${state.banos.length>=29?'disabled title="Máximo 30 baños distintos"':''}>＋ Agregar otro baño distinto</button>
+      <button class="ui-btn ui-btn-block" id="addBanoBtn" style="margin-bottom:var(--space-3)" ${state.banos.length>=29?'disabled title="Máximo 30 áreas distintas"':''}>＋ Agregar otra área (sección)</button>
       <div class="ui-field"><label>Código postal (afina el envío)</label>
         <input id="zip" type="text" inputmode="numeric" maxlength="5" placeholder="00000" value="${state.zip}"></div>
       <div class="ui-alert ui-alert-ok"><b>Proyecto listo.</b>
-        ${state.banos.length?`<b>${state.banos.length+1} baños distintos</b> en el proyecto.`
-          :`${state.repeticiones>1?`<b>${state.repeticiones} baños</b> de `:''}${[q.nStall?q.nStall+' cabinas':'', q.nUrinal?q.nUrinal+' mingitorios':''].filter(Boolean).join(' y ')}
+        ${state.banos.length?`<b>${state.banos.length+1} áreas distintas</b> en el proyecto.`
+          :`${state.repeticiones>1?`<b>${state.repeticiones} áreas</b> de `:''}${[q.nStall?q.nStall+' cabinas':'', q.nUrinal?q.nUrinal+' mingitorios':''].filter(Boolean).join(' y ')}
         en ${q.m.name}, distribución ${LAYOUTS.find(l=>l.id===state.room.layout).name.toLowerCase()}.`}</div>
       <button class="ui-btn ui-btn-primary ui-btn-block" id="orderBtn">Solicitar cotización formal</button>
       <p class="ui-meta" style="margin:var(--space-2) 0 0">Necesitas una cuenta para dar seguimiento: si no tienes,
@@ -1828,7 +1828,7 @@ function setUnitCount(kind,n){
   const list=state.room.stalls, cur=countKind(kind), other=list.length-cur;
   n=Math.max(0,Math.min(MAX_POR_TIPO,n));
   if(n+other>MAX_TOTAL){
-    toast(`Máximo ${MAX_TOTAL} unidades por baño. Para más, agrega otro baño en el paso de cierre: cada baño es una sección.`);
+    toast(`Máximo ${MAX_TOTAL} unidades por área. Para más, agrega otra área en el paso de cierre: cada área es una sección.`);
     return;
   }
   if(n===cur || n+other<1) return;
@@ -1980,7 +1980,7 @@ new ResizeObserver(()=>{ if(state.view==='2d') draw2D(); else resize3D(); }).obs
 
 /* ═══════════════ Arranque ═══════════════ */
 cargaBorrador();                               // lo que dejaste, tal cual lo dejaste
-document.getElementById('roomName').value = state.room.name || 'Baño 1';
+document.getElementById('roomName').value = state.room.name || 'Área 1';
 refreshStallSelect();
 renderStepper();
 gotoStep(state.step);

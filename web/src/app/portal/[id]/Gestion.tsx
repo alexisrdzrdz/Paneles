@@ -40,7 +40,7 @@ export function Gestion({ quoteId, estado }: { quoteId: string; estado: QuoteSta
           <div className="ui-field" style={{ gridColumn: '1 / -1' }}>
             <label htmlFor="mensaje">Mensaje para el cliente (opcional)</label>
             <textarea id="mensaje" name="mensaje" rows={2}
-              placeholder="Se ve en su portal y en el correo de aviso." />
+              placeholder="Se ve en la conversación del proyecto, en su portal." />
           </div>
           <div style={{ gridColumn: '1 / -1' }}>
             <Submit>Guardar y avisar</Submit>

@@ -35,6 +35,26 @@ const PAGABLES = new Set(['approved', 'in_production', 'shipped', 'delivered']);
 const qty = (milli: number) =>
   (milli / 1000).toFixed(2).replace(/\.?0+$/, '');
 
+/* Hacia dónde abre la puerta, en palabras que el taller usa. */
+const SWING: Record<string, string> = {
+  'left-in': 'bisagra izq. · abre adentro',
+  'left-out': 'bisagra izq. · abre afuera',
+  'right-in': 'bisagra der. · abre adentro',
+  'right-out': 'bisagra der. · abre afuera',
+};
+
+type ProyectoGuardado = { runs?: { units?: { kind: string; doorSwing?: string | null }[] }[] };
+
+/* Lee del proyecto guardado el giro de cada puerta de cabina. */
+function puertasDe(payload: unknown): string[] {
+  const proyecto = (payload as { proyecto?: ProyectoGuardado } | null)?.proyecto;
+  const out: string[] = [];
+  proyecto?.runs?.forEach((r) => r.units?.forEach((u) => {
+    if (u.kind === 'stall') out.push(SWING[u.doorSwing ?? ''] ?? 'sin especificar');
+  }));
+  return out;
+}
+
 export default async function QuoteDetail({ params }: { params: Promise<{ id: string }> }) {
   const user = await currentUser();
   if (!user) redirect('/entrar');
@@ -302,6 +322,32 @@ export default async function QuoteDetail({ params }: { params: Promise<{ id: st
               return estado ? <AbrirEnCotizador estado={estado} /> : null;
             })()}
           </div>
+
+          {(() => {
+            const puertas = puertasDe(quote.payload);
+            if (!puertas.length) return null;
+            const todasIgual = puertas.every((p) => p === puertas[0]);
+            return (
+              <div style={{
+                border: 'var(--border-width) solid var(--line)', borderRadius: 'var(--radius-md)',
+                background: 'var(--surface)', padding: 'var(--space-4)', marginTop: 'var(--space-3)',
+              }}>
+                <h2 style={{ fontSize: 14, marginTop: 0, color: 'var(--ink-dim)' }}>Apertura de puertas</h2>
+                {todasIgual ? (
+                  <div style={{ fontSize: 'var(--fs-label)' }}>
+                    Las {puertas.length} puertas: <b>{puertas[0]}</b>
+                  </div>
+                ) : (
+                  <ol style={{ listStyle: 'none', margin: 0, padding: 0, fontSize: 'var(--fs-label)', lineHeight: 1.9 }}>
+                    {puertas.map((p, i) => (
+                      <li key={i}>Cabina {i + 1}: <b>{p}</b></li>
+                    ))}
+                  </ol>
+                )}
+                <p className="ui-meta" style={{ margin: 'var(--space-2) 0 0' }}>Visto de frente a la cabina.</p>
+              </div>
+            );
+          })()}
 
           <Direccion
             quoteId={quote.id}

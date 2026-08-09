@@ -623,6 +623,9 @@ function proyectoPayload(){
         widthIn: st.aEnd-st.aStart,
         depthIn: st.depth,
         doorIn: isUrinalUnit(st.cfg)?0:Math.min(st.cfg.doorOpening, st.aEnd-st.aStart),
+        /* Hacia dónde abre la puerta: no cambia el precio, pero el taller lo
+           necesita para fabricar. Los mingitorios no llevan puerta. */
+        doorSwing: isUrinalUnit(st.cfg)?null:st.cfg.doorSwing,
         privacy: !!st.cfg.privacy,
         ada: !!st.cfg.ada
       })),
@@ -1554,26 +1557,27 @@ function renderStep(){
            <div class="ui-field"><label>Fracción</label>
              <select data-cfg="stallWidthFrac">${o(OPTS.frac,'stallWidthFrac')}</select></div>
          </div>
-         <div class="ui-form" style="gap:var(--space-2)">
-           <div class="ui-field"><label>Apertura de puerta</label>
+         <div class="ui-field"><label>Apertura de puerta</label>
              <select data-cfg="doorOpening">${o(OPTS.doorOpening,'doorOpening')}</select></div>
-           <div class="ui-field"><label>Giro de puerta</label>
-             <select data-cfg="doorSwing">${o(OPTS.swing,'doorSwing')}</select></div>
-         </div>
          <div class="ui-form" style="gap:var(--space-2)">
            <div class="ui-field"><label>Posición de puerta</label>
              <select data-cfg="doorPosition">${o(OPTS.position,'doorPosition')}</select></div>
            <div class="ui-field"><label>Posición de inodoro</label>
              <select data-cfg="toiletPosition">${o(OPTS.position,'toiletPosition')}</select></div>
          </div>`;
-    const nFino = (isU?2:7) + 2;                       // + altura y separación del piso
+    const nFino = (isU?2:6) + 2;                       // + altura y separación del piso
     body.innerHTML=`
       ${scopeControl()}
       <div class="ui-label">${isU?'Separación entre mingitorios':'Tamaño de las cabinas'}</div>
       ${sizePresets(isU, T)}
       ${isU ? '' : `<label class="ui-check">
         <input type="checkbox" id="privChk" ${T.length&&T.every(i=>r.stalls[i].privacy)?'checked':''}>
-        <span>Tiras de privacidad <small style="color:var(--ink-faint)">— cierran la rendija junto a la bisagra</small></span></label>`}
+        <span>Tiras de privacidad <small style="color:var(--ink-faint)">— cierran la rendija junto a la bisagra</small></span></label>
+      <div class="ui-label" style="margin-top:var(--space-3)">¿Hacia dónde abre la puerta?</div>
+      <div class="ui-segmented" id="swingSeg" style="display:flex;flex-wrap:wrap">
+        ${OPTS.swing.map(s=>`<button class="ui-seg ${T.length&&T.every(i=>r.stalls[i].doorSwing===s[0])?'is-on':''}" type="button" data-swing="${s[0]}" style="flex:1 1 46%">${s[1]}</button>`).join('')}
+      </div>
+      <p class="ui-meta" style="margin:6px 0 0">Visto de frente a la cabina: la bisagra va del lado indicado y la hoja abre hacia adentro o afuera. El taller lo fabrica así.</p>`}
       ${moveControl()}
       ${countKind('stall') ? `<div class="ui-label" style="margin-top:var(--space-3)">Altura del montaje</div>
       <div class="ui-segmented" id="mountSeg" style="display:flex">
@@ -1611,6 +1615,9 @@ function renderStep(){
     }));
     const pc=document.getElementById('privChk');
     if(pc) pc.addEventListener('change',e=>{ editTargets().forEach(i=>{ r.stalls[i].privacy=e.target.checked; }); render(); });
+    body.querySelectorAll('#swingSeg .ui-seg').forEach(b=> b.addEventListener('click',()=>{
+      editTargets().forEach(i=>{ r.stalls[i].doorSwing=b.dataset.swing; }); renderStep(); render();
+    }));
     body.querySelectorAll('[data-room]').forEach(sel=> sel.addEventListener('change',e=>{
       state.room[sel.dataset.room]=parseFloat(e.target.value); state.room.mount='custom'; framed=false; renderStep(); render();
     }));

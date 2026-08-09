@@ -1,7 +1,12 @@
 import {
-  pgTable, uuid, text, timestamp, integer, jsonb, index, pgEnum, boolean,
+  pgTable, uuid, text, timestamp, integer, bigint, jsonb, index, pgEnum, boolean,
   pgSequence, customType,
 } from 'drizzle-orm/pg-core';
+
+/* Montos que se ACUMULAN o MULTIPLICAN (por repeticiones, por número de baños)
+   van en bigint: un edificio grande supera con facilidad el techo de int4
+   ($21.4M). Los precios unitarios de catálogo se quedan en integer. */
+const dinero = (col: string) => bigint(col, { mode: 'number' });
 
 /* Drizzle no trae bytea de fábrica; los comprobantes se guardan en la base
    (los hosts serverless no tienen disco) y se sirven por una ruta con
@@ -92,7 +97,7 @@ export const quotes = pgTable('quotes', {
   status: quoteStatus('status').notNull().default('draft'),
   payload: jsonb('payload').notNull(),
   /* Centavos enteros. Nunca float para dinero. */
-  totalCents: integer('total_cents').notNull().default(0),
+  totalCents: dinero('total_cents').notNull().default(0),
   currency: text('currency').notNull().default('USD'),
   materialId: text('material_id'),
   unitCount: integer('unit_count').notNull().default(0),
@@ -127,7 +132,7 @@ export const paymentStatus = pgEnum('payment_status', [
 export const payments = pgTable('payments', {
   id: uuid('id').primaryKey().defaultRandom(),
   quoteId: uuid('quote_id').notNull().references(() => quotes.id, { onDelete: 'cascade' }),
-  amountCents: integer('amount_cents').notNull(),
+  amountCents: dinero('amount_cents').notNull(),
   method: paymentMethod('method').notNull().default('transferencia'),
   /* Lo que captura el staff a mano nace confirmado; lo que reporta el
      cliente nace pendiente. */
@@ -278,11 +283,11 @@ export const quoteLines = pgTable('quote_lines', {
   category: itemCategory('category').notNull(),
   /* Lo que el proyecto realmente necesita y lo que se termina cobrando:
      con `pieza_completa` no coinciden, y el cliente merece ver la diferencia. */
-  neededMilli: integer('needed_milli').notNull(),
-  billedMilli: integer('billed_milli').notNull(),
+  neededMilli: dinero('needed_milli').notNull(),
+  billedMilli: dinero('billed_milli').notNull(),
   unit: text('unit').notNull(),               // 'pz', 'm', 'm²', 'h'
   unitPriceCents: integer('unit_price_cents').notNull(),
-  totalCents: integer('total_cents').notNull(),
+  totalCents: dinero('total_cents').notNull(),
   sortOrder: integer('sort_order').notNull().default(0),
 }, (t) => [index('quote_lines_quote_idx').on(t.quoteId, t.sortOrder)]);
 

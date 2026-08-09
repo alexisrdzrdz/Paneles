@@ -244,7 +244,7 @@
         <div class="canvas-bar">
           <div class="ui-field grow" style="margin:0;min-width:150px">
             <label>Nombre del baño</label>
-            <input id="roomName" type="text" value="Baño 1">
+            <input id="roomName" type="text" maxlength="60" value="Baño 1">
           </div>
           <div class="grow"></div>
           <div class="ui-field" style="margin:0;min-width:130px">
@@ -731,17 +731,24 @@ function cargaBano(b){
   state.sel=[0]; state.selected=0; framed=false; serverQuote=null; priceLast='';
 }
 /* Construye el proyecto de un baño GUARDADO reutilizando la geometría, que
-   vive atada a state.room: se intercambia un instante y se restaura. */
+   vive atada a state.room: se intercambia un instante y se restaura SIEMPRE
+   (try/finally), para que un baño corrupto no deje el editor apuntando a él. */
 function proyectoDe(b){
   const saveRoom=state.room, saveMat=state.materialId;
-  state.room=b.room; state.materialId=b.materialId;
-  const p=proyectoPayload();
-  state.room=saveRoom; state.materialId=saveMat;
-  return p;
+  try{
+    state.room=b.room; state.materialId=b.materialId;
+    return proyectoPayload();
+  } finally {
+    state.room=saveRoom; state.materialId=saveMat;
+  }
 }
 function agregarOtroBano(){
+  if(state.banos.length>=29){ toast('Máximo 30 baños distintos por proyecto. Para pisos iguales, usa las repeticiones de arriba.','danger'); return; }
   const p=proyectoPayload();
   if(!p.runs.length){ toast('Agrega al menos una cabina o mingitorio antes de sumar otro baño.','danger'); return; }
+  /* Sin precio del servidor no se guarda: si no, el baño entraría al total
+     con $0 y el número que ve el cliente quedaría por debajo del real. */
+  if(!serverQuote){ toast('Espera un momento: se está calculando el precio de este baño.'); return; }
   state.banos.push(snapshotActual());
   cargaBano({ room:banoNuevo(), materialId:state.materialId, colorHex:state.colorHex, repeticiones:1 });
   refreshStallSelect(); gotoStep(0);
@@ -1759,7 +1766,7 @@ function renderStep(){
       <p class="ui-meta" style="margin:-6px 0 var(--space-3)">Si este mismo baño se repite en varios pisos, ponlo aquí.
         Si un piso es distinto, agrégalo como otro baño abajo.</p>
       ${banoListaHTML()}
-      <button class="ui-btn ui-btn-block" id="addBanoBtn" style="margin-bottom:var(--space-3)">＋ Agregar otro baño distinto</button>
+      <button class="ui-btn ui-btn-block" id="addBanoBtn" style="margin-bottom:var(--space-3)" ${state.banos.length>=29?'disabled title="Máximo 30 baños distintos"':''}>＋ Agregar otro baño distinto</button>
       <div class="ui-field"><label>Código postal (afina el envío)</label>
         <input id="zip" type="text" inputmode="numeric" maxlength="5" placeholder="00000" value="${state.zip}"></div>
       <div class="ui-alert ui-alert-ok"><b>Proyecto listo.</b>

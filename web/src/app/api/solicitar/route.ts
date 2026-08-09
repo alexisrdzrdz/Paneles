@@ -13,11 +13,13 @@ import { solicitudClienteMail, solicitudAdminMail } from '@/lib/mail';
    con los precios DEL DÍA materializado línea por línea, bitácora y correos.
    El total se recalcula aquí; el que calculó el navegador no se le cree. */
 
-/* Un baño del proyecto: su diseño y cuántas veces se repite (pisos iguales). */
+/* Un baño del proyecto: su diseño y cuántas veces se repite (pisos iguales).
+   El nombre se recorta en vez de rechazar: un nombre largo no debe tumbar
+   todo el envío. */
 const banoSchema = z.object({
   proyecto: proyectoSchema,
   repeticiones: z.number().int().min(1).max(500).catch(1),
-  nombre: z.string().trim().max(60).optional(),
+  nombre: z.string().trim().transform((s) => s.slice(0, 60) || undefined).optional().catch(undefined),
 });
 
 const bodySchema = z.object({
